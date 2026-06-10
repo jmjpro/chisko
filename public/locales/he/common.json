@@ -1,0 +1,18 @@
+{
+  "app_title": "חשמל חכם",
+  "app_subtitle": "בניה בקרוב",
+  "language": "שפה",
+  "plans_page_title": "תוכניות",
+  "table_supplier": "ספק",
+  "table_plan": "תוכנית",
+  "table_type": "סוג",
+  "table_discount": "הנחה",
+  "table_window": "חלון הנחה",
+  "table_weekday_only": "ימי חול בלבד",
+  "plan_type_fixed": "קבועה",
+  "plan_type_day": "יום",
+  "plan_type_night": "לילה",
+  "yes": "כן",
+  "no": "לא",
+  "all_week": "כל השבוע"
+}

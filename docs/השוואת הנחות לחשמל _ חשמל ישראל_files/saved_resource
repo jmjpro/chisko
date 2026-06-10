@@ -1,0 +1,206 @@
+body{
+	font-family:"HEEBO", Sans-serif", Sans-serif 
+}
+
+@media only screen and (max-width: 768px) {
+header.wp-block-template-part {
+display: none;
+}
+}
+
+
+
+
+#electricity-calculator {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f9f9f9;
+    box-sizing: border-box;
+    position: relative;
+}
+
+#electricity-calculator h2, #electricity-calculator h3 {
+    text-align: center;
+}
+
+#electricity-calculator form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+#electricity-calculator label {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+#electricity-calculator input, #electricity-calculator select, #electricity-calculator button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#electricity-calculator input[type='checkbox'] {
+	width: auto;
+}
+
+#customer-checkboxes input {
+    margin-right: 10px;
+}
+
+@media (min-width: 600px) {
+    #customer-checkboxes {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    #customer-checkboxes label {
+        width: 50%;
+    }
+}
+
+#results {
+    margin-top: 20px;
+}
+
+#results strong {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.highlight {
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 15px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    font-size: 14px;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+.highlight-company {
+    font-weight: bold;
+    background-color: yellow;
+    padding: 2px 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+button {
+    background-color: #2f4d68;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #263a52;
+}
+
+.back-button {
+    background-color: transparent;
+    color: black;
+    border: none;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.back-button:hover {
+    color: black;
+    background-color: transparent;
+}
+
+#popup-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #fff;
+    z-index: 1000;
+    width: 300px;
+    box-sizing: border-box;
+}
+
+#popup-form .form-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#popup-form .close-button {
+    top: 10px;
+    left: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #2f4d68;
+    cursor: pointer;
+	width: 2em;
+}
+
+#popup-form .close-button:hover {
+    color: #263a52;
+    background-color: transparent;
+}
+
+#popup-form input, #popup-form button {
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#popup-form button[type="button"] {
+    background: #2f4d68;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+#popup-form button[type="button"]:hover {
+    background: #263a52;
+}

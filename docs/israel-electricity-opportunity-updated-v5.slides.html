@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="slides-format" content="viewport" />
+        <title>Israel Electricity Lead Opportunity</title>
+        <style>
+            :root {
+                --bg: #f7f6f2;
+                --panel: #fffdf9;
+                --panel-2: #f3f0ea;
+                --text: #26231d;
+                --muted: #6f6c66;
+                --accent: #0b6b6f;
+                --accent-2: #c59200;
+                --border: rgba(38, 35, 29, 0.08);
+                --shadow: 0 14px 40px rgba(38, 35, 29, 0.08);
+            }
+            * {
+                box-sizing: border-box;
+            }
+            html,
+            body {
+                margin: 0;
+                height: 100%;
+                background: var(--bg);
+                font-family:
+                    Inter,
+                    system-ui,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    sans-serif;
+                color: var(--text);
+            }
+            body {
+                overflow: auto;
+            }
+            .deck {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            .slide-card {
+                width: min(1240px, 100%);
+                background: linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.78),
+                    rgba(255, 255, 255, 0.95)
+                );
+                border: 1px solid var(--border);
+                border-radius: 28px;
+                box-shadow: var(--shadow);
+                display: grid;
+                grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+                overflow: hidden;
+            }
+            .left,
+            .right {
+                padding: 36px;
+                min-width: 0;
+            }
+            .left {
+                background:
+                    radial-gradient(
+                        circle at top right,
+                        rgba(11, 107, 111, 0.1),
+                        transparent 30%
+                    ),
+                    radial-gradient(
+                        circle at bottom left,
+                        rgba(197, 146, 0, 0.12),
+                        transparent 24%
+                    ),
+                    var(--panel);
+                display: flex;
+                flex-direction: column;
+            }
+            .right {
+                background: var(--panel-2);
+                border-left: 1px solid var(--border);
+                display: flex;
+                flex-direction: column;
+            }
+            .eyebrow {
+                font-size: 12px;
+                font-weight: 800;
+                letter-spacing: 0.17em;
+                text-transform: uppercase;
+                color: var(--accent);
+            }
+            h1 {
+                margin: 16px 0 16px;
+                font-size: 54px;
+                line-height: 0.95;
+                letter-spacing: -0.045em;
+                max-width: 10.5ch;
+            }
+            .sub {
+                font-size: 20px;
+                line-height: 1.42;
+                color: var(--muted);
+                max-width: 34rem;
+            }
+            .rule {
+                width: 78px;
+                height: 4px;
+                border-radius: 999px;
+                background: linear-gradient(
+                    90deg,
+                    var(--accent),
+                    var(--accent-2)
+                );
+                margin: 22px 0 28px;
+            }
+            .stat-grid {
+                margin-top: auto;
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 14px;
+            }
+            .stat {
+                background: rgba(255, 255, 255, 0.88);
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                padding: 18px 16px;
+                box-shadow: 0 6px 20px rgba(38, 35, 29, 0.04);
+            }
+            .stat-num {
+                font-size: 40px;
+                font-weight: 800;
+                line-height: 1;
+                color: var(--accent);
+                letter-spacing: -0.03em;
+            }
+            .stat-label {
+                margin-top: 10px;
+                font-size: 12px;
+                font-weight: 700;
+                line-height: 1.35;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                color: var(--muted);
+            }
+            h2 {
+                margin: 0;
+                font-size: 34px;
+                line-height: 1.02;
+                letter-spacing: -0.03em;
+                max-width: 12ch;
+            }
+            .bullets {
+                margin: 22px 0;
+                padding-left: 20px;
+                color: #4d4a44;
+                font-size: 17px;
+                line-height: 1.45;
+            }
+            .bullets li {
+                margin: 0 0 12px;
+            }
+            .revenue-box {
+                background: #fff;
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                padding: 18px;
+                margin: 4px 0 16px;
+            }
+            .revenue-kicker {
+                font-size: 12px;
+                font-weight: 800;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--muted);
+            }
+            .revenue-big {
+                font-size: 36px;
+                font-weight: 800;
+                line-height: 1.02;
+                letter-spacing: -0.03em;
+                color: var(--accent);
+                margin: 8px 0 10px;
+            }
+            .revenue-copy {
+                font-size: 15px;
+                line-height: 1.45;
+                color: var(--muted);
+            }
+            .tiers {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .tier {
+                background: #fff;
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 14px;
+            }
+            .tier-top {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            .tier-name {
+                font-size: 13px;
+                font-weight: 800;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: var(--muted);
+            }
+            .tier-price {
+                font-size: 24px;
+                font-weight: 800;
+                line-height: 1;
+                color: var(--text);
+                white-space: nowrap;
+            }
+            .tier-copy {
+                margin-top: 8px;
+                font-size: 14px;
+                line-height: 1.45;
+                color: #4d4a44;
+            }
+            .footer {
+                margin-top: 16px;
+                padding-top: 16px;
+                border-top: 1px solid var(--border);
+            }
+            .footer strong {
+                display: block;
+                font-size: 17px;
+                line-height: 1.35;
+            }
+            .footer span {
+                display: block;
+                margin-top: 8px;
+                font-size: 12px;
+                line-height: 1.45;
+                color: var(--muted);
+            }
+            sup {
+                font-size: 20px;
+            }
+            @media (max-width: 1100px) {
+                .deck {
+                    padding: 14px;
+                }
+                .slide-card {
+                    grid-template-columns: 1fr;
+                }
+                .right {
+                    border-left: none;
+                    border-top: 1px solid var(--border);
+                }
+                h1 {
+                    font-size: 42px;
+                    max-width: none;
+                }
+                .sub {
+                    font-size: 18px;
+                    max-width: none;
+                }
+                h2 {
+                    font-size: 28px;
+                    max-width: none;
+                }
+            }
+            @media (max-width: 720px) {
+                .left,
+                .right {
+                    padding: 22px 18px;
+                }
+                h1 {
+                    font-size: 34px;
+                }
+                .sub {
+                    font-size: 16px;
+                }
+                .stat-grid {
+                    grid-template-columns: 1fr;
+                    gap: 10px;
+                    margin-top: 24px;
+                }
+                .stat-num {
+                    font-size: 34px;
+                }
+                h2 {
+                    font-size: 24px;
+                }
+                .bullets {
+                    font-size: 15px;
+                    padding-left: 18px;
+                }
+                .revenue-big {
+                    font-size: 30px;
+                }
+                .tier-top {
+                    flex-direction: column;
+                    gap: 6px;
+                }
+                .tier-price {
+                    font-size: 22px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="deck">
+            <div class="slide-card">
+                <section class="left">
+                    <div class="eyebrow">Market opportunity</div>
+                    <h1>
+                        Israel’s retail electricity market is still wide open
+                    </h1>
+                    <div class="sub">
+                        The near-term opportunity should be framed around
+                        households available to switch and the value of each
+                        lead, not only total electricity spend. An illustrative
+                        early-share assumption of 1% to 3% of the available
+                        market yields about 27k to 99k households.
+                    </div>
+                    <div class="rule"></div>
+                    <div class="stat-grid">
+                        <div class="stat">
+                            <div class="stat-num">
+                                2.7M<sup><a href="#footnote-1">1</a></sup>
+                            </div>
+                            <div class="stat-label">
+                                Households available to switch
+                            </div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-num">27k–99k</div>
+                            <div class="stat-label">
+                                Reachable early share (1%–3%)
+                            </div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-num">₪10–₪150+</div>
+                            <div class="stat-label">
+                                Lead value range by intent tier
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="right">
+                    <h2>
+                        Revenue logic should match the lead quality you deliver
+                    </h2>
+                    <ul class="bullets">
+                        <li>
+                            Basic leads capture quote intent and contact
+                            details.
+                        </li>
+                        <li>
+                            Qualified leads add bill data, household details,
+                            plan-fit estimate, and contact consent.
+                        </li>
+                        <li>
+                            High-intent leads become switch-ready after a
+                            recommendation and supplier click-through.
+                        </li>
+                    </ul>
+                    <div class="revenue-box">
+                        <div class="revenue-kicker">
+                            Illustrative pricing model for households available
+                            to switch
+                        </div>
+                        <div class="revenue-big">Lead economics: ₪10–₪150+</div>
+                        <div class="revenue-copy">
+                            Use ~2.7M households as an illustrative Israel
+                            household market base; a 1% to 3% early capture rate
+                            implies about 27k to 99k households, then revenue
+                            scales by how many progress into each lead tier.
+                        </div>
+                    </div>
+                    <div class="tiers">
+                        <div class="tier">
+                            <div class="tier-top">
+                                <div class="tier-name">Basic lead</div>
+                                <div class="tier-price">₪10–₪20</div>
+                            </div>
+                            <div class="tier-copy">
+                                Name, phone, email, and intent to get a quote.
+                            </div>
+                        </div>
+                        <div class="tier">
+                            <div class="tier-top">
+                                <div class="tier-name">Qualified lead</div>
+                                <div class="tier-price">₪25–₪60</div>
+                            </div>
+                            <div class="tier-copy">
+                                Bill uploaded, household size known, plan fit
+                                estimated, and consent to be contacted.
+                            </div>
+                        </div>
+                        <div class="tier">
+                            <div class="tier-top">
+                                <div class="tier-name">
+                                    High-intent / switch-ready
+                                </div>
+                                <div class="tier-price">₪80–₪150+</div>
+                            </div>
+                            <div class="tier-copy">
+                                Bills uploaded, recommendation accepted, and
+                                click-through to supplier signup.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <strong
+                            >The most persuasive market story is: ~2.7M
+                            households form the illustrative market base, a
+                            realistic 1% to 3% early capture gives 27k to 99k
+                            reachable households, and monetization rises with
+                            intent and data quality.</strong
+                        >
+                        <span></span>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div
+            id="footnote-1"
+            style="
+                font-size: 11px;
+                line-height: 1.35;
+                color: #94a3b8;
+                margin: 28px 40px 0 40px;
+            "
+        >
+            1. Israel Central Bureau of Statistics (CBS), “Population of Israel
+            on the Eve of 2026” and “Family Day 2024 - Families and Households
+            in Israel.” The ~2.7M figure is an illustrative rounded estimate
+            derived from official population and household/family statistics,
+            not a directly published CBS household total.
+        </div>
+    </body>
+</html>

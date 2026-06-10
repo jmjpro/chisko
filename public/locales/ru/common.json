@@ -1,0 +1,18 @@
+{
+  "app_title": "Умное электричество",
+  "app_subtitle": "Скоро",
+  "language": "Язык",
+  "plans_page_title": "Тарифы",
+  "table_supplier": "Поставщик",
+  "table_plan": "Тариф",
+  "table_type": "Тип",
+  "table_discount": "Скидка",
+  "table_window": "Окно скидки",
+  "table_weekday_only": "Только будни",
+  "plan_type_fixed": "Фиксированный",
+  "plan_type_day": "Дневной",
+  "plan_type_night": "Ночной",
+  "yes": "Да",
+  "no": "Нет",
+  "all_week": "Вся неделя"
+}

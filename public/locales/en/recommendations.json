@@ -1,0 +1,12 @@
+{
+  "assumption_high_confidence": "Calculation based on actual smart meter data",
+  "assumption_medium_confidence": "Hour split estimated from home profile — not based on smart meter data",
+  "assumption_low_confidence": "Low confidence — only fixed plans shown; upload a smart meter file or specify at least two clear usage signals for a full recommendation",
+  "assumption_default_kwh": "Average annual consumption of {{kwh}} kWh used as the calculation basis",
+  "assumption_taoz_data": "TAOZ baseline cost calculated from billing period data only — slight deviation from the annual average possible due to seasonal variation",
+  "assumption_weekend_window": "Plans covering weekends were estimated assuming Fri–Sat consumption proportional to total matches other days of the week",
+  "ineligibility_low_confidence": "Smart meter or two clear usage signals required to recommend a time-of-use tariff",
+  "ineligibility_requires_smart_meter": "This tariff requires a smart meter",
+  "ineligibility_membership_required": "This tariff requires membership: {{membership}}",
+  "ineligibility_coverage_area": "This tariff is not available in your area"
+}

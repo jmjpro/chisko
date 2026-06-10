@@ -1,0 +1,114 @@
+[
+  {
+    "_seedId": "bezek_energy",
+    "nameHe": "בזק חשמל",
+    "nameEn": "Bezek Electricity",
+    "isActive": true,
+    "supportedHandoffTypes": ["clickThrough"],
+    "payoutTrigger": "perSignedContract",
+    "payoutStates": [
+      { "key": "pending",     "labelHe": "ממתין לאישור",  "labelEn": "Pending Approval" },
+      { "key": "qualified",   "labelHe": "הוכשר",         "labelEn": "Qualified Lead" },
+      { "key": "contracted",  "labelHe": "חוזה נחתם",     "labelEn": "Contracted" },
+      { "key": "paid",        "labelHe": "שולם",           "labelEn": "Paid" }
+    ],
+    "initialPayoutState": "pending",
+    "_note": "handoffTypes and payout config are placeholders — confirm commercial terms with supplier"
+  },
+  {
+    "_seedId": "superpower_electra",
+    "nameHe": "אלקטרה פאוור",
+    "nameEn": "Electra Power",
+    "isActive": true,
+    "supportedHandoffTypes": ["clickThrough"],
+    "payoutTrigger": "perSignedContract",
+    "payoutStates": [
+      { "key": "pending",     "labelHe": "ממתין לאישור",  "labelEn": "Pending Approval" },
+      { "key": "qualified",   "labelHe": "הוכשר",         "labelEn": "Qualified Lead" },
+      { "key": "contracted",  "labelHe": "חוזה נחתם",     "labelEn": "Contracted" },
+      { "key": "paid",        "labelHe": "שולם",           "labelEn": "Paid" }
+    ],
+    "initialPayoutState": "pending",
+    "_note": "handoffTypes and payout config are placeholders — confirm commercial terms with supplier"
+  },
+  {
+    "_seedId": "hot_energy",
+    "nameHe": "הוט אנרג'י",
+    "nameEn": "HOT Energy",
+    "isActive": true,
+    "supportedHandoffTypes": ["clickThrough"],
+    "payoutTrigger": "perSignedContract",
+    "payoutStates": [
+      { "key": "pending",     "labelHe": "ממתין לאישור",  "labelEn": "Pending Approval" },
+      { "key": "qualified",   "labelHe": "הוכשר",         "labelEn": "Qualified Lead" },
+      { "key": "contracted",  "labelHe": "חוזה נחתם",     "labelEn": "Contracted" },
+      { "key": "paid",        "labelHe": "שולם",           "labelEn": "Paid" }
+    ],
+    "initialPayoutState": "pending",
+    "_note": "handoffTypes and payout config are placeholders — confirm commercial terms with supplier"
+  },
+  {
+    "_seedId": "partner_power",
+    "nameHe": "פרטנר חשמל",
+    "nameEn": "Partner Electricity",
+    "isActive": true,
+    "supportedHandoffTypes": ["clickThrough"],
+    "payoutTrigger": "perSignedContract",
+    "payoutStates": [
+      { "key": "pending",     "labelHe": "ממתין לאישור",  "labelEn": "Pending Approval" },
+      { "key": "qualified",   "labelHe": "הוכשר",         "labelEn": "Qualified Lead" },
+      { "key": "contracted",  "labelHe": "חוזה נחתם",     "labelEn": "Contracted" },
+      { "key": "paid",        "labelHe": "שולם",           "labelEn": "Paid" }
+    ],
+    "initialPayoutState": "pending",
+    "_note": "handoffTypes and payout config are placeholders — confirm commercial terms with supplier"
+  },
+  {
+    "_seedId": "cellcom_energy",
+    "nameHe": "סלקום אנרג'י",
+    "nameEn": "Cellcom Energy",
+    "isActive": true,
+    "supportedHandoffTypes": ["clickThrough"],
+    "payoutTrigger": "perSignedContract",
+    "payoutStates": [
+      { "key": "pending",     "labelHe": "ממתין לאישור",  "labelEn": "Pending Approval" },
+      { "key": "qualified",   "labelHe": "הוכשר",         "labelEn": "Qualified Lead" },
+      { "key": "contracted",  "labelHe": "חוזה נחתם",     "labelEn": "Contracted" },
+      { "key": "paid",        "labelHe": "שולם",           "labelEn": "Paid" }
+    ],
+    "initialPayoutState": "pending",
+    "_note": "handoffTypes and payout config are placeholders — confirm commercial terms with supplier"
+  },
+  {
+    "_seedId": "amisragas",
+    "nameHe": "אמישראגז חשמל",
+    "nameEn": "Amisragas Electricity",
+    "isActive": true,
+    "supportedHandoffTypes": ["clickThrough"],
+    "payoutTrigger": "perSignedContract",
+    "payoutStates": [
+      { "key": "pending",     "labelHe": "ממתין לאישור",  "labelEn": "Pending Approval" },
+      { "key": "qualified",   "labelHe": "הוכשר",         "labelEn": "Qualified Lead" },
+      { "key": "contracted",  "labelHe": "חוזה נחתם",     "labelEn": "Contracted" },
+      { "key": "paid",        "labelHe": "שולם",           "labelEn": "Paid" }
+    ],
+    "initialPayoutState": "pending",
+    "_note": "1 plan offered per supplier list. Plan details not yet extracted — add to seed-plans.json once sourced."
+  },
+  {
+    "_seedId": "pazgaz",
+    "nameHe": "פזגז חשמל",
+    "nameEn": "Pazgaz Electricity",
+    "isActive": true,
+    "supportedHandoffTypes": ["clickThrough"],
+    "payoutTrigger": "perSignedContract",
+    "payoutStates": [
+      { "key": "pending",     "labelHe": "ממתין לאישור",  "labelEn": "Pending Approval" },
+      { "key": "qualified",   "labelHe": "הוכשר",         "labelEn": "Qualified Lead" },
+      { "key": "contracted",  "labelHe": "חוזה נחתם",     "labelEn": "Contracted" },
+      { "key": "paid",        "labelHe": "שולם",           "labelEn": "Paid" }
+    ],
+    "initialPayoutState": "pending",
+    "_note": "handoffTypes and payout config are placeholders — confirm commercial terms with supplier"
+  }
+]

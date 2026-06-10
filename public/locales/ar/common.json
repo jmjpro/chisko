@@ -1,0 +1,18 @@
+{
+  "app_title": "الكهرباء الذكية",
+  "app_subtitle": "قريباً",
+  "language": "اللغة",
+  "plans_page_title": "الخطط",
+  "table_supplier": "المورد",
+  "table_plan": "الخطة",
+  "table_type": "النوع",
+  "table_discount": "الخصم",
+  "table_window": "نافذة الخصم",
+  "table_weekday_only": "أيام الأسبوع فقط",
+  "plan_type_fixed": "ثابت",
+  "plan_type_day": "نهاري",
+  "plan_type_night": "ليلي",
+  "yes": "نعم",
+  "no": "لا",
+  "all_week": "طوال الأسبوع"
+}

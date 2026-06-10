@@ -1,0 +1,143 @@
+[
+  {
+    "_seedId": "electra_day_21",
+    "_supplierSeedId": "superpower_electra",
+    "nameHe": "אלקטרה יום",
+    "nameEn": "Electra Day",
+    "planType": "day"
+  },
+  {
+    "_seedId": "electra_night_21",
+    "_supplierSeedId": "superpower_electra",
+    "nameHe": "אלקטרה לילה פלוס",
+    "nameEn": "Electra Night Plus",
+    "planType": "night"
+  },
+  {
+    "_seedId": "electra_day_12_12x12",
+    "_supplierSeedId": "superpower_electra",
+    "nameHe": "אלקטרה 12x12",
+    "nameEn": "Electra 12x12",
+    "planType": "day",
+    "_note": "Window is 05:00–17:00 all days of the week (not Sun–Thu only). discountAppliesSunThu: false in plan version."
+  },
+  {
+    "_seedId": "electra_fixed_6_5",
+    "_supplierSeedId": "superpower_electra",
+    "nameHe": "אלקטרה פאוור",
+    "nameEn": "Electra Power",
+    "planType": "fixed"
+  },
+  {
+    "_seedId": "cellcom_day_20",
+    "_supplierSeedId": "cellcom_energy",
+    "nameHe": "סלקום חסכון משתלם",
+    "nameEn": "Cellcom Worthwhile Savings",
+    "planType": "day"
+  },
+  {
+    "_seedId": "cellcom_night_18",
+    "_supplierSeedId": "cellcom_energy",
+    "nameHe": "סלקום חוסכים למשפחה",
+    "nameEn": "Cellcom Family Savers",
+    "planType": "night",
+    "_note": "Window crosses midnight: 20:00–02:00. Recommendation engine must handle endHour < startHour."
+  },
+  {
+    "_seedId": "cellcom_night_15",
+    "_supplierSeedId": "cellcom_energy",
+    "nameHe": "סלקום לילה",
+    "nameEn": "Cellcom Night",
+    "planType": "night",
+    "_note": "Applies all 7 days of the week (not Sun–Thu only). discountAppliesSunThu: false in plan version."
+  },
+  {
+    "_seedId": "cellcom_fixed_6",
+    "_supplierSeedId": "cellcom_energy",
+    "nameHe": "סלקום חסכון פלוס",
+    "nameEn": "Cellcom Savings Plus",
+    "planType": "fixed"
+  },
+  {
+    "_seedId": "bezek_night_20",
+    "_supplierSeedId": "bezek_energy",
+    "nameHe": "בזק לילה",
+    "nameEn": "Bezek Night",
+    "planType": "night",
+    "_note": "Bezek requires credit data consent (קבלת חיווי על נתוני האשראי) for all plans. Schema has no credit-check field — flag this in UI copy."
+  },
+  {
+    "_seedId": "bezek_day_15",
+    "_supplierSeedId": "bezek_energy",
+    "nameHe": "בזק יום",
+    "nameEn": "Bezek Day",
+    "planType": "day",
+    "_note": "Bezek requires credit data consent (קבלת חיווי על נתוני האשראי) for all plans. Schema has no credit-check field — flag this in UI copy."
+  },
+  {
+    "_seedId": "bezek_fixed_6",
+    "_supplierSeedId": "bezek_energy",
+    "nameHe": "בזק קבועה",
+    "nameEn": "Bezek Fixed",
+    "planType": "fixed",
+    "_note": "Bezek requires credit data consent (קבלת חיווי על נתוני האשראי) for all plans. Schema has no credit-check field — flag this in UI copy."
+  },
+  {
+    "_seedId": "hot_night_20",
+    "_supplierSeedId": "hot_energy",
+    "nameHe": "הוט לילה",
+    "nameEn": "HOT Night",
+    "planType": "night"
+  },
+  {
+    "_seedId": "hot_day_15",
+    "_supplierSeedId": "hot_energy",
+    "nameHe": "הוט יום",
+    "nameEn": "HOT Day",
+    "planType": "day"
+  },
+  {
+    "_seedId": "hot_fixed_5",
+    "_supplierSeedId": "hot_energy",
+    "nameHe": "הוט HOT",
+    "nameEn": "HOT Fixed",
+    "planType": "fixed"
+  },
+  {
+    "_seedId": "partner_night_20",
+    "_supplierSeedId": "partner_power",
+    "nameHe": "פרטנר חיות לילה",
+    "nameEn": "Partner Night Owls",
+    "planType": "night"
+  },
+  {
+    "_seedId": "partner_day_15",
+    "_supplierSeedId": "partner_power",
+    "nameHe": "פרטנר עובדים מהבית",
+    "nameEn": "Partner Work From Home",
+    "planType": "day"
+  },
+  {
+    "_seedId": "partner_fixed_tiered",
+    "_supplierSeedId": "partner_power",
+    "nameHe": "פרטנר קבועה",
+    "nameEn": "Partner Fixed",
+    "planType": "fixed",
+    "_note": "Tiered: 5% year 1, 6% year 2, 7% year 3+. Modelled at 6% (3-year average) for savings calculations."
+  },
+  {
+    "_seedId": "pazgaz_fixed_10_yellow",
+    "_supplierSeedId": "pazgaz",
+    "nameHe": "פזגז צבירה ל-Yellow",
+    "nameEn": "Pazgaz Yellow Accumulation",
+    "planType": "fixed",
+    "_note": "Discount credited to Yellow app (up to ₪600/year), not a direct bill reduction. Describe in words to leads rather than treating identically to cash discounts in savings calc."
+  },
+  {
+    "_seedId": "pazgaz_fixed_6",
+    "_supplierSeedId": "pazgaz",
+    "nameHe": "פזגז קבועה",
+    "nameEn": "Pazgaz Fixed",
+    "planType": "fixed"
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "app_title": "Smart Electricity",
+  "app_subtitle": "Coming soon",
+  "language": "Language",
+  "plans_page_title": "Plans",
+  "table_supplier": "Supplier",
+  "table_plan": "Plan",
+  "table_type": "Type",
+  "table_discount": "Discount",
+  "table_window": "Discount Window",
+  "table_weekday_only": "Weekday Only",
+  "plan_type_fixed": "Fixed",
+  "plan_type_day": "Day",
+  "plan_type_night": "Night",
+  "yes": "Yes",
+  "no": "No",
+  "all_week": "All week"
+}
