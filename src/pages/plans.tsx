@@ -21,7 +21,7 @@ export default function PlansPage() {
       <main className="flex-1 px-6 py-8 overflow-x-auto">
         <h1 className="text-2xl font-bold mb-6">{t("plans_page_title")}</h1>
         {data === undefined ? (
-          <p className="text-slate-500">…</p>
+          <p className="text-muted-foreground">…</p>
         ) : (
           <table className="w-full text-sm border-collapse">
             <thead>
@@ -70,7 +70,7 @@ export default function PlansPage() {
                     <td className="py-3 pe-6">
                       {t(`plan_type_${row.planType}`)}
                     </td>
-                    <td className="py-3 pe-6">{row.discountPercent}%</td>
+                    <td className="py-3 pe-6 tnum">{row.discountPercent}%</td>
                     <td className="py-3 pe-6">{window}</td>
                     <td className="py-3">{weekdayOnly}</td>
                   </tr>

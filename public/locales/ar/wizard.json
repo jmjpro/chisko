@@ -1,9 +1,21 @@
 {
   "upload_title": "تحميل ملف العداد الذكي",
   "upload_description": "قم بتحميل ملف CSV الخاص بك من IEC لتحليل دقيق لاستهلاك الكهرباء.",
-  "upload_processing": "جارٍ معالجة الملف…",
+  "upload_recommended_label": "يُوصى به بشدة:",
+  "upload_recommended": "تحميل ملف CSV لعداد IEC الذكي يمنحك توصية عالية الثقة بناءً على استهلاكك الفعلي. بدونه، سنقدّر بناءً على إجاباتك فقط.",
+  "home_title": "منزلك",
+  "usage_title": "كيف تستخدم الكهرباء",
+  "step_upload": "الرفع",
+  "step_home": "المنزل",
+  "step_usage": "الاستخدام",
+  "step_results": "النتائج",
+  "upload_processing": "جارِ معالجة الملف…",
   "upload_error": "خطأ في معالجة الملف. يرجى المحاولة مرة أخرى.",
   "upload_success": "تمت معالجة الملف بنجاح ✓",
+  "upload_drop_prompt": "اسحب ملف CSV هنا، أو انقر للاستعراض",
+  "upload_drag_active": "أفلت للتحميل",
+  "upload_error_not_csv": "يرجى تحديد ملف .csv.",
+  "upload_error_bad_format": "لا يبدو هذا ملف CSV لعداد ذكي من IEC. يرجى تصدير الملف الصحيح من موقع IEC.",
   "city_title": "ما هي مدينتك؟",
   "city_placeholder": "مثال: تل أبيب",
   "memberships_title": "ما هي الاشتراكات المجمّعة لديك؟",
@@ -40,5 +52,7 @@
   "confidence_high": "عالٍ",
   "confidence_medium": "متوسط",
   "confidence_low": "منخفض",
-  "result_no_change_label": "بدون تغيير العادات:"
+  "result_no_change_label": "بدون تغيير العادات:",
+  "review_answers_title": "إجاباتك",
+  "recalculate": "إعادة حساب التوصية"
 }

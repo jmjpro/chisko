@@ -1,9 +1,21 @@
 {
   "upload_title": "Upload Smart Meter File",
   "upload_description": "Upload your IEC CSV file for an accurate analysis of your electricity usage.",
+  "upload_recommended_label": "Highly recommended:",
+  "upload_recommended": "Uploading your IEC smart-meter CSV gives you a high-confidence recommendation based on your actual usage. Without it, we estimate from your answers alone.",
+  "home_title": "Your Home",
+  "usage_title": "How You Use Electricity",
+  "step_upload": "Upload",
+  "step_home": "Your Home",
+  "step_usage": "Your Usage",
+  "step_results": "Results",
   "upload_processing": "Processing file…",
   "upload_error": "Error processing file. Please try again.",
   "upload_success": "File processed successfully ✓",
+  "upload_drop_prompt": "Drop your IEC CSV here, or click to browse",
+  "upload_drag_active": "Drop to upload",
+  "upload_error_not_csv": "Please select a .csv file.",
+  "upload_error_bad_format": "This doesn't look like an IEC smart-meter CSV. Please export the correct file from the IEC website.",
   "city_title": "What is your city?",
   "city_placeholder": "e.g. Tel Aviv",
   "memberships_title": "Which bundle subscriptions do you have?",
@@ -40,5 +52,7 @@
   "confidence_high": "High",
   "confidence_medium": "Medium",
   "confidence_low": "Low",
-  "result_no_change_label": "Without changing habits:"
+  "result_no_change_label": "Without changing habits:",
+  "review_answers_title": "Your Answers",
+  "recalculate": "Recalculate Recommendation"
 }

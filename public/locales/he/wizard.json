@@ -1,9 +1,21 @@
 {
   "upload_title": "העלאת קובץ מונה חכם",
   "upload_description": "העלה קובץ CSV מאתר IEC לניתוח מדויק של צריכת החשמל שלך.",
+  "upload_recommended_label": "מומלץ מאוד:",
+  "upload_recommended": "העלאת קובץ ה-CSV של מד החכם מ-IEC מספקת המלצה ברמת ביטחון גבוהה על בסיס הצריכה בפועל שלך. ללא זה, נעריך על פי תשובותיך בלבד.",
+  "home_title": "הבית שלך",
+  "usage_title": "איך אתה משתמש בחשמל",
+  "step_upload": "העלאה",
+  "step_home": "הבית",
+  "step_usage": "השימוש",
+  "step_results": "תוצאות",
   "upload_processing": "מעבד קובץ…",
   "upload_error": "שגיאה בעיבוד הקובץ. אנא נסה שוב.",
   "upload_success": "הקובץ עובד בהצלחה ✓",
+  "upload_drop_prompt": "גרור לכאן את קובץ ה-CSV, או לחץ לבחירת קובץ",
+  "upload_drag_active": "שחרר להעלאה",
+  "upload_error_not_csv": "אנא בחר קובץ .csv.",
+  "upload_error_bad_format": "קובץ זה אינו נראה כקובץ CSV של מונה חכם של חברת החשמל. אנא ייצא את הקובץ הנכון מאתר IEC.",
   "city_title": "מה העיר שלך?",
   "city_placeholder": "לדוגמה: תל אביב",
   "memberships_title": "באילו שירותי מנוי אתה חבר?",
@@ -40,5 +52,7 @@
   "confidence_high": "גבוהה",
   "confidence_medium": "בינונית",
   "confidence_low": "נמוכה",
-  "result_no_change_label": "ללא שינוי הרגלים:"
+  "result_no_change_label": "ללא שינוי הרגלים:",
+  "review_answers_title": "התשובות שלך",
+  "recalculate": "חשב מחדש את ההמלצה"
 }
