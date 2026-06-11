@@ -84,7 +84,7 @@ export default function Header() {
     <header className="flex items-center justify-between px-6 py-4 border-b border-border">
       <a href="/" aria-label="IsraMAX" className="flex items-center gap-2.5">
         <img
-          src="/logomark.svg"
+          src="/logoMark.svg"
           alt=""
           aria-hidden="true"
           className="h-8 w-8"
