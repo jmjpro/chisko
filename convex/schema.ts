@@ -283,7 +283,11 @@ export default defineSchema({
     houseNumber: v.string(),
   })
     .index("by_city_and_street", ["cityCode", "streetCode"])
-    .index("by_city_street_and_house", ["cityCode", "streetCode", "houseNumber"]),
+    .index("by_city_street_and_house", [
+      "cityCode",
+      "streetCode",
+      "houseNumber",
+    ]),
 
   // Singleton tracking the last successful Smart Meter Registry refresh
   smartMeterRegistryMeta: defineTable({

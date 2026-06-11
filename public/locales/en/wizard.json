@@ -18,6 +18,7 @@
   "meter_lookup_found": "Smart meter confirmed for your address.",
   "meter_lookup_not_found": "Your address is not in the Smart Meter Registry — you have a standard meter.",
   "meter_lookup_checking": "Checking…",
+  "meter_lookup_no_results": "No results",
   "meter_lookup_hebrew_note": "Address data is in Hebrew — please select using Hebrew characters.",
   "upload_title": "Upload Smart Meter File",
   "upload_description": "Upload your IEC CSV file for an accurate analysis of your electricity usage.",

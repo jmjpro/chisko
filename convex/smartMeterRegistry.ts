@@ -44,7 +44,11 @@ export const getHouseNumbers = query({
 });
 
 export const checkAddress = query({
-  args: { cityCode: v.number(), streetCode: v.number(), houseNumber: v.string() },
+  args: {
+    cityCode: v.number(),
+    streetCode: v.number(),
+    houseNumber: v.string(),
+  },
   handler: async (ctx, args) => {
     const row = await ctx.db
       .query("smartMeterAddresses")
@@ -73,7 +77,7 @@ export const deleteAddressBatch = internalMutation({
   handler: async (ctx) => {
     const rows = await ctx.db.query("smartMeterAddresses").take(BATCH_SIZE);
     for (const row of rows) {
-      await ctx.db.delete(row._id);
+      await ctx.db.delete("smartMeterAddresses", row._id);
     }
     return rows.length;
   },
@@ -84,7 +88,7 @@ export const deleteStreetBatch = internalMutation({
   handler: async (ctx) => {
     const rows = await ctx.db.query("smartMeterStreets").take(BATCH_SIZE);
     for (const row of rows) {
-      await ctx.db.delete(row._id);
+      await ctx.db.delete("smartMeterStreets", row._id);
     }
     return rows.length;
   },
@@ -95,7 +99,7 @@ export const deleteCityBatch = internalMutation({
   handler: async (ctx) => {
     const rows = await ctx.db.query("smartMeterCities").take(BATCH_SIZE);
     for (const row of rows) {
-      await ctx.db.delete(row._id);
+      await ctx.db.delete("smartMeterCities", row._id);
     }
     return rows.length;
   },

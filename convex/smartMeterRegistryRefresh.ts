@@ -7,7 +7,8 @@ import { BATCH_SIZE } from "./smartMeterRegistry";
 const IEC_CSV_URL =
   "https://minisites.howazit.com/5430101017/mobility_addresses.csv";
 
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export const doRefresh = internalAction({
   args: {},
@@ -24,7 +25,9 @@ export const doRefresh = internalAction({
     }
 
     const buffer = await response.arrayBuffer();
-    console.log(`${ts()} Downloaded ${(buffer.byteLength / 1024 / 1024).toFixed(1)} MB — decoding…`);
+    console.log(
+      `${ts()} Downloaded ${(buffer.byteLength / 1024 / 1024).toFixed(1)} MB — decoding…`,
+    );
     const decoder = new TextDecoder("windows-1255");
     const text = decoder.decode(buffer);
 
@@ -68,12 +71,16 @@ export const doRefresh = internalAction({
       addresses.push({ cityCode, streetCode, houseNumber });
     }
 
-    const cities = Array.from(cityMap.entries()).map(([cityCode, cityName]) => ({
-      cityCode,
-      cityName,
-    }));
+    const cities = Array.from(cityMap.entries()).map(
+      ([cityCode, cityName]) => ({
+        cityCode,
+        cityName,
+      }),
+    );
     const streets = Array.from(streetMap.values());
-    console.log(`${ts()} Parsed: ${cities.length} cities, ${streets.length} streets, ${addresses.length.toLocaleString()} addresses`);
+    console.log(
+      `${ts()} Parsed: ${cities.length} cities, ${streets.length} streets, ${addresses.length.toLocaleString()} addresses`,
+    );
 
     // ── Clear existing data ──────────────────────────────────────────────────
     let deletedAddresses = 0;
@@ -85,11 +92,16 @@ export const doRefresh = internalAction({
       deletedAddresses += n;
       if (n === 0) break;
       if (deletedAddresses % 10000 === 0) {
-        console.log(`${ts()}   Clearing addresses: ${deletedAddresses.toLocaleString()} deleted…`);
+        console.log(
+          `${ts()}   Clearing addresses: ${deletedAddresses.toLocaleString()} deleted…`,
+        );
       }
       await sleep(150);
     }
-    if (deletedAddresses > 0) console.log(`${ts()}   Cleared ${deletedAddresses.toLocaleString()} addresses`);
+    if (deletedAddresses > 0)
+      console.log(
+        `${ts()}   Cleared ${deletedAddresses.toLocaleString()} addresses`,
+      );
 
     let deletedStreets = 0;
     while (true) {
@@ -101,7 +113,8 @@ export const doRefresh = internalAction({
       if (n === 0) break;
       await sleep(150);
     }
-    if (deletedStreets > 0) console.log(`${ts()}   Cleared ${deletedStreets} streets`);
+    if (deletedStreets > 0)
+      console.log(`${ts()}   Cleared ${deletedStreets} streets`);
 
     let deletedCities = 0;
     while (true) {
@@ -113,7 +126,8 @@ export const doRefresh = internalAction({
       if (n === 0) break;
       await sleep(150);
     }
-    if (deletedCities > 0) console.log(`${ts()}   Cleared ${deletedCities} cities`);
+    if (deletedCities > 0)
+      console.log(`${ts()}   Cleared ${deletedCities} cities`);
 
     // ── Insert new data ──────────────────────────────────────────────────────
     console.log(`${ts()} Inserting ${cities.length} cities…`);
@@ -133,7 +147,9 @@ export const doRefresh = internalAction({
     }
 
     const totalAddressBatches = Math.ceil(addresses.length / BATCH_SIZE);
-    console.log(`${ts()} Inserting ${addresses.length.toLocaleString()} addresses (${totalAddressBatches} batches)…`);
+    console.log(
+      `${ts()} Inserting ${addresses.length.toLocaleString()} addresses (${totalAddressBatches} batches)…`,
+    );
     for (let i = 0; i < addresses.length; i += BATCH_SIZE) {
       await ctx.runMutation(internal.smartMeterRegistry.insertAddressesBatch, {
         rows: addresses.slice(i, i + BATCH_SIZE),
@@ -142,7 +158,9 @@ export const doRefresh = internalAction({
       const batch = Math.floor(i / BATCH_SIZE) + 1;
       if (batch % 25 === 0) {
         const pct = Math.round((batch / totalAddressBatches) * 100);
-        console.log(`${ts()}   Addresses: ${pct}% (${batch}/${totalAddressBatches} batches)`);
+        console.log(
+          `${ts()}   Addresses: ${pct}% (${batch}/${totalAddressBatches} batches)`,
+        );
       }
     }
 

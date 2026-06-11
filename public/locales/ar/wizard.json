@@ -18,6 +18,7 @@
   "meter_lookup_found": "تم تأكيد العداد الذكي لعنوانك.",
   "meter_lookup_not_found": "عنوانك غير موجود في سجل العدادات الذكية — لديك عداد عادي.",
   "meter_lookup_checking": "جارٍ التحقق…",
+  "meter_lookup_no_results": "لا توجد نتائج",
   "meter_lookup_hebrew_note": "بيانات العناوين متاحة بالعبرية فقط — يرجى الاختيار باستخدام الأحرف العبرية.",
   "upload_title": "تحميل ملف العداد الذكي",
   "upload_description": "قم بتحميل ملف CSV الخاص بك من IEC لتحليل دقيق لاستهلاك الكهرباء.",

@@ -18,6 +18,7 @@
   "meter_lookup_found": "מונה חכם אושר לכתובתך.",
   "meter_lookup_not_found": "הכתובת לא נמצאה במרשם המונים החכמים — יש לך מונה רגיל.",
   "meter_lookup_checking": "בודק…",
+  "meter_lookup_no_results": "אין תוצאות",
   "meter_lookup_hebrew_note": "",
   "upload_title": "העלאת קובץ מונה חכם",
   "upload_description": "העלה קובץ CSV מאתר IEC לניתוח מדויק של צריכת החשמל שלך.",

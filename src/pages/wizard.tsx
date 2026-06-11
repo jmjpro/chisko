@@ -4,6 +4,7 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
+import { AddressCombobox } from "@/components/ui/combobox";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import CsvDropzone from "../components/CsvDropzone";
@@ -33,8 +34,12 @@ export default function WizardPage() {
   // Cascading address picker (only used in meterNotSure path)
   const [cascadeCityCode, setCascadeCityCode] = useState<number | null>(null);
   const [cascadeCityName, setCascadeCityName] = useState<string | null>(null);
-  const [cascadeStreetCode, setCascadeStreetCode] = useState<number | null>(null);
-  const [cascadeStreetName, setCascadeStreetName] = useState<string | null>(null);
+  const [cascadeStreetCode, setCascadeStreetCode] = useState<number | null>(
+    null,
+  );
+  const [cascadeStreetName, setCascadeStreetName] = useState<string | null>(
+    null,
+  );
   const [cascadeHouseNumber, setCascadeHouseNumber] = useState<string | null>(
     null,
   );
@@ -82,8 +87,11 @@ export default function WizardPage() {
     rec ? { recommendationId: rec._id } : "skip",
   );
 
-  // Smart Meter Registry — cascading picker queries
-  const cities = useQuery(api.smartMeterRegistry.getCities);
+  // Smart Meter Registry — cascading picker queries (city deferred until needed)
+  const cities = useQuery(
+    api.smartMeterRegistry.getCities,
+    meterNotSure ? {} : "skip",
+  );
   const streets = useQuery(
     api.smartMeterRegistry.getStreets,
     cascadeCityCode !== null ? { cityCode: cascadeCityCode } : "skip",
@@ -107,12 +115,15 @@ export default function WizardPage() {
       : "skip",
   );
 
-  // Resolve hasSmartMeter once the address lookup completes
-  useEffect(() => {
-    if (!meterNotSure || cascadeHouseNumber === null || addressFound === undefined)
-      return;
-    setHasSmartMeter(addressFound ? "yes" : "no");
-  }, [addressFound, meterNotSure, cascadeHouseNumber]);
+  // Derive smart meter status: explicit choice when the user picked yes/no,
+  // or resolved from the Smart Meter Registry lookup when they chose "not sure".
+  const effectiveHasSmartMeter: "yes" | "no" | null = meterNotSure
+    ? addressFound === true
+      ? "yes"
+      : addressFound === false
+        ? "no"
+        : null
+    : hasSmartMeter;
 
   // Initialize session from localStorage
   useEffect(() => {
@@ -162,7 +173,6 @@ export default function WizardPage() {
     setCascadeStreetCode(null);
     setCascadeStreetName(null);
     setCascadeHouseNumber(null);
-    setHasSmartMeter(null);
     setCity(cityName); // pre-fill city for "Your Home" step
   }
 
@@ -170,12 +180,10 @@ export default function WizardPage() {
     setCascadeStreetCode(streetCode);
     setCascadeStreetName(streetName);
     setCascadeHouseNumber(null);
-    setHasSmartMeter(null);
   }
 
   function handleCascadeHouseChange(houseNumber: string) {
     setCascadeHouseNumber(houseNumber);
-    setHasSmartMeter(null); // will be resolved by the addressFound useEffect
   }
 
   void cascadeCityName;
@@ -190,7 +198,7 @@ export default function WizardPage() {
     try {
       const hpId = await upsertHomeProfile({
         sessionId,
-        hasSmartMeter: hasSmartMeter ?? "unknown",
+        hasSmartMeter: effectiveHasSmartMeter ?? "unknown",
         bundleMemberships,
         city,
         ...(cascadeStreetName ? { street: cascadeStreetName } : {}),
@@ -250,7 +258,8 @@ export default function WizardPage() {
   // ── Step navigation ──────────────────────────────────────────────────────
 
   // Upload step (logical 1) only appears for smart meter users
-  const visibleSteps = hasSmartMeter === "yes" ? [0, 1, 2, 3, 4] : [0, 2, 3, 4];
+  const visibleSteps =
+    effectiveHasSmartMeter === "yes" ? [0, 1, 2, 3, 4] : [0, 2, 3, 4];
   const displayStep = visibleSteps.indexOf(step);
   const totalDisplaySteps = visibleSteps.length;
 
@@ -269,7 +278,7 @@ export default function WizardPage() {
   }
 
   const stepLabels =
-    hasSmartMeter === "yes"
+    effectiveHasSmartMeter === "yes"
       ? [
           tw("step_meter"),
           tw("step_upload"),
@@ -284,7 +293,7 @@ export default function WizardPage() {
           tw("step_results"),
         ];
 
-  const canAdvance = step === 0 ? hasSmartMeter !== null : true;
+  const canAdvance = step === 0 ? effectiveHasSmartMeter !== null : true;
 
   // ── Step rendering ────────────────────────────────────────────────────────
 
@@ -366,24 +375,23 @@ export default function WizardPage() {
                   <label className="block text-xs font-medium mb-1">
                     {tw("meter_lookup_city")}
                   </label>
-                  <select
-                    value={cascadeCityCode ?? ""}
-                    onChange={(e) => {
-                      const code = parseInt(e.target.value, 10);
-                      const found = cities?.find((c) => c.cityCode === code);
-                      if (found) handleCascadeCityChange(code, found.cityName);
+                  <AddressCombobox
+                    items={(cities ?? []).map((c) => ({
+                      value: c.cityCode,
+                      label: c.cityName,
+                    }))}
+                    value={cascadeCityCode}
+                    onValueChange={(item) => {
+                      if (!item) {
+                        resetCascade();
+                        return;
+                      }
+                      handleCascadeCityChange(item.value as number, item.label);
                     }}
-                    className="border border-input rounded-md px-2 py-1.5 w-full bg-background text-sm"
-                  >
-                    <option value="">
-                      {tw("meter_lookup_city_placeholder")}
-                    </option>
-                    {(cities ?? []).map((c) => (
-                      <option key={c._id} value={c.cityCode}>
-                        {c.cityName}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder={tw("meter_lookup_city_placeholder")}
+                    emptyText={tw("meter_lookup_no_results")}
+                    loading={cities === undefined}
+                  />
                 </div>
 
                 {/* Street */}
@@ -392,27 +400,29 @@ export default function WizardPage() {
                     <label className="block text-xs font-medium mb-1">
                       {tw("meter_lookup_street")}
                     </label>
-                    <select
-                      value={cascadeStreetCode ?? ""}
-                      onChange={(e) => {
-                        const code = parseInt(e.target.value, 10);
-                        const found = streets?.find(
-                          (s) => s.streetCode === code,
+                    <AddressCombobox
+                      items={(streets ?? []).map((s) => ({
+                        value: s.streetCode,
+                        label: s.streetName,
+                      }))}
+                      value={cascadeStreetCode}
+                      onValueChange={(item) => {
+                        if (!item) {
+                          setCascadeStreetCode(null);
+                          setCascadeStreetName(null);
+                          setCascadeHouseNumber(null);
+                          setHasSmartMeter(null);
+                          return;
+                        }
+                        handleCascadeStreetChange(
+                          item.value as number,
+                          item.label,
                         );
-                        if (found)
-                          handleCascadeStreetChange(code, found.streetName);
                       }}
-                      className="border border-input rounded-md px-2 py-1.5 w-full bg-background text-sm"
-                    >
-                      <option value="">
-                        {tw("meter_lookup_street_placeholder")}
-                      </option>
-                      {(streets ?? []).map((s) => (
-                        <option key={s._id} value={s.streetCode}>
-                          {s.streetName}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder={tw("meter_lookup_street_placeholder")}
+                      emptyText={tw("meter_lookup_no_results")}
+                      loading={streets === undefined}
+                    />
                   </div>
                 )}
 
@@ -422,20 +432,24 @@ export default function WizardPage() {
                     <label className="block text-xs font-medium mb-1">
                       {tw("meter_lookup_house")}
                     </label>
-                    <select
-                      value={cascadeHouseNumber ?? ""}
-                      onChange={(e) => handleCascadeHouseChange(e.target.value)}
-                      className="border border-input rounded-md px-2 py-1.5 w-full bg-background text-sm"
-                    >
-                      <option value="">
-                        {tw("meter_lookup_house_placeholder")}
-                      </option>
-                      {(houseNumbers ?? []).map((h) => (
-                        <option key={h} value={h}>
-                          {h}
-                        </option>
-                      ))}
-                    </select>
+                    <AddressCombobox
+                      items={(houseNumbers ?? []).map((h) => ({
+                        value: h,
+                        label: h,
+                      }))}
+                      value={cascadeHouseNumber}
+                      onValueChange={(item) => {
+                        if (!item) {
+                          setCascadeHouseNumber(null);
+                          setHasSmartMeter(null);
+                          return;
+                        }
+                        handleCascadeHouseChange(item.value as string);
+                      }}
+                      placeholder={tw("meter_lookup_house_placeholder")}
+                      emptyText={tw("meter_lookup_no_results")}
+                      loading={houseNumbers === undefined}
+                    />
                   </div>
                 )}
 
@@ -858,7 +872,7 @@ export default function WizardPage() {
 
           <div className="space-y-5">
             {/* File — only shown for smart meter users */}
-            {hasSmartMeter === "yes" && (
+            {effectiveHasSmartMeter === "yes" && (
               <div>
                 <p className="text-sm font-medium mb-2">{tw("upload_title")}</p>
                 <CsvDropzone
