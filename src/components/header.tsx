@@ -82,7 +82,7 @@ export default function Header() {
 
   return (
     <header className="flex items-center justify-between px-6 py-4 border-b border-border">
-      <a href="/" aria-label="IsraMAX" className="flex items-center gap-2.5">
+      <a href="/" aria-label="Chisko" className="flex items-center gap-2.5">
         <img
           src="/logoMark.svg"
           alt=""
@@ -90,8 +90,8 @@ export default function Header() {
           className="h-8 w-8"
         />
         <span className="text-xl font-bold tracking-tight">
-          <span className="text-foreground">Isra</span>
-          <span className="text-primary">MAX</span>
+          <span className="text-foreground">Chi</span>
+          <span className="text-primary">sko</span>
         </span>
       </a>
 
