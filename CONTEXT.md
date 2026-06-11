@@ -99,7 +99,7 @@ _Avoid_: Mobility addresses, IEC address list, meter addresses
 ## Inputs
 
 **Home Profile**:
-A household's self-reported characteristics captured via questionnaire. Fields: smart meter (yes/no — determined at the start of the wizard, never unknown after completion), city, street, house number (street and house number populated only when collected via Smart Meter Registry lookup), bundle memberships (HOT triple, Cellcom, etc.), current supplier + plan (if no bill uploaded), approximate monthly kWh (if no bill uploaded), work-from-home pattern, EV charging (yes/no + timing), washer/dryer timing, AC usage level, and willingness to shift appliance usage to save more (yes/no).
+A household's self-reported characteristics captured via questionnaire. Fields: smart meter (yes/no — determined at the start of the wizard, never unknown after completion), city, street, house number (street and house number populated only when collected via Smart Meter Registry lookup), bundle memberships (HOT triple, Cellcom, etc.), current supplier + plan (if no bill uploaded), approximate monthly kWh (if no bill uploaded), work-from-home pattern, EV charging (yes/no + timing), washer/dryer timing, AC usage level, and willingness to shift appliance usage to save more (yes/no). When the current supplier is IEC (or unknown), both are represented as a null supplier reference — the Recommendation engine uses the full IEC Rate as the cost baseline in either case.
 _Avoid_: User profile, household, account
 
 **Bill Import**:

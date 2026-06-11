@@ -49,6 +49,7 @@ export default function WizardPage() {
   const [bundleMemberships, setBundleMemberships] = useState<string[]>([]);
   const [currentSupplierId, setCurrentSupplierId] =
     useState<Id<"suppliers"> | null>(null);
+  const [supplierSelectValue, setSupplierSelectValue] = useState("iec");
   const [workFromHome, setWorkFromHome] = useState<
     "always" | "sometimes" | "never"
   >("sometimes");
@@ -524,20 +525,24 @@ export default function WizardPage() {
                 {tw("supplier_title")}
               </label>
               <select
-                value={currentSupplierId ?? ""}
-                onChange={(e) =>
+                value={supplierSelectValue}
+                onChange={(e) => {
+                  setSupplierSelectValue(e.target.value);
                   setCurrentSupplierId(
-                    e.target.value ? (e.target.value as Id<"suppliers">) : null,
-                  )
-                }
+                    e.target.value && e.target.value !== "iec"
+                      ? (e.target.value as Id<"suppliers">)
+                      : null,
+                  );
+                }}
                 className="border border-input rounded-md px-3 py-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
               >
-                <option value="">{tw("supplier_unknown")}</option>
+                <option value="iec">{tw("supplier_iec")}</option>
                 {(suppliers ?? []).map((s) => (
                   <option key={s._id} value={s._id}>
                     {s.name}
                   </option>
                 ))}
+                <option value="">{tw("supplier_unknown")}</option>
               </select>
             </div>
 
@@ -905,20 +910,24 @@ export default function WizardPage() {
                 {tw("supplier_title")}
               </label>
               <select
-                value={currentSupplierId ?? ""}
-                onChange={(e) =>
+                value={supplierSelectValue}
+                onChange={(e) => {
+                  setSupplierSelectValue(e.target.value);
                   setCurrentSupplierId(
-                    e.target.value ? (e.target.value as Id<"suppliers">) : null,
-                  )
-                }
+                    e.target.value && e.target.value !== "iec"
+                      ? (e.target.value as Id<"suppliers">)
+                      : null,
+                  );
+                }}
                 className="border border-input rounded-md px-3 py-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
               >
-                <option value="">{tw("supplier_unknown")}</option>
+                <option value="iec">{tw("supplier_iec")}</option>
                 {(suppliers ?? []).map((s) => (
                   <option key={s._id} value={s._id}>
                     {s.name}
                   </option>
                 ))}
+                <option value="">{tw("supplier_unknown")}</option>
               </select>
             </div>
 

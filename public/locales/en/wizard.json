@@ -38,6 +38,7 @@
   "memberships_title": "Which bundle subscriptions do you have?",
   "memberships_none": "None",
   "supplier_title": "Who is your current electricity supplier?",
+  "supplier_iec": "IEC / Israel Electric Corporation",
   "supplier_unknown": "Don't know / Not relevant",
   "wfh_title": "How often do you work from home?",
   "wfh_always": "Always",

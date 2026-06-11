@@ -38,6 +38,7 @@
   "memberships_title": "Какими пакетными услугами вы пользуетесь?",
   "memberships_none": "Нет",
   "supplier_title": "Кто ваш текущий поставщик электроэнергии?",
+  "supplier_iec": "חברת חשמל",
   "supplier_unknown": "Не знаю / Неважно",
   "wfh_title": "Как часто вы работаете из дома?",
   "wfh_always": "Всегда",
