@@ -26,3 +26,17 @@ Namespace rules:
 - Server-side code (Convex functions) cannot use react-i18next; emit structured i18n keys (serialized as JSON) and translate on the client.
 
 Supported languages: `en`, `he`, `ar`, `ru`. All four locale files must be updated together.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues for `jmjpro/chisko` (uses the `gh` CLI). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default label vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context repo: one `CONTEXT.md` + `docs/adr/` at the root. See `docs/agents/domain.md`.
