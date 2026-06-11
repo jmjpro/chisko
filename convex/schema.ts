@@ -118,6 +118,9 @@ export default defineSchema({
     ),
     bundleMemberships: v.array(v.string()), // e.g. ["HOT triple", "HOT Mobile"]
     city: v.string(),
+    // Populated only when address was collected via Smart Meter Registry lookup
+    street: v.optional(v.string()),
+    houseNumber: v.optional(v.string()),
     currentSupplierId: v.union(v.id("suppliers"), v.null()),
     currentPlanId: v.union(v.id("plans"), v.null()),
     approximateMonthlyKwh: v.union(v.number(), v.null()),
@@ -257,6 +260,35 @@ export default defineSchema({
     .index("by_lead", ["leadId"])
     .index("by_supplier", ["supplierId"])
     .index("by_lead_and_supplier", ["leadId", "supplierId"]),
+
+  // Smart Meter Registry — deduped city list (from IEC mobility program CSV)
+  smartMeterCities: defineTable({
+    cityCode: v.number(),
+    cityName: v.string(),
+  }).index("by_city_code", ["cityCode"]),
+
+  // Smart Meter Registry — deduped street list per city
+  smartMeterStreets: defineTable({
+    cityCode: v.number(),
+    streetCode: v.number(),
+    streetName: v.string(),
+  })
+    .index("by_city_code", ["cityCode"])
+    .index("by_city_and_street_code", ["cityCode", "streetCode"]),
+
+  // Smart Meter Registry — one row per address known to have a smart meter
+  smartMeterAddresses: defineTable({
+    cityCode: v.number(),
+    streetCode: v.number(),
+    houseNumber: v.string(),
+  })
+    .index("by_city_and_street", ["cityCode", "streetCode"])
+    .index("by_city_street_and_house", ["cityCode", "streetCode", "houseNumber"]),
+
+  // Singleton tracking the last successful Smart Meter Registry refresh
+  smartMeterRegistryMeta: defineTable({
+    lastRefreshedAt: v.number(),
+  }),
 
   // Singleton counter for PDF extraction confidence.
   // The mandatory confirmation gate is removed once zeroEditExtractions / totalPdfExtractions

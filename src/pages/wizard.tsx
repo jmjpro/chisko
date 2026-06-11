@@ -10,11 +10,11 @@ import CsvDropzone from "../components/CsvDropzone";
 import Wizard from "../components/Wizard";
 import WizardStep from "../components/WizardStep";
 
-// 0 = Upload, 1 = Your Home, 2 = Your Usage, 3 = Results
-const TOTAL_STEPS = 4;
+// Logical steps: 0=Meter, 1=Upload, 2=Home, 3=Usage, 4=Results
+// Upload step (1) is skipped for non-smart-meter users.
 
 export default function WizardPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { t: tw } = useTranslation("wizard");
   const { t: tr } = useTranslation("recommendations");
 
@@ -24,6 +24,18 @@ export default function WizardPage() {
     null,
   );
   const [homeProfileId, setHomeProfileId] = useState<Id<"homeProfiles"> | null>(
+    null,
+  );
+
+  // Step 0: meter type
+  const [hasSmartMeter, setHasSmartMeter] = useState<"yes" | "no" | null>(null);
+  const [meterNotSure, setMeterNotSure] = useState(false);
+  // Cascading address picker (only used in meterNotSure path)
+  const [cascadeCityCode, setCascadeCityCode] = useState<number | null>(null);
+  const [cascadeCityName, setCascadeCityName] = useState<string | null>(null);
+  const [cascadeStreetCode, setCascadeStreetCode] = useState<number | null>(null);
+  const [cascadeStreetName, setCascadeStreetName] = useState<string | null>(null);
+  const [cascadeHouseNumber, setCascadeHouseNumber] = useState<string | null>(
     null,
   );
 
@@ -52,11 +64,9 @@ export default function WizardPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [resultError, setResultError] = useState<string | null>(null);
-  // Prevents the auto-generate effect from firing more than once on initial
-  // arrival at the results step. Recalculation bypasses this via the button.
   const hasStartedGenerating = useRef(false);
 
-  // Convex
+  // Convex mutations / actions
   const getOrCreateSession = useMutation(api.sessions.getOrCreate);
   const generateUploadUrl = useMutation(api.billImports.generateUploadUrl);
   const parseSmartMeterCsv = useAction(api.billImports.parseSmartMeterCsv);
@@ -65,12 +75,44 @@ export default function WizardPage() {
   const suppliers = useQuery(api.suppliers.list);
   const rec = useQuery(
     api.recommendations.getForSession,
-    sessionId && step === 3 ? { sessionId } : "skip",
+    sessionId && step === 4 ? { sessionId } : "skip",
   );
   const evaluatedPlans = useQuery(
     api.recommendations.getEvaluatedPlans,
     rec ? { recommendationId: rec._id } : "skip",
   );
+
+  // Smart Meter Registry — cascading picker queries
+  const cities = useQuery(api.smartMeterRegistry.getCities);
+  const streets = useQuery(
+    api.smartMeterRegistry.getStreets,
+    cascadeCityCode !== null ? { cityCode: cascadeCityCode } : "skip",
+  );
+  const houseNumbers = useQuery(
+    api.smartMeterRegistry.getHouseNumbers,
+    cascadeCityCode !== null && cascadeStreetCode !== null
+      ? { cityCode: cascadeCityCode, streetCode: cascadeStreetCode }
+      : "skip",
+  );
+  const addressFound = useQuery(
+    api.smartMeterRegistry.checkAddress,
+    cascadeCityCode !== null &&
+      cascadeStreetCode !== null &&
+      cascadeHouseNumber !== null
+      ? {
+          cityCode: cascadeCityCode,
+          streetCode: cascadeStreetCode,
+          houseNumber: cascadeHouseNumber,
+        }
+      : "skip",
+  );
+
+  // Resolve hasSmartMeter once the address lookup completes
+  useEffect(() => {
+    if (!meterNotSure || cascadeHouseNumber === null || addressFound === undefined)
+      return;
+    setHasSmartMeter(addressFound ? "yes" : "no");
+  }, [addressFound, meterNotSure, cascadeHouseNumber]);
 
   // Initialize session from localStorage
   useEffect(() => {
@@ -85,6 +127,62 @@ export default function WizardPage() {
       .catch(console.error);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-generate on first arrival at results
+  useEffect(() => {
+    if (step !== 4 || !sessionId || hasStartedGenerating.current) return;
+    hasStartedGenerating.current = true;
+    void handleGenerateRecommendation();
+  }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Step 0 handlers ──────────────────────────────────────────────────────
+
+  function handleMeterChoice(choice: "yes" | "no") {
+    setHasSmartMeter(choice);
+    setMeterNotSure(false);
+    if (choice === "no") setBillImportId(null);
+    resetCascade();
+  }
+
+  function handleMeterNotSure() {
+    setMeterNotSure(true);
+    setHasSmartMeter(null);
+  }
+
+  function resetCascade() {
+    setCascadeCityCode(null);
+    setCascadeCityName(null);
+    setCascadeStreetCode(null);
+    setCascadeStreetName(null);
+    setCascadeHouseNumber(null);
+  }
+
+  function handleCascadeCityChange(cityCode: number, cityName: string) {
+    setCascadeCityCode(cityCode);
+    setCascadeCityName(cityName);
+    setCascadeStreetCode(null);
+    setCascadeStreetName(null);
+    setCascadeHouseNumber(null);
+    setHasSmartMeter(null);
+    setCity(cityName); // pre-fill city for "Your Home" step
+  }
+
+  function handleCascadeStreetChange(streetCode: number, streetName: string) {
+    setCascadeStreetCode(streetCode);
+    setCascadeStreetName(streetName);
+    setCascadeHouseNumber(null);
+    setHasSmartMeter(null);
+  }
+
+  function handleCascadeHouseChange(houseNumber: string) {
+    setCascadeHouseNumber(houseNumber);
+    setHasSmartMeter(null); // will be resolved by the addressFound useEffect
+  }
+
+  void cascadeCityName;
+  void cascadeStreetName;
+
+  // ── Recommendation generation ────────────────────────────────────────────
+
   async function handleGenerateRecommendation() {
     if (!sessionId) return;
     setGenerating(true);
@@ -92,9 +190,11 @@ export default function WizardPage() {
     try {
       const hpId = await upsertHomeProfile({
         sessionId,
-        hasSmartMeter: billImportId ? "yes" : "unknown",
+        hasSmartMeter: hasSmartMeter ?? "unknown",
         bundleMemberships,
         city,
+        ...(cascadeStreetName ? { street: cascadeStreetName } : {}),
+        ...(cascadeHouseNumber ? { houseNumber: cascadeHouseNumber } : {}),
         currentSupplierId,
         currentPlanId: null,
         approximateMonthlyKwh: null,
@@ -117,13 +217,6 @@ export default function WizardPage() {
       setGenerating(false);
     }
   }
-
-  // Auto-generate on first arrival at the results step.
-  useEffect(() => {
-    if (step !== 3 || !sessionId || hasStartedGenerating.current) return;
-    hasStartedGenerating.current = true;
-    void handleGenerateRecommendation();
-  }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
   void homeProfileId;
 
@@ -154,18 +247,226 @@ export default function WizardPage() {
     );
   }
 
-  // ── Step content ──────────────────────────────────────────────────────────
+  // ── Step navigation ──────────────────────────────────────────────────────
+
+  // Upload step (logical 1) only appears for smart meter users
+  const visibleSteps = hasSmartMeter === "yes" ? [0, 1, 2, 3, 4] : [0, 2, 3, 4];
+  const displayStep = visibleSteps.indexOf(step);
+  const totalDisplaySteps = visibleSteps.length;
+
+  function goNext() {
+    const idx = visibleSteps.indexOf(step);
+    if (idx < visibleSteps.length - 1) setStep(visibleSteps[idx + 1]);
+  }
+
+  function goPrev() {
+    const idx = visibleSteps.indexOf(step);
+    if (idx > 0) setStep(visibleSteps[idx - 1]);
+  }
+
+  function goToResults() {
+    setStep(4);
+  }
+
+  const stepLabels =
+    hasSmartMeter === "yes"
+      ? [
+          tw("step_meter"),
+          tw("step_upload"),
+          tw("step_home"),
+          tw("step_usage"),
+          tw("step_results"),
+        ]
+      : [
+          tw("step_meter"),
+          tw("step_home"),
+          tw("step_usage"),
+          tw("step_results"),
+        ];
+
+  const canAdvance = step === 0 ? hasSmartMeter !== null : true;
+
+  // ── Step rendering ────────────────────────────────────────────────────────
 
   function renderStep() {
     switch (step) {
-      // ── Step 0: Upload (optional, strongly recommended) ──────────────────
+      // ── Step 0: Meter type ───────────────────────────────────────────────
       case 0:
+        return (
+          <WizardStep title={tw("meter_title")}>
+            <div className="space-y-3 mb-6">
+              {/* Smart meter */}
+              <label className="flex items-center gap-4 cursor-pointer rounded-lg border border-input p-3 hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <input
+                  type="radio"
+                  name="meterType"
+                  checked={hasSmartMeter === "yes" && !meterNotSure}
+                  onChange={() => handleMeterChoice("yes")}
+                  className="accent-primary shrink-0"
+                />
+                <img
+                  src="/meterSmart.webp"
+                  alt=""
+                  className="h-16 w-auto rounded"
+                />
+                <span className="text-sm font-medium">
+                  {tw("meter_smart_label")}
+                </span>
+              </label>
+
+              {/* Manual meter */}
+              <label className="flex items-center gap-4 cursor-pointer rounded-lg border border-input p-3 hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <input
+                  type="radio"
+                  name="meterType"
+                  checked={hasSmartMeter === "no" && !meterNotSure}
+                  onChange={() => handleMeterChoice("no")}
+                  className="accent-primary shrink-0"
+                />
+                <img
+                  src="/meterManual.webp"
+                  alt=""
+                  className="h-16 w-auto rounded"
+                />
+                <span className="text-sm font-medium">
+                  {tw("meter_manual_label")}
+                </span>
+              </label>
+
+              {/* Not sure */}
+              <label className="flex items-center gap-3 cursor-pointer rounded-lg border border-input p-3 hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <input
+                  type="radio"
+                  name="meterType"
+                  checked={meterNotSure}
+                  onChange={handleMeterNotSure}
+                  className="accent-primary shrink-0"
+                />
+                <span className="text-sm font-medium">
+                  {tw("meter_not_sure_label")}
+                </span>
+              </label>
+            </div>
+
+            {/* Cascading address picker */}
+            {meterNotSure && (
+              <div className="rounded-lg border border-border p-4">
+                <p className="text-sm font-semibold mb-3">
+                  {tw("meter_lookup_title")}
+                </p>
+
+                {i18n.language !== "he" && (
+                  <p className="text-xs text-muted-foreground mb-3">
+                    {tw("meter_lookup_hebrew_note")}
+                  </p>
+                )}
+
+                {/* City */}
+                <div className="mb-3">
+                  <label className="block text-xs font-medium mb-1">
+                    {tw("meter_lookup_city")}
+                  </label>
+                  <select
+                    value={cascadeCityCode ?? ""}
+                    onChange={(e) => {
+                      const code = parseInt(e.target.value, 10);
+                      const found = cities?.find((c) => c.cityCode === code);
+                      if (found) handleCascadeCityChange(code, found.cityName);
+                    }}
+                    className="border border-input rounded-md px-2 py-1.5 w-full bg-background text-sm"
+                  >
+                    <option value="">
+                      {tw("meter_lookup_city_placeholder")}
+                    </option>
+                    {(cities ?? []).map((c) => (
+                      <option key={c._id} value={c.cityCode}>
+                        {c.cityName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Street */}
+                {cascadeCityCode !== null && (
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium mb-1">
+                      {tw("meter_lookup_street")}
+                    </label>
+                    <select
+                      value={cascadeStreetCode ?? ""}
+                      onChange={(e) => {
+                        const code = parseInt(e.target.value, 10);
+                        const found = streets?.find(
+                          (s) => s.streetCode === code,
+                        );
+                        if (found)
+                          handleCascadeStreetChange(code, found.streetName);
+                      }}
+                      className="border border-input rounded-md px-2 py-1.5 w-full bg-background text-sm"
+                    >
+                      <option value="">
+                        {tw("meter_lookup_street_placeholder")}
+                      </option>
+                      {(streets ?? []).map((s) => (
+                        <option key={s._id} value={s.streetCode}>
+                          {s.streetName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* House number */}
+                {cascadeStreetCode !== null && (
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium mb-1">
+                      {tw("meter_lookup_house")}
+                    </label>
+                    <select
+                      value={cascadeHouseNumber ?? ""}
+                      onChange={(e) => handleCascadeHouseChange(e.target.value)}
+                      className="border border-input rounded-md px-2 py-1.5 w-full bg-background text-sm"
+                    >
+                      <option value="">
+                        {tw("meter_lookup_house_placeholder")}
+                      </option>
+                      {(houseNumbers ?? []).map((h) => (
+                        <option key={h} value={h}>
+                          {h}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Lookup result */}
+                {cascadeHouseNumber && addressFound === undefined && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {tw("meter_lookup_checking")}
+                  </p>
+                )}
+                {cascadeHouseNumber && addressFound === true && (
+                  <p className="text-sm text-primary mt-2">
+                    {tw("meter_lookup_found")}
+                  </p>
+                )}
+                {cascadeHouseNumber && addressFound === false && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {tw("meter_lookup_not_found")}
+                  </p>
+                )}
+              </div>
+            )}
+          </WizardStep>
+        );
+
+      // ── Step 1: Upload (smart meter users only) ──────────────────────────
+      case 1:
         return (
           <WizardStep
             title={tw("upload_title")}
             description={tw("upload_description")}
           >
-            {/* Recommended callout */}
             <div className="mb-5 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-foreground">
               <span className="font-semibold text-primary">
                 {tw("upload_recommended_label")}
@@ -183,23 +484,25 @@ export default function WizardPage() {
           </WizardStep>
         );
 
-      // ── Step 1: Your Home ────────────────────────────────────────────────
-      case 1:
+      // ── Step 2: Your Home ────────────────────────────────────────────────
+      case 2:
         return (
           <WizardStep title={tw("home_title")}>
-            {/* City */}
-            <div className="mb-5">
-              <label className="block text-sm font-medium mb-1.5">
-                {tw("city_title")}
-              </label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="border border-input rounded-md px-3 py-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
-                placeholder={tw("city_placeholder")}
-              />
-            </div>
+            {/* City — hidden when pre-filled from registry lookup */}
+            {cascadeCityCode === null && (
+              <div className="mb-5">
+                <label className="block text-sm font-medium mb-1.5">
+                  {tw("city_title")}
+                </label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="border border-input rounded-md px-3 py-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
+                  placeholder={tw("city_placeholder")}
+                />
+              </div>
+            )}
 
             {/* Current supplier */}
             <div className="mb-5">
@@ -260,8 +563,8 @@ export default function WizardPage() {
           </WizardStep>
         );
 
-      // ── Step 2: Your Usage ───────────────────────────────────────────────
-      case 2:
+      // ── Step 3: Your Usage ───────────────────────────────────────────────
+      case 3:
         return (
           <WizardStep title={tw("usage_title")}>
             {/* Work from home */}
@@ -449,7 +752,7 @@ export default function WizardPage() {
           </WizardStep>
         );
 
-      case 3:
+      case 4:
         return renderResults();
 
       default:
@@ -554,19 +857,21 @@ export default function WizardPage() {
           </h3>
 
           <div className="space-y-5">
-            {/* File */}
-            <div>
-              <p className="text-sm font-medium mb-2">{tw("upload_title")}</p>
-              <CsvDropzone
-                onValidFile={(file) => void handleFileUpload(file)}
-                onError={setUploadError}
-                loading={uploadLoading}
-                success={!!billImportId}
-                error={uploadError}
-              />
-            </div>
+            {/* File — only shown for smart meter users */}
+            {hasSmartMeter === "yes" && (
+              <div>
+                <p className="text-sm font-medium mb-2">{tw("upload_title")}</p>
+                <CsvDropzone
+                  onValidFile={(file) => void handleFileUpload(file)}
+                  onError={setUploadError}
+                  loading={uploadLoading}
+                  success={!!billImportId}
+                  error={uploadError}
+                />
+              </div>
+            )}
 
-            {/* City */}
+            {/* City — always shown, even when pre-filled from lookup */}
             <div>
               <label className="block text-sm font-medium mb-1.5">
                 {tw("city_title")}
@@ -830,21 +1135,16 @@ export default function WizardPage() {
       <Header />
       <main className="flex-1 px-6 py-8 max-w-lg mx-auto w-full">
         <Wizard
-          step={step}
-          totalSteps={TOTAL_STEPS}
-          onPrev={() => setStep((s) => s - 1)}
-          onNext={() => setStep((s) => s + 1)}
-          onSubmit={() => setStep(3)}
-          canAdvance={true}
+          step={displayStep}
+          totalSteps={totalDisplaySteps}
+          onPrev={goPrev}
+          onNext={goNext}
+          onSubmit={goToResults}
+          canAdvance={canAdvance}
           prevLabel={tw("prev")}
           nextLabel={tw("next")}
           submitLabel={tw("submit")}
-          stepLabels={[
-            tw("step_upload"),
-            tw("step_home"),
-            tw("step_usage"),
-            tw("step_results"),
-          ]}
+          stepLabels={stepLabels}
         >
           {renderStep()}
         </Wizard>

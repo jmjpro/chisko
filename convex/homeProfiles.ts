@@ -11,6 +11,8 @@ export const upsert = mutation({
     ),
     bundleMemberships: v.array(v.string()),
     city: v.string(),
+    street: v.optional(v.string()),
+    houseNumber: v.optional(v.string()),
     currentSupplierId: v.union(v.id("suppliers"), v.null()),
     currentPlanId: v.union(v.id("plans"), v.null()),
     approximateMonthlyKwh: v.union(v.number(), v.null()),
@@ -40,15 +42,20 @@ export const upsert = mutation({
     ),
     willingToShiftUsage: v.boolean(),
   },
-  handler: async (ctx, { sessionId, ...fields }) => {
+  handler: async (ctx, { sessionId, street, houseNumber, ...fields }) => {
+    const update = {
+      ...fields,
+      ...(street !== undefined ? { street } : {}),
+      ...(houseNumber !== undefined ? { houseNumber } : {}),
+    };
     const existing = await ctx.db
       .query("homeProfiles")
       .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
       .first();
     if (existing) {
-      await ctx.db.patch("homeProfiles", existing._id, fields);
+      await ctx.db.patch("homeProfiles", existing._id, update);
       return existing._id;
     }
-    return ctx.db.insert("homeProfiles", { sessionId, ...fields });
+    return ctx.db.insert("homeProfiles", { sessionId, ...update });
   },
 });

@@ -9,11 +9,14 @@
  */
 
 import type * as billImports from "../billImports.js";
+import type * as crons from "../crons.js";
 import type * as homeProfiles from "../homeProfiles.js";
 import type * as plans from "../plans.js";
 import type * as recommendations from "../recommendations.js";
 import type * as seed from "../seed.js";
 import type * as sessions from "../sessions.js";
+import type * as smartMeterRegistry from "../smartMeterRegistry.js";
+import type * as smartMeterRegistryRefresh from "../smartMeterRegistryRefresh.js";
 import type * as suppliers from "../suppliers.js";
 
 import type {
@@ -24,11 +27,14 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   billImports: typeof billImports;
+  crons: typeof crons;
   homeProfiles: typeof homeProfiles;
   plans: typeof plans;
   recommendations: typeof recommendations;
   seed: typeof seed;
   sessions: typeof sessions;
+  smartMeterRegistry: typeof smartMeterRegistry;
+  smartMeterRegistryRefresh: typeof smartMeterRegistryRefresh;
   suppliers: typeof suppliers;
 }>;
 
