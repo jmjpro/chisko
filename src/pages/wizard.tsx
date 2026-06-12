@@ -381,7 +381,7 @@ export default function WizardPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 px-6 py-8 max-w-lg mx-auto w-full">
+      <main className="flex-1 px-6 py-8 max-w-lg md:max-w-2xl mx-auto w-full">
         <Wizard
           step={displayStep}
           totalSteps={totalDisplaySteps}
