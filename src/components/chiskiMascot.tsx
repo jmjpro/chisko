@@ -14,20 +14,80 @@ export default function ChiskiMascot({ className }: { className?: string }) {
         </linearGradient>
       </defs>
 
-      <path d="M41 38 L33 18 L55 32 Z" fill="#F59E0B" stroke="#D97706" strokeWidth="3.5" strokeLinejoin="round" />
-      <path d="M87 38 L95 18 L73 32 Z" fill="#F59E0B" stroke="#D97706" strokeWidth="3.5" strokeLinejoin="round" />
+      <path
+        d="M41 38 L33 18 L55 32 Z"
+        fill="#F59E0B"
+        stroke="#D97706"
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M87 38 L95 18 L73 32 Z"
+        fill="#F59E0B"
+        stroke="#D97706"
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
 
-      <path className="chiski-wing-l" d="M27 66 Q15 84 29 100 Q33 84 30 68 Z" fill="#E08C07" stroke="#D97706" strokeWidth="3" strokeLinejoin="round" />
-      <path className="chiski-wing-r" d="M101 66 Q113 84 99 100 Q95 84 98 68 Z" fill="#E08C07" stroke="#D97706" strokeWidth="3" strokeLinejoin="round" />
+      <path
+        className="chiski-wing-l"
+        d="M27 66 Q15 84 29 100 Q33 84 30 68 Z"
+        fill="#E08C07"
+        stroke="#D97706"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path
+        className="chiski-wing-r"
+        d="M101 66 Q113 84 99 100 Q95 84 98 68 Z"
+        fill="#E08C07"
+        stroke="#D97706"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
 
-      <ellipse cx="64" cy="74" rx="40" ry="42" fill="url(#chiskiBodyGrad)" stroke="#D97706" strokeWidth="3.5" />
+      <ellipse
+        cx="64"
+        cy="74"
+        rx="40"
+        ry="42"
+        fill="url(#chiskiBodyGrad)"
+        stroke="#D97706"
+        strokeWidth="3.5"
+      />
       <ellipse cx="64" cy="86" rx="25" ry="26" fill="#FDE68A" opacity="0.65" />
 
-      <path d="M53 110 L53 121 M48 113 L53 119 M58 113 L53 119" fill="none" stroke="#D97706" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M75 110 L75 121 M70 113 L75 119 M80 113 L75 119" fill="none" stroke="#D97706" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M53 110 L53 121 M48 113 L53 119 M58 113 L53 119"
+        fill="none"
+        stroke="#D97706"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M75 110 L75 121 M70 113 L75 119 M80 113 L75 119"
+        fill="none"
+        stroke="#D97706"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
 
-      <path d="M33 46 L49 41" fill="none" stroke="#D97706" strokeWidth="4" strokeLinecap="round" />
-      <path d="M95 46 L79 41" fill="none" stroke="#D97706" strokeWidth="4" strokeLinecap="round" />
+      <path
+        d="M33 46 L49 41"
+        fill="none"
+        stroke="#D97706"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M95 46 L79 41"
+        fill="none"
+        stroke="#D97706"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
 
       <circle cx="46" cy="63" r="16" fill="#FFFFFF" />
       <circle cx="82" cy="63" r="16" fill="#FFFFFF" />
@@ -35,10 +95,30 @@ export default function ChiskiMascot({ className }: { className?: string }) {
       <circle cx="83" cy="65" r="6" fill="#1E293B" />
       <circle cx="49" cy="63" r="1.9" fill="#FFFFFF" />
       <circle cx="85" cy="63" r="1.9" fill="#FFFFFF" />
-      <circle cx="46" cy="63" r="16" fill="none" stroke="#1E293B" strokeWidth="4" />
-      <circle cx="82" cy="63" r="16" fill="none" stroke="#1E293B" strokeWidth="4" />
+      <circle
+        cx="46"
+        cy="63"
+        r="16"
+        fill="none"
+        stroke="#1E293B"
+        strokeWidth="4"
+      />
+      <circle
+        cx="82"
+        cy="63"
+        r="16"
+        fill="none"
+        stroke="#1E293B"
+        strokeWidth="4"
+      />
 
-      <path d="M61 61 Q64 57 67 61" fill="none" stroke="#1E293B" strokeWidth="4" strokeLinecap="round" />
+      <path
+        d="M61 61 Q64 57 67 61"
+        fill="none"
+        stroke="#1E293B"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
 
       <path d="M64 75 L71 82 L64 91 L57 82 Z" fill="#D97706" />
     </svg>
