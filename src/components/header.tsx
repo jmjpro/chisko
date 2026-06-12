@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Menu } from "@base-ui/react/menu";
 import { Check, Monitor, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
+import LogoMark from "@/components/logoMark";
 
 const LANGUAGES = [
   { code: "en", label: "English", dir: "ltr" },
@@ -83,12 +84,7 @@ export default function Header() {
   return (
     <header className="flex items-center justify-between px-6 py-4 border-b border-border">
       <a href="/" aria-label="Chisko" className="flex items-center gap-2.5">
-        <img
-          src="/logoMark.svg"
-          alt=""
-          aria-hidden="true"
-          className="h-8 w-8"
-        />
+        <LogoMark className="h-8 w-8" aria-hidden="true" />
         <span className="text-xl font-bold tracking-tight">
           <span className="text-foreground">Chi</span>
           <span className="text-primary">sko</span>

@@ -162,6 +162,72 @@
   --brand-gold-foreground: oklch(0.220 0.050 70);
 }
 
+/* Chiski mascot wing flap — entrance once, then idle every ~5s */
+@keyframes chiskiWingL-entrance {
+  0%   { transform: rotate(0deg); }
+  18%  { transform: rotate(50deg); }
+  28%  { transform: rotate(38deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes chiskiWingR-entrance {
+  0%   { transform: rotate(0deg); }
+  18%  { transform: rotate(-50deg); }
+  28%  { transform: rotate(-38deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes chiskiWingL-idle {
+  0%, 84% { transform: rotate(0deg); }
+  87%     { transform: rotate(50deg); }
+  90%     { transform: rotate(38deg); }
+  100%    { transform: rotate(0deg); }
+}
+@keyframes chiskiWingR-idle {
+  0%, 84% { transform: rotate(0deg); }
+  87%     { transform: rotate(-50deg); }
+  90%     { transform: rotate(-38deg); }
+  100%    { transform: rotate(0deg); }
+}
+
+.chiski-wing-l {
+  transform-box: view-box;
+  transform-origin: 30px 68px;
+  animation:
+    chiskiWingL-entrance 650ms ease-out,
+    chiskiWingL-idle 5s 1s linear infinite;
+}
+.chiski-wing-r {
+  transform-box: view-box;
+  transform-origin: 98px 68px;
+  animation:
+    chiskiWingR-entrance 650ms ease-out,
+    chiskiWingR-idle 5s 1s linear infinite;
+}
+
+/* Logo ear tuft wiggle — once on page load */
+@keyframes logoTuftL {
+  0%   { transform: rotate(0deg); }
+  30%  { transform: rotate(-15deg); }
+  65%  { transform: rotate(4deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes logoTuftR {
+  0%   { transform: rotate(0deg); }
+  30%  { transform: rotate(15deg); }
+  65%  { transform: rotate(-4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.logo-tuft-l {
+  transform-box: view-box;
+  transform-origin: 25px 17px;
+  animation: logoTuftL 400ms ease-out forwards;
+}
+.logo-tuft-r {
+  transform-box: view-box;
+  transform-origin: 40px 17px;
+  animation: logoTuftR 400ms ease-out forwards;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
