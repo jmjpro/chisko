@@ -72,5 +72,15 @@
   "confidence_low": "Low",
   "result_no_change_label": "Without changing habits:",
   "review_answers_title": "Your Answers",
-  "recalculate": "Recalculate Recommendation"
+  "recalculate": "Recalculate Recommendation",
+  "plan_type_fixed": "Fixed Rate",
+  "plan_type_day": "Day Rate",
+  "plan_type_night": "Night Rate",
+  "plan_discount_fixed": "{{percent}}% off the IEC rate",
+  "plan_discount_window_weekdays": "{{percent}}% off {{start}}–{{end}}, Sun–Thu",
+  "plan_discount_window_all_days": "{{percent}}% off {{start}}–{{end}}, all days",
+  "savings_breakdown_title": "How we calculated this",
+  "savings_breakdown_baseline": "IEC rate: ₪{{amount}}/year",
+  "savings_breakdown_projected": "Under this plan: ₪{{amount}}/year",
+  "savings_breakdown_saving": "Annual saving: ₪{{amount}}"
 }

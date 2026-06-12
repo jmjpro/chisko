@@ -72,5 +72,15 @@
   "confidence_low": "Низкая",
   "result_no_change_label": "Без изменения привычек:",
   "review_answers_title": "Ваши ответы",
-  "recalculate": "Пересчитать рекомендацию"
+  "recalculate": "Пересчитать рекомендацию",
+  "plan_type_fixed": "Фиксированный тариф",
+  "plan_type_day": "Дневной тариф",
+  "plan_type_night": "Ночной тариф",
+  "plan_discount_fixed": "{{percent}}% скидка от тарифа חברת חשמל",
+  "plan_discount_window_weekdays": "{{percent}}% скидка {{start}}–{{end}}, вс–чт",
+  "plan_discount_window_all_days": "{{percent}}% скидка {{start}}–{{end}}, все дни",
+  "savings_breakdown_title": "Как мы это рассчитали",
+  "savings_breakdown_baseline": "Тариф חברת חשמל: ₪{{amount}}/год",
+  "savings_breakdown_projected": "По этому тарифу: ₪{{amount}}/год",
+  "savings_breakdown_saving": "Годовая экономия: ₪{{amount}}"
 }

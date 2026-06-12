@@ -1,6 +1,14 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import CsvDropzone from "@/components/CsvDropzone";
 import WizardStep from "@/components/WizardStep";
 import HomeFields, { type HomeFieldsProps } from "./HomeFields";
@@ -15,12 +23,21 @@ type Rec = {
   showNoChangeSeparately: boolean;
   confidenceLevel: string;
   assumptions: string;
+  baselineAnnualCostAgorot: number;
 } | null;
+
+type PlanVersionMechanics = {
+  discountPercent: number;
+  discountWindowStartHour?: number;
+  discountWindowEndHour?: number;
+  weekdayWindowOnly: boolean;
+};
 
 type EvaluatedPlan = {
   planVersionId: Id<"planVersions">;
   supplier?: { name: string } | null;
-  plan?: { name: string } | null;
+  plan?: { name: string; planType: "fixed" | "day" | "night" } | null;
+  planVersion?: PlanVersionMechanics | null;
 };
 
 export interface ResultsStepProps {
@@ -37,6 +54,14 @@ export interface ResultsStepProps {
   setUploadError: (err: string | null) => void;
   homeFields: HomeFieldsProps;
   usageFields: UsageFieldsProps;
+}
+
+function formatHour(h: number): string {
+  return String(h).padStart(2, "0") + ":00";
+}
+
+function formatAgorot(agorot: number): string {
+  return Math.round(agorot / 100).toLocaleString();
 }
 
 export default function ResultsStep({
@@ -56,6 +81,149 @@ export default function ResultsStep({
 }: ResultsStepProps) {
   const { t: tw } = useTranslation("wizard");
   const { t: tr } = useTranslation("recommendations");
+
+  const [primarySheetOpen, setPrimarySheetOpen] = useState(false);
+  const [noChangeSheetOpen, setNoChangeSheetOpen] = useState(false);
+
+  function getDiscountDescription(
+    pv: PlanVersionMechanics | null | undefined,
+    planType: "fixed" | "day" | "night" | undefined,
+  ): string {
+    if (!pv || !planType) return "";
+    if (planType === "fixed") {
+      return tw("plan_discount_fixed", { percent: pv.discountPercent });
+    }
+    const start = formatHour(pv.discountWindowStartHour ?? 0);
+    const end = formatHour(pv.discountWindowEndHour ?? 0);
+    const key = pv.weekdayWindowOnly
+      ? "plan_discount_window_weekdays"
+      : "plan_discount_window_all_days";
+    return tw(key, { percent: pv.discountPercent, start, end });
+  }
+
+  function parseAssumptions(raw: string): string {
+    try {
+      const entries = JSON.parse(raw) as {
+        key: string;
+        params?: Record<string, string | number>;
+      }[];
+      return entries.map(({ key, params }) => tr(key, params)).join(". ");
+    } catch {
+      return raw;
+    }
+  }
+
+  function renderSavingsBreakdown(
+    annualSavingsAgorot: number,
+  ): React.ReactNode {
+    if (!rec) return null;
+    const baseline = rec.baselineAnnualCostAgorot;
+    const projected = baseline - annualSavingsAgorot;
+    return (
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">
+            {tw("savings_breakdown_baseline", {
+              amount: formatAgorot(baseline),
+            })}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">
+            {tw("savings_breakdown_projected", {
+              amount: formatAgorot(projected),
+            })}
+          </span>
+        </div>
+        <div className="flex justify-between pt-1 border-t border-border font-medium">
+          <span>
+            {tw("savings_breakdown_saving", {
+              amount: formatAgorot(annualSavingsAgorot),
+            })}
+          </span>
+        </div>
+        <p className="pt-2 text-xs text-muted-foreground border-t border-border">
+          {parseAssumptions(rec.assumptions)}
+        </p>
+      </div>
+    );
+  }
+
+  function renderPlanCard(
+    plan: EvaluatedPlan | undefined,
+    annualSavingsAgorot: number,
+    label: string | null,
+    isPrimary: boolean,
+    sheetOpen: boolean,
+    setSheetOpen: (open: boolean) => void,
+  ): React.ReactNode {
+    if (!plan) return null;
+    const planType = plan.plan?.planType;
+    const discountDescription = getDiscountDescription(
+      plan.planVersion,
+      planType,
+    );
+
+    return (
+      <div
+        className={
+          isPrimary
+            ? "rounded-lg border border-primary/30 bg-primary/5 p-4 mb-4"
+            : "rounded-lg border border-border p-4 mb-4"
+        }
+      >
+        {label && <p className="text-sm text-muted-foreground mb-1">{label}</p>}
+        <p className="font-semibold text-lg">
+          {plan.supplier?.name} — {plan.plan?.name}
+        </p>
+
+        <div className="flex flex-wrap items-center gap-2 mt-2">
+          {planType && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+              {tw(`plan_type_${planType}`)}
+            </span>
+          )}
+          {discountDescription && (
+            <span className="text-sm text-muted-foreground">
+              {discountDescription}
+            </span>
+          )}
+        </div>
+
+        <p
+          className={
+            isPrimary ? "text-primary font-medium mt-2" : "text-primary mt-2"
+          }
+        >
+          {tw("result_savings", {
+            amount: formatAgorot(annualSavingsAgorot),
+          })}
+        </p>
+
+        {isPrimary && rec && (
+          <p className="text-sm text-muted-foreground mt-1">
+            {tw("result_confidence", {
+              level: tw(`confidence_${rec.confidenceLevel}`),
+            })}
+          </p>
+        )}
+
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <SheetTrigger asChild>
+            <button className="text-sm text-muted-foreground underline underline-offset-2 mt-2 hover:text-foreground transition-colors">
+              {tw("savings_breakdown_title")}
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="max-h-[60vh] overflow-y-auto">
+            <SheetHeader className="mb-4">
+              <SheetTitle>{tw("savings_breakdown_title")}</SheetTitle>
+            </SheetHeader>
+            {renderSavingsBreakdown(annualSavingsAgorot)}
+          </SheetContent>
+        </Sheet>
+      </div>
+    );
+  }
 
   function renderRecommendation() {
     if (resultError) {
@@ -85,57 +253,25 @@ export default function ResultsStep({
 
     return (
       <>
-        <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 mb-4">
-          <p className="font-semibold text-lg">
-            {primary?.supplier?.name} — {primary?.plan?.name}
-          </p>
-          <p className="text-primary font-medium mt-1">
-            {tw("result_savings", {
-              amount: Math.round(
-                rec.primaryAnnualSavingsAgorot / 100,
-              ).toLocaleString(),
-            })}
-          </p>
-          <p className="text-sm text-muted-foreground mt-1">
-            {tw("result_confidence", {
-              level: tw(`confidence_${rec.confidenceLevel}`),
-            })}
-          </p>
-        </div>
-
-        {rec.showNoChangeSeparately && noChange && (
-          <div className="rounded-lg border border-border p-4 mb-4">
-            <p className="text-sm text-muted-foreground mb-1">
-              {tw("result_no_change_label")}
-            </p>
-            <p className="font-semibold">
-              {noChange.supplier?.name} — {noChange.plan?.name}
-            </p>
-            <p className="text-primary mt-1">
-              {tw("result_savings", {
-                amount: Math.round(
-                  rec.noChangePlanAnnualSavingsAgorot / 100,
-                ).toLocaleString(),
-              })}
-            </p>
-          </div>
+        {renderPlanCard(
+          primary,
+          rec.primaryAnnualSavingsAgorot,
+          null,
+          true,
+          primarySheetOpen,
+          setPrimarySheetOpen,
         )}
 
-        <p className="text-sm text-muted-foreground mt-4">
-          {(() => {
-            try {
-              const entries = JSON.parse(rec.assumptions) as {
-                key: string;
-                params?: Record<string, string | number>;
-              }[];
-              return entries
-                .map(({ key, params }) => tr(key, params))
-                .join(". ");
-            } catch {
-              return rec.assumptions;
-            }
-          })()}
-        </p>
+        {rec.showNoChangeSeparately &&
+          noChange &&
+          renderPlanCard(
+            noChange,
+            rec.noChangePlanAnnualSavingsAgorot,
+            tw("result_no_change_label"),
+            false,
+            noChangeSheetOpen,
+            setNoChangeSheetOpen,
+          )}
       </>
     );
   }

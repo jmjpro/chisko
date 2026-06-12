@@ -72,5 +72,15 @@
   "confidence_low": "منخفض",
   "result_no_change_label": "بدون تغيير العادات:",
   "review_answers_title": "إجاباتك",
-  "recalculate": "إعادة حساب التوصية"
+  "recalculate": "إعادة حساب التوصية",
+  "plan_type_fixed": "تعريفة ثابتة",
+  "plan_type_day": "تعريفة نهارية",
+  "plan_type_night": "تعريفة ليلية",
+  "plan_discount_fixed": "{{percent}}% خصم من تعريفة חברת חשמל",
+  "plan_discount_window_weekdays": "{{percent}}% خصم {{start}}–{{end}}، الأحد–الخميس",
+  "plan_discount_window_all_days": "{{percent}}% خصم {{start}}–{{end}}، جميع الأيام",
+  "savings_breakdown_title": "كيف حسبنا هذا",
+  "savings_breakdown_baseline": "تعريفة חברת חשמל: ₪{{amount}}/سنة",
+  "savings_breakdown_projected": "مع هذه الخطة: ₪{{amount}}/سنة",
+  "savings_breakdown_saving": "التوفير السنوي: ₪{{amount}}"
 }

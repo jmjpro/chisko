@@ -72,5 +72,15 @@
   "confidence_low": "נמוכה",
   "result_no_change_label": "ללא שינוי הרגלים:",
   "review_answers_title": "התשובות שלך",
-  "recalculate": "חשב מחדש את ההמלצה"
+  "recalculate": "חשב מחדש את ההמלצה",
+  "plan_type_fixed": "תעריף קבוע",
+  "plan_type_day": "תעריף יום",
+  "plan_type_night": "תעריף לילה",
+  "plan_discount_fixed": "{{percent}}% הנחה מתעריף חברת החשמל",
+  "plan_discount_window_weekdays": "{{percent}}% הנחה {{start}}–{{end}}, א'–ה'",
+  "plan_discount_window_all_days": "{{percent}}% הנחה {{start}}–{{end}}, כל הימים",
+  "savings_breakdown_title": "איך חישבנו את זה",
+  "savings_breakdown_baseline": "תעריף חברת החשמל: ₪{{amount}}/שנה",
+  "savings_breakdown_projected": "עם התוכנית הזו: ₪{{amount}}/שנה",
+  "savings_breakdown_saving": "חיסכון שנתי: ₪{{amount}}"
 }
