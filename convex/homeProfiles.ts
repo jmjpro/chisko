@@ -41,6 +41,7 @@ export const upsert = mutation({
       v.literal("none"),
     ),
     willingToShiftUsage: v.boolean(),
+    willingToAcceptOffBillBenefits: v.boolean(),
   },
   handler: async (ctx, { sessionId, street, houseNumber, ...fields }) => {
     const update = {

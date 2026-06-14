@@ -94,6 +94,15 @@ export function checkEligibility(
     };
   }
 
+  if (pv.benefitDelivery === "appCredit" && !p.willingToAcceptOffBillBenefits) {
+    return {
+      isEligible: false,
+      ineligibilityReason: JSON.stringify({
+        key: "ineligibility_off_bill_benefit_declined",
+      }),
+    };
+  }
+
   const e = pv.eligibility;
 
   if (e.requiresSmartMeter && p.hasSmartMeter !== "yes") {
@@ -166,21 +175,25 @@ export function calcSavingsAgorot(
   weekendNight: number,
   iecRate: number,
 ): number {
+  let savings: number;
+
   if (plan.planType === "fixed") {
-    return Math.round(annualKwh * iecRate * (pv.discountPercent / 100));
+    savings = Math.round(annualKwh * iecRate * (pv.discountPercent / 100));
+  } else {
+    const { dayFraction, nightFraction } = computeWindowFractions(
+      pv.discountWindowStartHour!,
+      pv.discountWindowEndHour!,
+    );
+
+    const weekdayKwh = weekdayDay * dayFraction + weekdayNight * nightFraction;
+    const discountedKwh = pv.weekdayWindowOnly
+      ? weekdayKwh
+      : weekdayKwh + weekendDay * dayFraction + weekendNight * nightFraction;
+
+    savings = Math.round(discountedKwh * iecRate * (pv.discountPercent / 100));
   }
 
-  const { dayFraction, nightFraction } = computeWindowFractions(
-    pv.discountWindowStartHour!,
-    pv.discountWindowEndHour!,
-  );
-
-  const weekdayKwh = weekdayDay * dayFraction + weekdayNight * nightFraction;
-  const discountedKwh = pv.weekdayWindowOnly
-    ? weekdayKwh
-    : weekdayKwh + weekendDay * dayFraction + weekendNight * nightFraction;
-
-  return Math.round(discountedKwh * iecRate * (pv.discountPercent / 100));
+  return Math.min(savings, pv.annualSavingsCapAgorot ?? Infinity);
 }
 
 type AssumptionEntry = {

@@ -8,5 +8,6 @@
   "ineligibility_low_confidence": "Smart meter or two clear usage signals required to recommend a time-of-use tariff",
   "ineligibility_requires_smart_meter": "This tariff requires a smart meter",
   "ineligibility_membership_required": "This tariff requires membership: {{membership}}",
-  "ineligibility_coverage_area": "This tariff is not available in your area"
+  "ineligibility_coverage_area": "This tariff is not available in your area",
+  "ineligibility_off_bill_benefit_declined": "You indicated you prefer savings directly on your electricity bill — this tariff delivers savings as partner app credits instead"
 }

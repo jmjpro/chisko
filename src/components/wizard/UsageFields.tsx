@@ -13,6 +13,8 @@ export interface UsageFieldsProps {
   setAcUsageLevel: (v: "heavy" | "moderate" | "light" | "none") => void;
   willingToShiftUsage: boolean;
   setWillingToShiftUsage: (v: boolean) => void;
+  willingToAcceptOffBillBenefits: boolean;
+  setWillingToAcceptOffBillBenefits: (v: boolean) => void;
   namePrefix?: string;
 }
 
@@ -29,6 +31,8 @@ export default function UsageFields({
   setAcUsageLevel,
   willingToShiftUsage,
   setWillingToShiftUsage,
+  willingToAcceptOffBillBenefits,
+  setWillingToAcceptOffBillBenefits,
   namePrefix = "",
 }: UsageFieldsProps) {
   const { t } = useTranslation();
@@ -180,7 +184,7 @@ export default function UsageFields({
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset className="mb-5">
         <legend className="text-sm font-medium mb-2">
           {tw("shift_title")}
         </legend>
@@ -201,6 +205,37 @@ export default function UsageFields({
               name={`${namePrefix}shift`}
               checked={!willingToShiftUsage}
               onChange={() => setWillingToShiftUsage(false)}
+              className="accent-primary"
+            />
+            {t("no")}
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend className="text-sm font-medium mb-2">
+          {tw("off_bill_title")}
+        </legend>
+        <p className="text-xs text-muted-foreground mb-2">
+          {tw("off_bill_description")}
+        </p>
+        <div className="flex gap-5">
+          <label className="flex items-center gap-2 cursor-pointer text-sm">
+            <input
+              type="radio"
+              name={`${namePrefix}offbill`}
+              checked={willingToAcceptOffBillBenefits}
+              onChange={() => setWillingToAcceptOffBillBenefits(true)}
+              className="accent-primary"
+            />
+            {t("yes")}
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-sm">
+            <input
+              type="radio"
+              name={`${namePrefix}offbill`}
+              checked={!willingToAcceptOffBillBenefits}
+              onChange={() => setWillingToAcceptOffBillBenefits(false)}
               className="accent-primary"
             />
             {t("no")}

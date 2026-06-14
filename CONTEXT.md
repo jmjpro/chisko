@@ -80,6 +80,16 @@ _Avoid_: Nighttime plan, off-peak plan
 **IEC Rate**:
 The Israel Electric Corporation's published reference tariff. All supplier discounts are expressed as a percentage reduction from this rate. It is the cost baseline for every Recommendation calculation.
 
+## Plan Version Attributes
+
+**Savings Cap**:
+An optional upper bound on the annual benefit a Plan Version can deliver, expressed in agorot. When present, the engine uses the lesser of the calculated savings and the Savings Cap — additional usage earns no further benefit beyond the cap. Most plans are uncapped.
+_Avoid_: Benefit ceiling, discount cap, savings limit
+
+**Benefit Delivery**:
+The mechanism by which a plan's discount is delivered. `billDiscount` plans reduce the electricity bill directly (the default). `appCredit` plans deliver value as credits in a partner program (e.g., Yellow app) rather than as a bill reduction. Benefit Delivery is a Plan Version attribute, not a Plan Type.
+_Avoid_: Non-cash benefit, indirect savings, loyalty benefit
+
 ## Eligibility Rules
 
 A Plan Version may carry any combination of these eligibility requirements, evaluated against the Home Profile before cost calculations run:
@@ -92,6 +102,10 @@ A Plan Version may carry any combination of these eligibility requirements, eval
 
 **Supplier Coverage**: A plan is only available where the supplier operates and can complete the switch. Coverage is supplier-defined and stored on the Plan Version.
 
+**Off-Bill Benefit Willingness**:
+A user's stated preference, captured late in the questionnaire, for whether they are willing to receive plan benefits as credits in a third-party program rather than as a direct bill reduction. When false, all Plan Versions with `appCredit` Benefit Delivery are ineligible — they are excluded before cost calculations run, the same path as any other eligibility check.
+_Avoid_: Non-cash preference, app credit preference
+
 **Smart Meter Registry**:
 The IEC-sourced dataset of addresses in Israel where a smart meter has been installed. Used to determine smart meter status for households that are uncertain which meter type they have.
 _Avoid_: Mobility addresses, IEC address list, meter addresses
@@ -99,7 +113,7 @@ _Avoid_: Mobility addresses, IEC address list, meter addresses
 ## Inputs
 
 **Home Profile**:
-A household's self-reported characteristics captured via questionnaire. Fields: smart meter (yes/no — determined at the start of the wizard, never unknown after completion), city, street, house number (street and house number populated only when collected via Smart Meter Registry lookup), bundle memberships (HOT triple, Cellcom, etc.), current supplier + plan (if no bill uploaded), approximate monthly kWh (if no bill uploaded), work-from-home pattern, EV charging (yes/no + timing), washer/dryer timing, AC usage level, and willingness to shift appliance usage to save more (yes/no). When the current supplier is IEC (or unknown), both are represented as a null supplier reference — the Recommendation engine uses the full IEC Rate as the cost baseline in either case.
+A household's self-reported characteristics captured via questionnaire. Fields: smart meter (yes/no — determined at the start of the wizard, never unknown after completion), city, street, house number (street and house number populated only when collected via Smart Meter Registry lookup), bundle memberships (HOT triple, Cellcom, etc.), current supplier + plan (if no bill uploaded), approximate monthly kWh (if no bill uploaded), work-from-home pattern, EV charging (yes/no + timing), washer/dryer timing, AC usage level, willingness to shift appliance usage to save more (yes/no), and Off-Bill Benefit Willingness (yes/no — asked late in the questionnaire). When the current supplier is IEC (or unknown), both are represented as a null supplier reference — the Recommendation engine uses the full IEC Rate as the cost baseline in either case.
 _Avoid_: User profile, household, account
 
 **Bill Import**:

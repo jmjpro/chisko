@@ -85,6 +85,8 @@ export default defineSchema({
     effectiveFrom: v.number(), // ms timestamp
     effectiveTo: v.union(v.number(), v.null()), // null = currently active
     discountPercent: v.number(), // e.g. 7.0 = 7% off IEC rate
+    annualSavingsCapAgorot: v.optional(v.number()), // null = uncapped; e.g. 60000 = ₪600/year
+    benefitDelivery: v.union(v.literal("billDiscount"), v.literal("appCredit")),
     // Discount window (day/night plans only)
     discountWindowStartHour: v.optional(v.number()), // 0–23
     discountWindowEndHour: v.optional(v.number()), // 0–23
@@ -149,6 +151,7 @@ export default defineSchema({
       v.literal("none"),
     ),
     willingToShiftUsage: v.boolean(),
+    willingToAcceptOffBillBenefits: v.boolean(),
   }).index("by_session", ["sessionId"]),
 
   // Parsed electricity bill or IEC smart-meter CSV.

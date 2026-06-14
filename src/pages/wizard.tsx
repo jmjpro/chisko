@@ -60,6 +60,8 @@ export default function WizardPage() {
     "heavy" | "moderate" | "light" | "none"
   >("moderate");
   const [willingToShiftUsage, setWillingToShiftUsage] = useState(true);
+  const [willingToAcceptOffBillBenefits, setWillingToAcceptOffBillBenefits] =
+    useState(true);
 
   // Upload / generation state
   const [uploadLoading, setUploadLoading] = useState(false);
@@ -225,6 +227,7 @@ export default function WizardPage() {
         washerDryerTime,
         acUsageLevel,
         willingToShiftUsage,
+        willingToAcceptOffBillBenefits,
       });
       await generateRecommendation({
         sessionId,
@@ -300,6 +303,8 @@ export default function WizardPage() {
     setAcUsageLevel,
     willingToShiftUsage,
     setWillingToShiftUsage,
+    willingToAcceptOffBillBenefits,
+    setWillingToAcceptOffBillBenefits,
   };
 
   // ── Step rendering ───────────────────────────────────────────────────────

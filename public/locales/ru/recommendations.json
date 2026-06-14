@@ -8,5 +8,6 @@
   "ineligibility_low_confidence": "Для рекомендации повременного тарифа требуется умный счётчик или два чётких сигнала потребления",
   "ineligibility_requires_smart_meter": "Этот тариф требует наличия умного счётчика",
   "ineligibility_membership_required": "Этот тариф требует подписки: {{membership}}",
-  "ineligibility_coverage_area": "Этот тариф недоступен в вашем регионе"
+  "ineligibility_coverage_area": "Этот тариф недоступен в вашем регионе",
+  "ineligibility_off_bill_benefit_declined": "Вы указали, что предпочитаете экономию непосредственно в счёте за электроэнергию — этот тариф начисляет экономию в виде баллов в партнёрском приложении"
 }

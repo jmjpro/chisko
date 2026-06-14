@@ -8,5 +8,6 @@
   "ineligibility_low_confidence": "דרוש מונה חכם או שני אותות שימוש ברורים לקבלת המלצה על תעריף לפי שעות",
   "ineligibility_requires_smart_meter": "תעריף זה דורש מונה חכם",
   "ineligibility_membership_required": "תעריף זה דורש מנוי: {{membership}}",
-  "ineligibility_coverage_area": "תעריף זה אינו זמין באזורך"
+  "ineligibility_coverage_area": "תעריף זה אינו זמין באזורך",
+  "ineligibility_off_bill_benefit_declined": "ציינת שאתה מעדיף חיסכון ישיר בחשבון החשמל — תעריף זה מעניק חיסכון כקרדיטים באפליקציית שותף"
 }

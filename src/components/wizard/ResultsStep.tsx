@@ -31,6 +31,7 @@ type PlanVersionMechanics = {
   discountWindowStartHour?: number;
   discountWindowEndHour?: number;
   weekdayWindowOnly: boolean;
+  benefitDelivery?: "billDiscount" | "appCredit";
 };
 
 type EvaluatedPlan = {
@@ -199,6 +200,12 @@ export default function ResultsStep({
             amount: formatAgorot(annualSavingsAgorot),
           })}
         </p>
+
+        {plan.planVersion?.benefitDelivery === "appCredit" && (
+          <p className="text-xs text-muted-foreground mt-1 bg-muted/50 rounded px-2 py-1">
+            {tw("benefit_delivery_app_credit")}
+          </p>
+        )}
 
         {isPrimary && rec && (
           <p className="text-sm text-muted-foreground mt-1">

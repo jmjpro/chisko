@@ -180,6 +180,8 @@ export const run = internalMutation({
     type PVSeed = {
       planSeedId: string;
       discountPercent: number;
+      annualSavingsCapAgorot?: number;
+      benefitDelivery: "billDiscount" | "appCredit";
       discountWindowStartHour?: number;
       discountWindowEndHour?: number;
       weekdayWindowOnly: boolean;
@@ -195,6 +197,7 @@ export const run = internalMutation({
       {
         planSeedId: "electra_day_21",
         discountPercent: 21,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 7,
         discountWindowEndHour: 17,
         weekdayWindowOnly: true,
@@ -208,6 +211,7 @@ export const run = internalMutation({
       {
         planSeedId: "electra_night_21",
         discountPercent: 21,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 23,
         discountWindowEndHour: 7,
         weekdayWindowOnly: true,
@@ -221,6 +225,7 @@ export const run = internalMutation({
       {
         planSeedId: "electra_day_12_12x12",
         discountPercent: 12,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 5,
         discountWindowEndHour: 17,
         weekdayWindowOnly: false,
@@ -234,6 +239,7 @@ export const run = internalMutation({
       {
         planSeedId: "electra_fixed_6_5",
         discountPercent: 6.5,
+        benefitDelivery: "billDiscount",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -245,6 +251,7 @@ export const run = internalMutation({
       {
         planSeedId: "cellcom_day_20",
         discountPercent: 20,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 7,
         discountWindowEndHour: 17,
         weekdayWindowOnly: true,
@@ -258,6 +265,7 @@ export const run = internalMutation({
       {
         planSeedId: "cellcom_night_18",
         discountPercent: 18,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 20,
         discountWindowEndHour: 2,
         weekdayWindowOnly: true,
@@ -271,6 +279,7 @@ export const run = internalMutation({
       {
         planSeedId: "cellcom_night_15",
         discountPercent: 15,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 23,
         discountWindowEndHour: 7,
         weekdayWindowOnly: false,
@@ -284,6 +293,7 @@ export const run = internalMutation({
       {
         planSeedId: "cellcom_fixed_6",
         discountPercent: 6,
+        benefitDelivery: "billDiscount",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -295,6 +305,7 @@ export const run = internalMutation({
       {
         planSeedId: "bezek_night_20",
         discountPercent: 20,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 23,
         discountWindowEndHour: 7,
         weekdayWindowOnly: true,
@@ -308,6 +319,7 @@ export const run = internalMutation({
       {
         planSeedId: "bezek_day_15",
         discountPercent: 15,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 7,
         discountWindowEndHour: 17,
         weekdayWindowOnly: true,
@@ -321,6 +333,7 @@ export const run = internalMutation({
       {
         planSeedId: "bezek_fixed_6",
         discountPercent: 6,
+        benefitDelivery: "billDiscount",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -332,6 +345,7 @@ export const run = internalMutation({
       {
         planSeedId: "hot_night_20",
         discountPercent: 20,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 23,
         discountWindowEndHour: 7,
         weekdayWindowOnly: true,
@@ -345,6 +359,7 @@ export const run = internalMutation({
       {
         planSeedId: "hot_day_15",
         discountPercent: 15,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 7,
         discountWindowEndHour: 17,
         weekdayWindowOnly: true,
@@ -358,6 +373,7 @@ export const run = internalMutation({
       {
         planSeedId: "hot_fixed_5",
         discountPercent: 5,
+        benefitDelivery: "billDiscount",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -369,6 +385,7 @@ export const run = internalMutation({
       {
         planSeedId: "partner_night_20",
         discountPercent: 20,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 23,
         discountWindowEndHour: 7,
         weekdayWindowOnly: true,
@@ -382,6 +399,7 @@ export const run = internalMutation({
       {
         planSeedId: "partner_day_15",
         discountPercent: 15,
+        benefitDelivery: "billDiscount",
         discountWindowStartHour: 7,
         discountWindowEndHour: 17,
         weekdayWindowOnly: true,
@@ -395,6 +413,7 @@ export const run = internalMutation({
       {
         planSeedId: "partner_fixed_tiered",
         discountPercent: 6,
+        benefitDelivery: "billDiscount",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -406,6 +425,8 @@ export const run = internalMutation({
       {
         planSeedId: "pazgaz_fixed_10_yellow",
         discountPercent: 10,
+        annualSavingsCapAgorot: 60000,
+        benefitDelivery: "appCredit",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -417,6 +438,7 @@ export const run = internalMutation({
       {
         planSeedId: "pazgaz_fixed_6",
         discountPercent: 6,
+        benefitDelivery: "billDiscount",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -428,6 +450,7 @@ export const run = internalMutation({
       {
         planSeedId: "hot_fixed_6_savers",
         discountPercent: 6,
+        benefitDelivery: "billDiscount",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -439,6 +462,7 @@ export const run = internalMutation({
       {
         planSeedId: "amisragas_fixed_7",
         discountPercent: 7,
+        benefitDelivery: "billDiscount",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -455,6 +479,10 @@ export const run = internalMutation({
         effectiveFrom: JAN_2024,
         effectiveTo: null,
         discountPercent: pv.discountPercent,
+        ...(pv.annualSavingsCapAgorot !== undefined && {
+          annualSavingsCapAgorot: pv.annualSavingsCapAgorot,
+        }),
+        benefitDelivery: pv.benefitDelivery,
         ...(pv.discountWindowStartHour !== undefined && {
           discountWindowStartHour: pv.discountWindowStartHour,
         }),

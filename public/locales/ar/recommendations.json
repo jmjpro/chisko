@@ -8,5 +8,6 @@
   "ineligibility_low_confidence": "مطلوب عداد ذكي أو إشارتا استخدام واضحتان للتوصية بتعريفة حسب ساعات الاستخدام",
   "ineligibility_requires_smart_meter": "هذه التعريفة تتطلب عداداً ذكياً",
   "ineligibility_membership_required": "هذه التعريفة تتطلب اشتراكاً في: {{membership}}",
-  "ineligibility_coverage_area": "هذه التعريفة غير متوفرة في منطقتك"
+  "ineligibility_coverage_area": "هذه التعريفة غير متوفرة في منطقتك",
+  "ineligibility_off_bill_benefit_declined": "أشرت إلى تفضيلك للحصول على التوفير مباشرةً في فاتورة الكهرباء — هذه التعريفة تمنح التوفير كرصيد في تطبيق شريك"
 }

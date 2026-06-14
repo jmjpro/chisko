@@ -23,6 +23,7 @@ function profile(overrides: Record<string, unknown> = {}): Doc<"homeProfiles"> {
     hasSmartMeter: "unknown",
     bundleMemberships: [],
     city: "Tel Aviv",
+    willingToAcceptOffBillBenefits: true,
     ...overrides,
   } as unknown as Doc<"homeProfiles">;
 }
@@ -50,6 +51,7 @@ function planVersion(
     },
     discountPercent: 7,
     weekdayWindowOnly: false,
+    benefitDelivery: "billDiscount",
     ...overrides,
   } as unknown as Doc<"planVersions">;
 }
@@ -356,6 +358,39 @@ describe("checkEligibility", () => {
     );
     expect(isEligible).toBe(true);
   });
+
+  it("appCredit plan + unwilling to accept off-bill benefits → ineligible", () => {
+    const { isEligible, ineligibilityReason } = checkEligibility(
+      planVersion({ benefitDelivery: "appCredit" }),
+      plan("fixed"),
+      profile({ willingToAcceptOffBillBenefits: false }),
+      "high",
+    );
+    expect(isEligible).toBe(false);
+    expect(JSON.parse(ineligibilityReason!).key).toBe(
+      "ineligibility_off_bill_benefit_declined",
+    );
+  });
+
+  it("appCredit plan + willing to accept off-bill benefits → not blocked by this gate", () => {
+    const { isEligible } = checkEligibility(
+      planVersion({ benefitDelivery: "appCredit" }),
+      plan("fixed"),
+      profile({ willingToAcceptOffBillBenefits: true }),
+      "high",
+    );
+    expect(isEligible).toBe(true);
+  });
+
+  it("billDiscount plan + unwilling to accept off-bill benefits → not blocked", () => {
+    const { isEligible } = checkEligibility(
+      planVersion({ benefitDelivery: "billDiscount" }),
+      plan("fixed"),
+      profile({ willingToAcceptOffBillBenefits: false }),
+      "high",
+    );
+    expect(isEligible).toBe(true);
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -400,6 +435,36 @@ describe("calcSavingsAgorot", () => {
     expect(
       calcSavingsAgorot(pv, plan("night"), 8000, kwd, kwn, kwed, kwen, iecRate),
     ).toBe(Math.round(2000 * iecRate * 0.2));
+  });
+
+  it("savings cap: returns cap when calculated savings exceed it", () => {
+    const pv = planVersion({
+      discountPercent: 10,
+      annualSavingsCapAgorot: 60000,
+    });
+    // 8000 kWh × 64.32 agorot × 10% = 51,456 agorot — wait, that's under 60k
+    // use 10000 kWh: 10000 × 64.32 × 0.10 = 64,320 > 60,000 → should return 60000
+    expect(calcSavingsAgorot(pv, plan("fixed"), 10000, 0, 0, 0, 0, 64.32)).toBe(
+      60000,
+    );
+  });
+
+  it("savings cap: returns full savings when below cap", () => {
+    const pv = planVersion({
+      discountPercent: 10,
+      annualSavingsCapAgorot: 60000,
+    });
+    // 8000 kWh × 64.32 × 10% = 51,456 < 60,000 → uncapped
+    expect(calcSavingsAgorot(pv, plan("fixed"), 8000, 0, 0, 0, 0, 64.32)).toBe(
+      Math.round(8000 * 64.32 * 0.1),
+    );
+  });
+
+  it("no savings cap (annualSavingsCapAgorot absent): full savings returned", () => {
+    const pv = planVersion({ discountPercent: 10 });
+    expect(calcSavingsAgorot(pv, plan("fixed"), 10000, 0, 0, 0, 0, 64.32)).toBe(
+      Math.round(10000 * 64.32 * 0.1),
+    );
   });
 
   it("weekday-only window excludes weekend contribution", () => {

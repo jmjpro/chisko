@@ -11,6 +11,7 @@
 import type * as billImports from "../billImports.js";
 import type * as crons from "../crons.js";
 import type * as homeProfiles from "../homeProfiles.js";
+import type * as migrations from "../migrations.js";
 import type * as plans from "../plans.js";
 import type * as recommendations from "../recommendations.js";
 import type * as seed from "../seed.js";
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   billImports: typeof billImports;
   crons: typeof crons;
   homeProfiles: typeof homeProfiles;
+  migrations: typeof migrations;
   plans: typeof plans;
   recommendations: typeof recommendations;
   seed: typeof seed;
