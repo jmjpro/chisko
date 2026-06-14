@@ -31,7 +31,7 @@ Supported languages: `en`, `he`, `ar`, `ru`. All four locale files must be updat
 
 ### Issue tracker
 
-Issues live in GitHub Issues for `jmjpro/chisko` (uses the `gh` CLI). See `docs/agents/issue-tracker.md`.
+Issues live in Linear (project: Chisko, team prefix `CHI`). Use the `linear-server` MCP (configured as an SSE server at `https://mcp.linear.app/sse`). See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 

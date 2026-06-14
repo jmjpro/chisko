@@ -1,10 +1,12 @@
 ---
 name: commit
-description: Stage relevant files and create a conventional commit that references a GitHub issue. Writes a message with a Closes/Fixes trailer so the issue auto-closes on merge.
-argument-hint: "<issue-number> [optional commit message hint]"
+description: Stage relevant files and create a conventional commit that references a Linear issue. Writes a message with a Closes/Fixes trailer so the issue auto-closes on merge.
+argument-hint: "<issue-id-or-number> [optional commit message hint]"
 ---
 
-Stage the relevant files and commit them with a conventional message that references the given issue number.
+Stage the relevant files and commit them with a conventional message that references the given Linear issue.
+
+The argument may be a full issue ID (`CHI-18`) or just a number (`18`). Normalize it to `CHI-N` format before writing the trailer.
 
 ## Steps
 
@@ -17,10 +19,10 @@ Stage the relevant files and commit them with a conventional message that refere
    - **Body** (optional blank line + 1-2 sentences): the *why*, only if non-obvious.
    - **Trailer block**:
      ```
-     Closes #<issue-number>
+     Closes CHI-<N>
      Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
      ```
-   - Use `Fixes #N` for bugs, `Closes #N` for features/tasks. Both auto-close on GitHub.
+   - Use `Fixes CHI-N` for bugs, `Closes CHI-N` for features/tasks. No `#` prefix — Linear uses the bare `CHI-N` format.
 
 4. Commit using a HEREDOC so formatting is preserved:
    ```bash
@@ -29,7 +31,7 @@ Stage the relevant files and commit them with a conventional message that refere
 
    Optional body here.
 
-   Closes #N
+   Closes CHI-N
    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
    EOF
    )"

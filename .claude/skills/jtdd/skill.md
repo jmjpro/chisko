@@ -1,56 +1,33 @@
 ---
 name: jtdd
-description: Joshua's TDD wrapper. Confirms issue is In Progress + ready-for-agent on the project board, runs the TDD session, then offers to advance label to ready-for-human.
-argument-hint: "<issue-number-or-url>"
+description: Joshua's TDD wrapper. Confirms issue is In Progress + ready-for-agent in Linear, runs the TDD session, then offers to advance label to ready-for-human.
+argument-hint: "<issue-id-or-number>"
 ---
 
-Accept one argument: an issue number (`18`) or a full GitHub URL (`https://github.com/jmjpro/chisko/issues/18`). Extract the issue number either way.
+Accept one argument: a Linear issue ID (`CHI-18`) or a bare number (`18`). Normalize to `CHI-N` format.
 
 ## Step 1 — Pre-condition check
 
-Fetch board state and issue details in parallel:
+Use the `linear-server` MCP tools to fetch the issue. Get its current workflow state (e.g. "In Progress") and its labels (e.g. `ready-for-agent`).
 
-```bash
-gh project item-list 2 --owner jmjpro --format json
-gh issue view <N> --repo jmjpro/chisko --json number,title,body,labels
-```
-
-**Required state:** board Status = `In Progress` AND label `ready-for-agent` is present.
+**Required state:** workflow state = `In Progress` AND label `ready-for-agent` is present.
 
 If both conditions are met, skip to Step 2.
 
 Otherwise, print a single summary line:
-> Issue #N "<title>" — status: <status or "not on board">, labels: <labels or "none">
+> CHI-N "<title>" — state: <state or "none">, labels: <labels or "none">
 
 Then ask: `Set to In Progress + ready-for-agent and continue? [y/n]`
 
 If no, stop.
 
-If yes, apply the changes:
-
-1. **If not on board** — add the item and capture its node ID from the returned JSON:
-   ```bash
-   gh project item-add 2 --owner jmjpro --url https://github.com/jmjpro/chisko/issues/<N> --format json
-   ```
-
-2. **If already on board** — the item node ID is the `id` field from `item-list`.
-
-3. **Set status to In Progress:**
-   ```bash
-   gh project item-edit --id <ITEM_NODE_ID> \
-     --project-id PVT_kwHOADGxjc4BaYiT \
-     --field-id PVTSSF_lAHOADGxjc4BaYiTzhVQimQ \
-     --single-select-option-id 47fc9ee4
-   ```
-
-4. **Add ready-for-agent label** (if not already present):
-   ```bash
-   gh issue edit <N> --repo jmjpro/chisko --add-label "ready-for-agent"
-   ```
+If yes, use the `linear-server` MCP tools to apply both changes in parallel:
+1. Update the issue's workflow state to `In Progress` (look up the state ID if needed via the team's workflow states).
+2. Add the label `ready-for-agent` to the issue (look up the label ID if needed via the team's labels).
 
 ## Step 2 — TDD
 
-Invoke `/tdd`. The issue content (title + body fetched in Step 1) is already in context — use it to drive the TDD session.
+Invoke `/tdd`. The issue title and body are already in context from Step 1 — use them to drive the TDD session.
 
 Run the full red-green-refactor loop per the tdd skill instructions. When all tests pass and refactoring is complete, proceed to Step 3.
 
@@ -58,14 +35,6 @@ Run the full red-green-refactor loop per the tdd skill instructions. When all te
 
 Ask: `TDD complete. Advance label ready-for-agent → ready-for-human? [y/n]`
 
-If yes:
-```bash
-gh issue edit <N> --repo jmjpro/chisko --remove-label "ready-for-agent" --add-label "ready-for-human"
-```
-
----
-
-**Board reference (project #2, owner jmjpro):**
-- Project node ID: `PVT_kwHOADGxjc4BaYiT`
-- Status field ID: `PVTSSF_lAHOADGxjc4BaYiTzhVQimQ`
-- Status option IDs: Todo `f75ad846` · In Progress `47fc9ee4` · Done `98236657`
+If yes, use the `linear-server` MCP tools to:
+1. Remove the label `ready-for-agent` from the issue.
+2. Add the label `ready-for-human` to the issue.
