@@ -59,6 +59,40 @@ test.describe("Full wizard flow", () => {
   });
 });
 
+test.describe("Home step — Place of Residence", () => {
+  test("shows Place of Residence combobox, not a plain text input", async ({
+    page,
+  }) => {
+    await page.goto("/wizard");
+    await page.getByText("Standard meter").click();
+    await page.getByRole("button", { name: "Next" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Your Home" }),
+    ).toBeVisible();
+
+    // New combobox label appears
+    await expect(page.getByText("Place of Residence")).toBeVisible();
+
+    // Old free-text city input is gone
+    await expect(page.getByPlaceholder("e.g. Tel Aviv")).not.toBeVisible();
+  });
+
+  test("Place of Residence combobox is visible in the Results review panel", async ({
+    page,
+  }) => {
+    await navigateToUsageStep(page);
+    await page.getByRole("button", { name: "Get My Recommendation" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Your Recommendation" }),
+    ).toBeVisible({ timeout: 20000 });
+
+    // The review panel at the bottom always shows Place of Residence (cascadeCityCode={null})
+    await expect(page.getByText("Place of Residence")).toBeVisible();
+  });
+});
+
 test.describe("Usage step — Off-Bill Benefit Willingness question", () => {
   test("off-bill question appears as the last fieldset", async ({ page }) => {
     await navigateToUsageStep(page);

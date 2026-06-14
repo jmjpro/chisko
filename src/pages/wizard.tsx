@@ -39,7 +39,12 @@ export default function WizardPage() {
   );
 
   // Home fields
-  const [city, setCity] = useState("");
+  const [placeOfResidence, setPlaceOfResidence] = useState<{
+    he: string;
+    en?: string;
+    ar?: string;
+    ru?: string;
+  } | null>(null);
   const [bundleMemberships, setBundleMemberships] = useState<string[]>([]);
   const [currentSupplierId, setCurrentSupplierId] =
     useState<Id<"suppliers"> | null>(null);
@@ -85,6 +90,9 @@ export default function WizardPage() {
     api.recommendations.getEvaluatedPlans,
     rec ? { recommendationId: rec._id } : "skip",
   );
+
+  // israelPlaces for the Place of Residence typeahead
+  const israelPlaces = useQuery(api.israelPlaces.getAll, {});
 
   // Smart Meter Registry queries
   const cities = useQuery(
@@ -163,7 +171,12 @@ export default function WizardPage() {
     setCascadeStreetCode(null);
     setCascadeStreetName(null);
     setCascadeHouseNumber(null);
-    setCity(cityName);
+    const match = israelPlaces?.find((p) => p.he === cityName);
+    setPlaceOfResidence(
+      match
+        ? { he: match.he, en: match.en, ar: match.ar, ru: match.ru }
+        : { he: cityName },
+    );
   }
 
   function handleStreetChange(streetCode: number, streetName: string) {
@@ -215,7 +228,7 @@ export default function WizardPage() {
         sessionId,
         hasSmartMeter: effectiveHasSmartMeter ?? "unknown",
         bundleMemberships,
-        city,
+        placeOfResidence: placeOfResidence ?? { he: "" },
         ...(cascadeStreetName ? { street: cascadeStreetName } : {}),
         ...(cascadeHouseNumber ? { houseNumber: cascadeHouseNumber } : {}),
         currentSupplierId,
@@ -279,8 +292,8 @@ export default function WizardPage() {
   // ── Shared field prop objects ────────────────────────────────────────────
 
   const homeFieldsProps = {
-    city,
-    setCity,
+    placeOfResidence,
+    setPlaceOfResidence,
     cascadeCityCode,
     supplierSelectValue,
     onSupplierChange: handleSupplierChange,
@@ -288,6 +301,7 @@ export default function WizardPage() {
     bundleMemberships,
     toggleMembership,
     clearMemberships: () => setBundleMemberships([]),
+    israelPlaces,
   };
 
   const usageFieldsProps = {

@@ -11,4 +11,12 @@ crons.cron(
   {},
 );
 
+// Refresh israelPlaces every Sunday at 02:30 UTC
+crons.cron(
+  "refresh israel places",
+  "30 2 * * 0",
+  internal.israelPlacesRefresh.doRefresh,
+  {},
+);
+
 export default crons;

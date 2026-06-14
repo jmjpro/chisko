@@ -10,7 +10,12 @@ export const upsert = mutation({
       v.literal("unknown"),
     ),
     bundleMemberships: v.array(v.string()),
-    city: v.string(),
+    placeOfResidence: v.object({
+      he: v.string(),
+      en: v.optional(v.string()),
+      ar: v.optional(v.string()),
+      ru: v.optional(v.string()),
+    }),
     street: v.optional(v.string()),
     houseNumber: v.optional(v.string()),
     currentSupplierId: v.union(v.id("suppliers"), v.null()),

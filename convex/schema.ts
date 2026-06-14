@@ -110,6 +110,14 @@ export default defineSchema({
     convertedToLeadId: v.union(v.id("leads"), v.null()),
   }).index("by_session_token", ["sessionToken"]),
 
+  // Israeli government locality registry — refreshed weekly from data.gov.il
+  israelPlaces: defineTable({
+    he: v.string(), // Hebrew name (required)
+    en: v.optional(v.string()),
+    ar: v.optional(v.string()),
+    ru: v.optional(v.string()),
+  }).index("by_he", ["he"]),
+
   // Household characteristics captured via questionnaire
   homeProfiles: defineTable({
     sessionId: v.id("sessions"),
@@ -119,7 +127,12 @@ export default defineSchema({
       v.literal("unknown"),
     ),
     bundleMemberships: v.array(v.string()), // e.g. ["HOT triple", "HOT Mobile"]
-    city: v.string(),
+    placeOfResidence: v.object({
+      he: v.string(),
+      en: v.optional(v.string()),
+      ar: v.optional(v.string()),
+      ru: v.optional(v.string()),
+    }),
     // Populated only when address was collected via Smart Meter Registry lookup
     street: v.optional(v.string()),
     houseNumber: v.optional(v.string()),

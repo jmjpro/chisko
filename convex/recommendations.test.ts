@@ -22,7 +22,7 @@ function profile(overrides: Record<string, unknown> = {}): Doc<"homeProfiles"> {
     acUsageLevel: "moderate",
     hasSmartMeter: "unknown",
     bundleMemberships: [],
-    city: "Tel Aviv",
+    placeOfResidence: { he: "תל אביב" },
     willingToAcceptOffBillBenefits: true,
     ...overrides,
   } as unknown as Doc<"homeProfiles">;
@@ -311,28 +311,45 @@ describe("checkEligibility", () => {
     expect(isEligible).toBe(false);
   });
 
-  it("coverageAreas non-empty + city not listed → ineligible", () => {
+  it("coverageAreas non-empty + placeOfResidence.he matches → eligible", () => {
     const { isEligible } = checkEligibility(
       planVersion({
         eligibility: {
           requiresSmartMeter: false,
           membershipRequired: null,
           residentialOnly: true,
-          coverageAreas: ["Tel Aviv"],
+          coverageAreas: ["city-a"],
         },
       }),
       plan("fixed"),
-      profile({ city: "Jerusalem" }),
+      profile({ placeOfResidence: { he: "city-a" } }),
+      "high",
+    );
+    expect(isEligible).toBe(true);
+  });
+
+  it("coverageAreas non-empty + place not listed → ineligible", () => {
+    const { isEligible } = checkEligibility(
+      planVersion({
+        eligibility: {
+          requiresSmartMeter: false,
+          membershipRequired: null,
+          residentialOnly: true,
+          coverageAreas: ["city-a"],
+        },
+      }),
+      plan("fixed"),
+      profile({ placeOfResidence: { he: "city-b" } }),
       "high",
     );
     expect(isEligible).toBe(false);
   });
 
-  it("coverageAreas empty (nationwide) → eligible regardless of city", () => {
+  it("coverageAreas empty (nationwide) → eligible regardless of place of residence", () => {
     const { isEligible } = checkEligibility(
       planVersion(),
       plan("fixed"),
-      profile({ city: "Haifa" }),
+      profile({ placeOfResidence: { he: "city-a" } }),
       "high",
     );
     expect(isEligible).toBe(true);
