@@ -9,8 +9,12 @@ The engine's output for a given home profile — includes a Primary Recommendati
 _Avoid_: Result, suggestion, analysis
 
 **Primary Recommendation**:
-The plan with the highest expected annual savings for a household, regardless of whether it requires behavior change.
+The plan with the highest expected annual savings for a household, regardless of whether it requires behavior change. Displayed as the #1 ranked card on the results page.
 _Avoid_: Best plan, top recommendation
+
+**Alternative Recommendation**:
+The 2nd and 3rd highest-saving eligible plans for a household, drawn from the evaluated plan pool and ranked by annual savings after the Primary Recommendation. Displayed as #2 and #3 on the results page, revealed behind a show-more toggle. Up to two Alternative Recommendations may be shown; fewer (or none) are shown when the eligible pool is too small.
+_Avoid_: Runner-up, secondary plan, other options
 
 **No-Change Recommendation**:
 The best Fixed Plan available for a household — shown alongside the Primary Recommendation when the user is unwilling to shift appliance usage, or when the savings gap between it and the Primary Recommendation exceeds ₪200/year. Always a Fixed Plan.

@@ -93,6 +93,57 @@ test.describe("Home step — Place of Residence", () => {
   });
 });
 
+test.describe("Alternative Recommendations", () => {
+  async function navigateToResultsStep(page: Page) {
+    await navigateToUsageStep(page);
+    await page.getByRole("button", { name: "Get My Recommendation" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Your Recommendation" }),
+    ).toBeVisible({ timeout: 20000 });
+  }
+
+  test("primary card shows rank badge #1", async ({ page }) => {
+    await navigateToResultsStep(page);
+    await expect(page.getByText("#1")).toBeVisible();
+  });
+
+  test("show-more trigger appears when alternatives are available", async ({
+    page,
+  }) => {
+    await navigateToResultsStep(page);
+    await expect(
+      page.getByRole("button", { name: /more option/i }),
+    ).toBeVisible();
+  });
+
+  test("clicking trigger reveals alternative cards with rank badges", async ({
+    page,
+  }) => {
+    await navigateToResultsStep(page);
+    await page.getByRole("button", { name: /more option/i }).click();
+    await expect(page.getByText("#2")).toBeVisible();
+    await expect(page.getByText("#3")).toBeVisible();
+  });
+
+  test("trigger changes to 'Hide options' when expanded", async ({ page }) => {
+    await navigateToResultsStep(page);
+    await page.getByRole("button", { name: /more option/i }).click();
+    await expect(
+      page.getByRole("button", { name: "Hide options" }),
+    ).toBeVisible();
+  });
+
+  test("clicking 'Hide options' collapses the alternatives", async ({
+    page,
+  }) => {
+    await navigateToResultsStep(page);
+    await page.getByRole("button", { name: /more option/i }).click();
+    await expect(page.getByText("#2")).toBeVisible();
+    await page.getByRole("button", { name: "Hide options" }).click();
+    await expect(page.getByText("#2")).not.toBeVisible();
+  });
+});
+
 test.describe("Usage step — Off-Bill Benefit Willingness question", () => {
   test("off-bill question appears as the last fieldset", async ({ page }) => {
     await navigateToUsageStep(page);

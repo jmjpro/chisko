@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,8 @@ type PlanVersionMechanics = {
 
 type EvaluatedPlan = {
   planVersionId: Id<"planVersions">;
+  isEligible: boolean;
+  annualSavingsAgorot: number;
   supplier?: { name: string } | null;
   plan?: { name: string; planType: "fixed" | "day" | "night" } | null;
   planVersion?: PlanVersionMechanics | null;
@@ -85,6 +87,8 @@ export default function ResultsStep({
 
   const [primarySheetOpen, setPrimarySheetOpen] = useState(false);
   const [noChangeSheetOpen, setNoChangeSheetOpen] = useState(false);
+  const [showAlternatives, setShowAlternatives] = useState(false);
+  const [altSheetsOpen, setAltSheetsOpen] = useState([false, false]);
 
   function getDiscountDescription(
     pv: PlanVersionMechanics | null | undefined,
@@ -257,17 +261,52 @@ export default function ResultsStep({
     const noChange = evaluatedPlans?.find(
       (p) => p.planVersionId === rec.noChangePlanVersionId,
     );
+    const alternatives = (evaluatedPlans ?? [])
+      .filter(
+        (p) => p.isEligible && p.planVersionId !== rec.primaryPlanVersionId,
+      )
+      .slice(0, 2);
 
     return (
       <>
         {renderPlanCard(
           primary,
           rec.primaryAnnualSavingsAgorot,
-          null,
+          tw("rank_label", { rank: 1 }),
           true,
           primarySheetOpen,
           setPrimarySheetOpen,
         )}
+
+        {alternatives.length > 0 && (
+          <button
+            className="text-sm text-muted-foreground underline underline-offset-2 mb-4 hover:text-foreground transition-colors"
+            onClick={() => setShowAlternatives((v) => !v)}
+          >
+            {showAlternatives
+              ? tw("hide_options")
+              : tw("show_more_options", { count: alternatives.length })}
+          </button>
+        )}
+
+        {showAlternatives &&
+          alternatives.map((alt, i) => (
+            <React.Fragment key={alt.planVersionId}>
+              {renderPlanCard(
+                alt,
+                alt.annualSavingsAgorot,
+                tw("rank_label", { rank: i + 2 }),
+                false,
+                altSheetsOpen[i],
+                (open) =>
+                  setAltSheetsOpen((prev) => {
+                    const next = [...prev];
+                    next[i] = open;
+                    return next;
+                  }),
+              )}
+            </React.Fragment>
+          ))}
 
         {rec.showNoChangeSeparately &&
           noChange &&

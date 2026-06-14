@@ -86,5 +86,9 @@
   "savings_breakdown_title": "كيف حسبنا هذا",
   "savings_breakdown_baseline": "تعريفة חברת חשמל: ₪{{amount}}/سنة",
   "savings_breakdown_projected": "مع هذه الخطة: ₪{{amount}}/سنة",
-  "savings_breakdown_saving": "التوفير السنوي: ₪{{amount}}"
+  "savings_breakdown_saving": "التوفير السنوي: ₪{{amount}}",
+  "rank_label": "#{{rank}}",
+  "show_more_options_one": "عرض خيار إضافي واحد",
+  "show_more_options_other": "عرض {{count}} خيارات إضافية",
+  "hide_options": "إخفاء الخيارات"
 }
