@@ -1,8 +1,28 @@
 import { useTranslation } from "react-i18next";
+import { AddressCombobox } from "@/components/ui/combobox";
+
+// Government data is stored ALL CAPS; display as title case without transforming stored values.
+function titleCase(s: string): string {
+  return s.toLowerCase().replace(/(^|[\s-])(\S)/g, (_, sep, ch: string) => sep + ch.toUpperCase());
+}
+
+interface PlaceOfResidence {
+  he: string;
+  en?: string;
+  ar?: string;
+  ru?: string;
+}
+
+interface PlaceItem {
+  he: string;
+  en?: string;
+  ar?: string;
+  ru?: string;
+}
 
 export interface HomeFieldsProps {
-  city: string;
-  setCity: (v: string) => void;
+  placeOfResidence: PlaceOfResidence | null;
+  setPlaceOfResidence: (v: PlaceOfResidence | null) => void;
   cascadeCityCode: number | null;
   supplierSelectValue: string;
   onSupplierChange: (rawValue: string) => void;
@@ -10,11 +30,12 @@ export interface HomeFieldsProps {
   bundleMemberships: string[];
   toggleMembership: (name: string, checked: boolean) => void;
   clearMemberships: () => void;
+  israelPlaces: PlaceItem[] | undefined;
 }
 
 export default function HomeFields({
-  city,
-  setCity,
+  placeOfResidence,
+  setPlaceOfResidence,
   cascadeCityCode,
   supplierSelectValue,
   onSupplierChange,
@@ -22,22 +43,50 @@ export default function HomeFields({
   bundleMemberships,
   toggleMembership,
   clearMemberships,
+  israelPlaces,
 }: HomeFieldsProps) {
-  const { t: tw } = useTranslation("wizard");
+  const { t: tw, i18n } = useTranslation("wizard");
 
   return (
     <>
       {cascadeCityCode === null && (
         <div className="mb-5">
           <label className="block text-sm font-medium mb-1.5">
-            {tw("city_title")}
+            {tw("place_of_residence_title")}
           </label>
-          <input
-            type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="border border-input rounded-md px-3 py-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
-            placeholder={tw("city_placeholder")}
+          {i18n.language === "ru" && (
+            <p className="text-xs text-muted-foreground mb-2">
+              {tw("place_of_residence_russian_note")}
+            </p>
+          )}
+          <AddressCombobox
+            items={(israelPlaces ?? []).map((p) => {
+              const raw =
+                (p[i18n.language as keyof PlaceItem] as string | undefined) ??
+                p.he;
+              return {
+                value: p.he,
+                label: i18n.language === "en" && p.en ? titleCase(raw) : raw,
+              };
+            })}
+            value={placeOfResidence?.he ?? null}
+            onValueChange={(item) => {
+              if (!item) {
+                setPlaceOfResidence(null);
+                return;
+              }
+              const match = (israelPlaces ?? []).find(
+                (p) => p.he === item.value,
+              );
+              setPlaceOfResidence(
+                match
+                  ? { he: match.he, en: match.en, ar: match.ar, ru: match.ru }
+                  : { he: String(item.value) },
+              );
+            }}
+            placeholder={tw("place_of_residence_placeholder")}
+            emptyText={tw("meter_lookup_no_results")}
+            loading={israelPlaces === undefined}
           />
         </div>
       )}

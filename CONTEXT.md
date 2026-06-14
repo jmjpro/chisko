@@ -110,10 +110,18 @@ _Avoid_: Non-cash preference, app credit preference
 The IEC-sourced dataset of addresses in Israel where a smart meter has been installed. Used to determine smart meter status for households that are uncertain which meter type they have.
 _Avoid_: Mobility addresses, IEC address list, meter addresses
 
+**Place of Residence** (Hebrew: יישוב):
+The official Israeli term for any populated locality — city, town, village, kibbutz, moshav, or Bedouin settlement — regardless of municipal status. Used throughout the wizard in place of "city", which implies a specific municipal classification that excludes many Israeli localities. Sourced from the Israeli government's locality registry (`data.gov.il`) and stored in the `israelPlaces` table with multilingual names (Hebrew required; English, Arabic, Russian where available). Stored on the Home Profile as a multilingual snapshot at selection time.
+_Avoid_: City, town, locality, settlement
+
+**israelPlaces**:
+A Convex table that caches Israel's official locality registry, refreshed weekly from `data.gov.il`. Each record stores the place name in up to four languages (Hebrew required; English, Arabic, Russian where available). Used to power the Place of Residence typeahead in the wizard and to resolve multilingual names for Home Profiles captured via the Smart Meter Registry cascade.
+_Avoid_: Cities table, places list
+
 ## Inputs
 
 **Home Profile**:
-A household's self-reported characteristics captured via questionnaire. Fields: smart meter (yes/no — determined at the start of the wizard, never unknown after completion), city, street, house number (street and house number populated only when collected via Smart Meter Registry lookup), bundle memberships (HOT triple, Cellcom, etc.), current supplier + plan (if no bill uploaded), approximate monthly kWh (if no bill uploaded), work-from-home pattern, EV charging (yes/no + timing), washer/dryer timing, AC usage level, willingness to shift appliance usage to save more (yes/no), and Off-Bill Benefit Willingness (yes/no — asked late in the questionnaire). When the current supplier is IEC (or unknown), both are represented as a null supplier reference — the Recommendation engine uses the full IEC Rate as the cost baseline in either case.
+A household's self-reported characteristics captured via questionnaire. Fields: smart meter (yes/no — determined at the start of the wizard, never unknown after completion), place of residence (a multilingual snapshot of the selected יישוב), street, house number (street and house number populated only when collected via Smart Meter Registry lookup), bundle memberships (HOT triple, Cellcom, etc.), current supplier + plan (if no bill uploaded), approximate monthly kWh (if no bill uploaded), work-from-home pattern, EV charging (yes/no + timing), washer/dryer timing, AC usage level, willingness to shift appliance usage to save more (yes/no), and Off-Bill Benefit Willingness (yes/no — asked late in the questionnaire). When the current supplier is IEC (or unknown), both are represented as a null supplier reference — the Recommendation engine uses the full IEC Rate as the cost baseline in either case.
 _Avoid_: User profile, household, account
 
 **Bill Import**:

@@ -11,6 +11,8 @@
 import type * as billImports from "../billImports.js";
 import type * as crons from "../crons.js";
 import type * as homeProfiles from "../homeProfiles.js";
+import type * as israelPlaces from "../israelPlaces.js";
+import type * as israelPlacesRefresh from "../israelPlacesRefresh.js";
 import type * as migrations from "../migrations.js";
 import type * as plans from "../plans.js";
 import type * as recommendations from "../recommendations.js";
@@ -30,6 +32,8 @@ declare const fullApi: ApiFromModules<{
   billImports: typeof billImports;
   crons: typeof crons;
   homeProfiles: typeof homeProfiles;
+  israelPlaces: typeof israelPlaces;
+  israelPlacesRefresh: typeof israelPlacesRefresh;
   migrations: typeof migrations;
   plans: typeof plans;
   recommendations: typeof recommendations;
