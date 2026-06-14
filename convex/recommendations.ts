@@ -129,7 +129,10 @@ export function checkEligibility(
   }
 
   // Empty coverageAreas = nationwide; otherwise placeOfResidence.he must be listed
-  if (e.coverageAreas.length > 0 && !e.coverageAreas.includes(p.placeOfResidence.he)) {
+  if (
+    e.coverageAreas.length > 0 &&
+    !e.coverageAreas.includes(p.placeOfResidence.he)
+  ) {
     return {
       isEligible: false,
       ineligibilityReason: JSON.stringify({

@@ -67,7 +67,9 @@ test.describe("Home step — Place of Residence", () => {
     await page.getByText("Standard meter").click();
     await page.getByRole("button", { name: "Next" }).click();
 
-    await expect(page.getByRole("heading", { name: "Your Home" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Your Home" }),
+    ).toBeVisible();
 
     // New combobox label appears
     await expect(page.getByText("Place of Residence")).toBeVisible();

@@ -45,7 +45,10 @@ export const doRefresh = internalAction({
     // ── Clear existing data ──────────────────────────────────────────────────
     let deleted = 0;
     while (true) {
-      const n: number = await ctx.runMutation(internal.israelPlaces.deleteBatch, {});
+      const n: number = await ctx.runMutation(
+        internal.israelPlaces.deleteBatch,
+        {},
+      );
       deleted += n;
       if (n === 0) break;
       await sleep(150);

@@ -3,7 +3,9 @@ import { AddressCombobox } from "@/components/ui/combobox";
 
 // Government data is stored ALL CAPS; display as title case without transforming stored values.
 function titleCase(s: string): string {
-  return s.toLowerCase().replace(/(^|[\s-])(\S)/g, (_, sep, ch: string) => sep + ch.toUpperCase());
+  return s
+    .toLowerCase()
+    .replace(/(^|[\s-])(\S)/g, (_, sep, ch: string) => sep + ch.toUpperCase());
 }
 
 interface PlaceOfResidence {
@@ -61,9 +63,7 @@ export default function HomeFields({
           )}
           <AddressCombobox
             items={(israelPlaces ?? []).map((p) => {
-              const raw =
-                (p[i18n.language as keyof PlaceItem] as string | undefined) ??
-                p.he;
+              const raw = p[i18n.language as keyof PlaceItem] ?? p.he;
               return {
                 value: p.he,
                 label: i18n.language === "en" && p.en ? titleCase(raw) : raw,
