@@ -19,29 +19,37 @@ function parseAcceptLanguage(header: string | null): Locale {
   return "he";
 }
 
-export const onRequest = defineMiddleware(({ request, cookies, redirect }, next) => {
-  const { pathname } = new URL(request.url);
+export const onRequest = defineMiddleware(
+  ({ request, cookies, redirect }, next) => {
+    const { pathname } = new URL(request.url);
 
-  // Skip static assets and Astro internals
-  if (pathname.startsWith("/_") || /\.\w+$/.test(pathname)) return next();
+    // Skip static assets and Astro internals
+    if (pathname.startsWith("/_") || /\.\w+$/.test(pathname)) return next();
 
-  // Skip share link routes — they handle locale via ?lang= query param
-  if (pathname.startsWith("/r/")) return next();
+    // Skip share link routes — they handle locale via ?lang= query param
+    if (pathname.startsWith("/r/")) return next();
 
-  // Skip paths already on a non-default locale prefix
-  if (PREFIXED_LOCALES.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`))) {
-    return next();
-  }
+    // Skip paths already on a non-default locale prefix
+    if (
+      PREFIXED_LOCALES.some(
+        (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),
+      )
+    ) {
+      return next();
+    }
 
-  // Cookie (explicit user choice) beats Accept-Language detection
-  const cookieVal = cookies.get(LANG_COOKIE)?.value;
-  const preferred: Locale = (LOCALES as readonly string[]).includes(cookieVal ?? "")
-    ? (cookieVal as Locale)
-    : parseAcceptLanguage(request.headers.get("accept-language"));
+    // Cookie (explicit user choice) beats Accept-Language detection
+    const cookieVal = cookies.get(LANG_COOKIE)?.value;
+    const preferred: Locale = (LOCALES as readonly string[]).includes(
+      cookieVal ?? "",
+    )
+      ? (cookieVal as Locale)
+      : parseAcceptLanguage(request.headers.get("accept-language"));
 
-  // Hebrew is the default locale (no prefix) — nothing to do
-  if (preferred === "he") return next();
+    // Hebrew is the default locale (no prefix) — nothing to do
+    if (preferred === "he") return next();
 
-  const target = `/${preferred}${pathname === "/" ? "/" : pathname}`;
-  return redirect(target, 302);
-});
+    const target = `/${preferred}${pathname === "/" ? "/" : pathname}`;
+    return redirect(target, 302);
+  },
+);

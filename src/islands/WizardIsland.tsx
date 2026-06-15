@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState, Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { ConvexProvider, ConvexReactClient, useAction, useMutation, useQuery } from "convex/react";
+import {
+  ConvexProvider,
+  ConvexReactClient,
+  useAction,
+  useMutation,
+  useQuery,
+} from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import Header from "../components/header";

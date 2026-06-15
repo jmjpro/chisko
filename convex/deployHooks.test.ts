@@ -7,7 +7,7 @@ import schema from "./schema";
 const modules = import.meta.glob("./**/*.ts");
 
 beforeEach(() => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true } as Response));
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true }));
 });
 
 afterEach(() => {
