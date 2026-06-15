@@ -5,6 +5,8 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import { generateSessionToken } from "../lib/sessionToken";
+import { rewriteStorageUrl } from "../lib/rewriteStorageUrl";
 import Wizard from "../components/Wizard";
 import MeterStep from "../components/wizard/MeterStep";
 import UploadStep from "../components/wizard/UploadStep";
@@ -135,7 +137,7 @@ export default function WizardPage() {
     const key = "ec2-session-token";
     let token = localStorage.getItem(key);
     if (!token) {
-      token = crypto.randomUUID();
+      token = generateSessionToken();
       localStorage.setItem(key, token);
     }
     getOrCreateSession({ sessionToken: token })
@@ -203,7 +205,11 @@ export default function WizardPage() {
     setUploadLoading(true);
     setUploadError(null);
     try {
-      const uploadUrl = await generateUploadUrl({});
+      const rawUploadUrl = await generateUploadUrl({});
+      const uploadUrl = rewriteStorageUrl(
+        rawUploadUrl,
+        import.meta.env.VITE_CONVEX_URL as string,
+      );
       const res = await fetch(uploadUrl, {
         method: "POST",
         body: file,
