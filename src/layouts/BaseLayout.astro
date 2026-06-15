@@ -1,0 +1,49 @@
+---
+import "../index.css";
+
+interface Props {
+  locale: string;
+  title?: string;
+  description?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+}
+
+const {
+  locale,
+  title = "Chisko",
+  description,
+  ogTitle,
+  ogDescription,
+} = Astro.props;
+
+const isRtl = ["he", "ar"].includes(locale);
+---
+
+<!doctype html>
+<html lang={locale} dir={isRtl ? "rtl" : "ltr"}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {ogTitle && <meta property="og:title" content={ogTitle} />}
+    {ogDescription && <meta property="og:description" content={ogDescription} />}
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+    <script is:inline>
+      // Restore theme before paint to avoid flash
+      (function () {
+        const stored = localStorage.getItem("theme");
+        const dark =
+          stored === "dark" ||
+          (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (dark) document.documentElement.classList.add("dark");
+      })();
+    </script>
+  </body>
+</html>

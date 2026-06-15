@@ -18,5 +18,9 @@
   "plan_type_night": "Ночной",
   "yes": "Да",
   "no": "Нет",
-  "all_week": "Вся неделя"
+  "all_week": "Вся неделя",
+  "share_invalid_title": "Недействительная ссылка",
+  "share_invalid_message": "Рекомендация не найдена или срок её действия истёк.",
+  "back_to_home": "На главную",
+  "share_savings_description": "Ожидаемая годовая экономия: ₪{{amount}}"
 }

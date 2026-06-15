@@ -15,6 +15,7 @@ const LANGUAGES = [
 type ThemeMode = "light" | "dark" | "system";
 
 function getInitialTheme(): ThemeMode {
+  if (typeof window === "undefined") return "system";
   const stored = localStorage.getItem("theme");
   if (stored === "dark") return "dark";
   if (stored === "light") return "light";
@@ -50,7 +51,11 @@ const CURRENT_ICON: Record<ThemeMode, React.ReactNode> = {
   system: <Monitor size={18} />,
 };
 
-export default function Header() {
+interface HeaderProps {
+  langSwitchUrls?: Record<string, string>;
+}
+
+export default function Header({ langSwitchUrls }: HeaderProps = {}) {
   const { i18n, t } = useTranslation();
   const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
 
@@ -78,7 +83,13 @@ export default function Header() {
   }
 
   function handleLanguageChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    void i18n.changeLanguage(e.target.value);
+    const lang = e.target.value;
+    document.cookie = `chisko_lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+    if (langSwitchUrls) {
+      window.location.href = langSwitchUrls[lang] ?? "/";
+    } else {
+      void i18n.changeLanguage(lang);
+    }
   }
 
   return (

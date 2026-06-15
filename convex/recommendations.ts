@@ -546,6 +546,41 @@ export const getForSession = query({
   },
 });
 
+/**
+ * Returns enriched data for the share link page — plan name, supplier name,
+ * and savings amount for the primary recommendation. Used by the SSR /r/[code] route.
+ */
+export const getSharePageData = query({
+  args: { shareCode: v.string() },
+  handler: async (ctx, args) => {
+    const rec = await ctx.db
+      .query("recommendations")
+      .withIndex("by_share_code", (q) => q.eq("shareCode", args.shareCode))
+      .unique();
+
+    if (!rec) return null;
+
+    const pv = await ctx.db.get("planVersions", rec.primaryPlanVersionId);
+    if (!pv) return null;
+
+    const plan = await ctx.db.get("plans", pv.planId);
+    if (!plan) return null;
+
+    const supplier = await ctx.db.get("suppliers", plan.supplierId);
+    if (!supplier) return null;
+
+    return {
+      shareCode: rec.shareCode,
+      planName: plan.name,
+      supplierName: supplier.name,
+      planType: plan.planType,
+      discountPercent: pv.discountPercent,
+      annualSavingsAgorot: rec.primaryAnnualSavingsAgorot,
+      confidenceLevel: rec.confidenceLevel,
+    };
+  },
+});
+
 /** Returns a recommendation by its shareable code — no session auth required. */
 export const getByShareCode = query({
   args: { shareCode: v.string() },

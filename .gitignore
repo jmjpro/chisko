@@ -26,3 +26,9 @@ dist-ssr
 # playwright
 test-results
 playwright-report
+
+# Astro generated
+.astro/
+
+# Claude Code local memory
+.claude/projects/

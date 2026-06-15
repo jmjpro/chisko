@@ -18,5 +18,9 @@
   "plan_type_night": "Night",
   "yes": "Yes",
   "no": "No",
-  "all_week": "All week"
+  "all_week": "All week",
+  "share_invalid_title": "Invalid link",
+  "share_invalid_message": "This recommendation was not found or has expired.",
+  "back_to_home": "Back to home",
+  "share_savings_description": "Expected annual savings: ₪{{amount}}"
 }

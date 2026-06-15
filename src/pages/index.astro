@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeaderIsland from "../islands/HeaderIsland";
+import Footer from "../components/footer";
+import ChiskiMascot from "../components/chiskiMascot";
+import he from "../../public/locales/he/home.json";
+
+const locale = "he";
+const langSwitchUrls: Record<string, string> = {
+  he: "/",
+  en: "/en/",
+  ar: "/ar/",
+  ru: "/ru/",
+};
+---
+
+<BaseLayout locale={locale} title={`Chisko — ${he.hero_title}`}>
+  <div class="min-h-screen flex flex-col">
+    <HeaderIsland client:only="react" locale={locale} langSwitchUrls={langSwitchUrls} />
+    <main class="flex-1 flex flex-col items-center justify-center px-6 py-16 text-center">
+      <ChiskiMascot className="w-40 h-40 mb-8 drop-shadow-md" />
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4 max-w-md">
+        {he.hero_title}
+      </h1>
+      <p class="text-lg text-muted-foreground mb-10 max-w-sm">
+        {he.hero_subtitle}
+      </p>
+      <div class="flex gap-4 flex-wrap justify-center">
+        <a
+          href="/wizard"
+          class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
+        >
+          {he.cta_wizard}
+        </a>
+        <a
+          href="/plans"
+          class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
+        >
+          {he.cta_plans}
+        </a>
+      </div>
+    </main>
+    <Footer />
+  </div>
+</BaseLayout>

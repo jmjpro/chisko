@@ -6,18 +6,21 @@
   "scripts": {
     "agent:dev": "npm run dev 2>&1 | tee /tmp/chisko-dev-server.log",
     "agent:dev:mobile": "npm run dev:mobile 2>&1 | tee /tmp/chisko-dev-server.log",
-    "dev": "convex dev --start 'vite --open'",
+    "dev": "convex dev --start 'astro dev'",
     "dev:mobile": "npx tsx scripts/devMobile.ts",
-    "build": "tsc -b && vite build",
+    "build": "astro build",
     "lint": "tsc && eslint .  --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
+    "preview": "astro preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "prepare": "husky"
   },
   "dependencies": {
+    "@astrojs/react": "^5.0.7",
+    "@astrojs/vercel": "^10.0.8",
     "@base-ui/react": "^1.5.0",
     "@fontsource-variable/inter": "^5.2.8",
+    "astro": "^6.4.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.36.1",
@@ -35,13 +38,14 @@
   },
   "devDependencies": {
     "@convex-dev/eslint-plugin": "^2.0.0",
+    "@edge-runtime/vm": "^5.0.0",
     "@eslint/js": "^9.39.4",
     "@playwright/test": "^1.60.0",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.2",
+    "convex-test": "^0.0.53",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
@@ -54,7 +58,7 @@
     "tsx": "^4.22.4",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.9",
+    "vite": "^7.0.0",
     "vitest": "^3.0.0"
   }
 }

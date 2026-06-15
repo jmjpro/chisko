@@ -18,5 +18,9 @@
   "plan_type_night": "לילה",
   "yes": "כן",
   "no": "לא",
-  "all_week": "כל השבוע"
+  "all_week": "כל השבוע",
+  "share_invalid_title": "הקישור אינו תקף",
+  "share_invalid_message": "המלצה זו לא נמצאה או שפגה תוקפה.",
+  "back_to_home": "חזרה לדף הבית",
+  "share_savings_description": "חיסכון שנתי צפוי: ₪{{amount}}"
 }

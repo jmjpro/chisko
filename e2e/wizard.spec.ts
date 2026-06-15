@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 
 // Navigate to the Usage step via the no-smart-meter path (Meter → Home → Usage)
 async function navigateToUsageStep(page: Page) {
-  await page.goto("/wizard");
+  await page.goto("/en/wizard");
 
   // Step 0: Meter — pick Standard meter
   await page.getByText("Standard meter").click();
@@ -63,7 +63,7 @@ test.describe("Home step — Place of Residence", () => {
   test("shows Place of Residence combobox, not a plain text input", async ({
     page,
   }) => {
-    await page.goto("/wizard");
+    await page.goto("/en/wizard");
     await page.getByText("Standard meter").click();
     await page.getByRole("button", { name: "Next" }).click();
 

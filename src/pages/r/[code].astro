@@ -1,0 +1,96 @@
+---
+export const prerender = false;
+
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../../convex/_generated/api";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import HeaderIsland from "../../islands/HeaderIsland";
+import Footer from "../../components/footer";
+import heCommon from "../../../public/locales/he/common.json";
+import enCommon from "../../../public/locales/en/common.json";
+import arCommon from "../../../public/locales/ar/common.json";
+import ruCommon from "../../../public/locales/ru/common.json";
+
+const LOCALES = ["he", "en", "ar", "ru"] as const;
+type Locale = (typeof LOCALES)[number];
+
+function parseAcceptLanguage(header: string | null): Locale {
+  if (!header) return "he";
+  const tags = header.split(",").map((entry) => {
+    const [tag, q] = entry.trim().split(";q=");
+    return { lang: tag.split("-")[0].toLowerCase(), q: q ? parseFloat(q) : 1 };
+  });
+  tags.sort((a, b) => b.q - a.q);
+  for (const { lang } of tags) {
+    if ((LOCALES as readonly string[]).includes(lang)) return lang as Locale;
+  }
+  return "he";
+}
+
+const { code } = Astro.params;
+
+const langParam = Astro.url.searchParams.get("lang");
+const locale: Locale = (LOCALES as readonly string[]).includes(langParam ?? "")
+  ? (langParam as Locale)
+  : parseAcceptLanguage(Astro.request.headers.get("accept-language"));
+
+const commonByLocale = { he: heCommon, en: enCommon, ar: arCommon, ru: ruCommon };
+const common = commonByLocale[locale];
+
+const client = new ConvexHttpClient(import.meta.env.VITE_CONVEX_URL as string);
+
+const data = await client.query(api.recommendations.getSharePageData, {
+  shareCode: code ?? "",
+});
+
+if (!data) {
+  Astro.response.status = 404;
+}
+
+const langSwitchUrls: Record<string, string> = {
+  he: `/r/${code}`,
+  en: `/r/${code}?lang=en`,
+  ar: `/r/${code}?lang=ar`,
+  ru: `/r/${code}?lang=ru`,
+};
+
+const ogTitle = data ? `Chisko — ${data.supplierName} ${data.planName}` : "Chisko";
+const savingsNis = data ? (data.annualSavingsAgorot / 100).toFixed(0) : null;
+const ogDescription = savingsNis
+  ? common.share_savings_description.replace("{{amount}}", savingsNis)
+  : undefined;
+---
+
+<BaseLayout
+  locale={locale}
+  title={ogTitle}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+>
+  <div class="min-h-screen flex flex-col">
+    <HeaderIsland client:only="react" locale={locale} langSwitchUrls={langSwitchUrls} />
+    <main class="flex-1 px-6 py-12 max-w-lg mx-auto w-full">
+      {
+        data ? (
+          <div class="space-y-4">
+            <h1 class="text-2xl font-bold">{data.supplierName} — {data.planName}</h1>
+            {savingsNis && (
+              <p class="text-muted-foreground">
+                {common.share_savings_description.replace("{{amount}}", savingsNis)}
+              </p>
+            )}
+          </div>
+        ) : (
+          <div class="text-center py-24">
+            <h1 class="text-2xl font-bold mb-2">{common.share_invalid_title}</h1>
+            <p class="text-muted-foreground">{common.share_invalid_message}</p>
+            <a href="/" class="mt-6 inline-block text-primary underline">
+              {common.back_to_home}
+            </a>
+          </div>
+        )
+      }
+    </main>
+    <Footer />
+  </div>
+</BaseLayout>

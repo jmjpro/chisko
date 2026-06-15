@@ -1,20 +1,14 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
-// https://vite.dev/config/
+// Minimal Vite config kept for tooling compatibility (vitest, etc.).
+// The main dev/build pipeline now runs through Astro (astro.config.mjs).
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  server: {
-    host: true,
-    watch: {
-      ignored: ["**/playwright-report/**", "**/test-results/**"],
     },
   },
 });

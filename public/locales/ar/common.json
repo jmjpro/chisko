@@ -18,5 +18,9 @@
   "plan_type_night": "ليلي",
   "yes": "نعم",
   "no": "لا",
-  "all_week": "طوال الأسبوع"
+  "all_week": "طوال الأسبوع",
+  "share_invalid_title": "رابط غير صالح",
+  "share_invalid_message": "لم يتم العثور على هذه التوصية أو انتهت صلاحيتها.",
+  "back_to_home": "العودة إلى الصفحة الرئيسية",
+  "share_savings_description": "المدخرات السنوية المتوقعة: ₪{{amount}}"
 }

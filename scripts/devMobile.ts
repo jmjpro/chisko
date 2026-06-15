@@ -23,7 +23,7 @@ function main() {
   const convexUrl = `http://${ip}:3210`;
   const siteUrl = `http://${ip}:3211`;
   console.log(`Mobile dev server → ${convexUrl}`);
-  spawn("npx", ["convex", "dev", "--start", "vite --open"], {
+  spawn("npx", ["convex", "dev", "--start", "astro dev --host"], {
     stdio: "inherit",
     env: {
       ...process.env,

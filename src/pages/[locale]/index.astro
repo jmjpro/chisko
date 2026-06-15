@@ -1,0 +1,64 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import HeaderIsland from "../../islands/HeaderIsland";
+import Footer from "../../components/footer";
+import ChiskiMascot from "../../components/chiskiMascot";
+
+export function getStaticPaths() {
+  return [
+    { params: { locale: "en" } },
+    { params: { locale: "ar" } },
+    { params: { locale: "ru" } },
+  ];
+}
+
+const { locale } = Astro.params;
+
+type LocaleKey = "en" | "ar" | "ru";
+const homeTranslations: Record<
+  LocaleKey,
+  { hero_title: string; hero_subtitle: string; cta_wizard: string; cta_plans: string }
+> = {
+  en: (await import("../../../public/locales/en/home.json")).default,
+  ar: (await import("../../../public/locales/ar/home.json")).default,
+  ru: (await import("../../../public/locales/ru/home.json")).default,
+};
+
+const t = homeTranslations[locale as LocaleKey];
+const langSwitchUrls: Record<string, string> = {
+  he: "/",
+  en: "/en/",
+  ar: "/ar/",
+  ru: "/ru/",
+};
+---
+
+<BaseLayout locale={locale} title={`Chisko — ${t.hero_title}`}>
+  <div class="min-h-screen flex flex-col">
+    <HeaderIsland client:only="react" locale={locale} langSwitchUrls={langSwitchUrls} />
+    <main class="flex-1 flex flex-col items-center justify-center px-6 py-16 text-center">
+      <ChiskiMascot className="w-40 h-40 mb-8 drop-shadow-md" />
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4 max-w-md">
+        {t.hero_title}
+      </h1>
+      <p class="text-lg text-muted-foreground mb-10 max-w-sm">
+        {t.hero_subtitle}
+      </p>
+      <div class="flex gap-4 flex-wrap justify-center">
+        <a
+          href={`/${locale}/wizard`}
+          class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
+        >
+          {t.cta_wizard}
+        </a>
+        <a
+          href={`/${locale}/plans`}
+          class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
+        >
+          {t.cta_plans}
+        </a>
+      </div>
+    </main>
+    <Footer />
+  </div>
+</BaseLayout>
