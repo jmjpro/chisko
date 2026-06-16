@@ -6,6 +6,7 @@ import { api } from "../../../convex/_generated/api";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import HeaderIsland from "../../islands/HeaderIsland";
 import Footer from "../../components/footer";
+import { getConvexUrl } from "../../lib/getConvexUrl";
 import heCommon from "../../../public/locales/he/common.json";
 import enCommon from "../../../public/locales/en/common.json";
 import arCommon from "../../../public/locales/ar/common.json";
@@ -37,7 +38,7 @@ const locale: Locale = (LOCALES as readonly string[]).includes(langParam ?? "")
 const commonByLocale = { he: heCommon, en: enCommon, ar: arCommon, ru: ruCommon };
 const common = commonByLocale[locale];
 
-const client = new ConvexHttpClient(import.meta.env.VITE_CONVEX_URL as string);
+const client = new ConvexHttpClient(getConvexUrl(import.meta.env.VITE_CONVEX_URL));
 
 const data = await client.query(api.recommendations.getSharePageData, {
   shareCode: code ?? "",

@@ -7,6 +7,7 @@ import Footer from "../components/footer";
 import common from "../../public/locales/he/common.json";
 import suppliers from "../../public/locales/he/suppliers.json";
 import plans from "../../public/locales/he/plans.json";
+import { getConvexUrl } from "../lib/getConvexUrl";
 
 const locale = "he";
 const langSwitchUrls: Record<string, string> = {
@@ -16,7 +17,7 @@ const langSwitchUrls: Record<string, string> = {
   ru: "/ru/plans",
 };
 
-const client = new ConvexHttpClient(import.meta.env.VITE_CONVEX_URL as string);
+const client = new ConvexHttpClient(getConvexUrl(import.meta.env.VITE_CONVEX_URL));
 const rows = await client.query(api.plans.listActive);
 
 function formatHour(h: number) {

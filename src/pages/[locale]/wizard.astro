@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import WizardIsland from "../../islands/WizardIsland";
+import { getConvexUrl } from "../../lib/getConvexUrl";
 
 export function getStaticPaths() {
   return [
@@ -18,7 +19,7 @@ const titles: Record<string, string> = {
   ru: "Chisko — Мастер",
 };
 
-const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
+const convexUrl = getConvexUrl(import.meta.env.VITE_CONVEX_URL);
 ---
 
 <BaseLayout locale={locale} title={titles[locale] ?? "Chisko"}>

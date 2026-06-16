@@ -5,8 +5,11 @@ import { BrowserRouter } from "react-router";
 import "./i18n";
 import "./index.css";
 import App from "./app.tsx";
+import { getConvexUrl } from "./lib/getConvexUrl";
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+const convex = new ConvexReactClient(
+  getConvexUrl(import.meta.env.VITE_CONVEX_URL),
+);
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Suspense fallback={null}>

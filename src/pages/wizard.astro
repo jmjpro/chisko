@@ -1,9 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WizardIsland from "../islands/WizardIsland";
+import { getConvexUrl } from "../lib/getConvexUrl";
 
 const locale = "he";
-const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
+const convexUrl = getConvexUrl(import.meta.env.VITE_CONVEX_URL);
 ---
 
 <BaseLayout locale={locale} title="Chisko — אשף">
