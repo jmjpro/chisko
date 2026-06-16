@@ -11,6 +11,8 @@ export default defineConfig([
   {
     ignores: [
       "dist",
+      ".astro",
+      ".vercel",
       "eslint.config.js",
       "convex/_generated",
       "postcss.config.js",

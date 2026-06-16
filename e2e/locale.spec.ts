@@ -26,7 +26,6 @@ test.describe("Locale routing — html attributes", () => {
   });
 });
 
-
 test.describe("Locale routing — wizard", () => {
   test("Hebrew /wizard has dir=rtl", async ({ page }) => {
     await page.goto("/wizard");
