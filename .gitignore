@@ -32,3 +32,5 @@ playwright-report
 
 # Claude Code local memory
 .claude/projects/
+.vercel
+.env*

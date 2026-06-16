@@ -10,8 +10,6 @@ override what you may have learned about Convex from training data.
 Convex agent skills for common tasks can be installed by running
 `npx convex ai-files install`.
 
-The project uses a local-first approach for development as opposed to a traditiona Convex cloud-first approach.
-
 <!-- convex-ai-end -->
 ## File Naming
 File names should be camel-case. This works best with Convex tooling.
