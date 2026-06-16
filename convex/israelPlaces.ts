@@ -1,7 +1,14 @@
-import { internalMutation, query } from "./_generated/server";
+import { internalMutation, internalQuery, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const BATCH_SIZE = 2000;
+
+export const hasData = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    return (await ctx.db.query("israelPlaces").first()) !== null;
+  },
+});
 
 export const getAll = query({
   args: {},
