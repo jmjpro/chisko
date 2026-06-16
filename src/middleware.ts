@@ -6,7 +6,7 @@ const PREFIXED_LOCALES = ["en", "ar", "ru"] as const;
 
 export const LANG_COOKIE = "chisko_lang";
 
-function parseAcceptLanguage(header: string | null): Locale {
+export function parseAcceptLanguage(header: string | null): Locale {
   if (!header) return "he";
   const tags = header.split(",").map((entry) => {
     const [tag, q] = entry.trim().split(";q=");
@@ -21,6 +21,12 @@ function parseAcceptLanguage(header: string | null): Locale {
 
 export const onRequest = defineMiddleware(
   ({ request, cookies, redirect }, next) => {
+    // Astro dev mode strips all request headers (including Cookie) for
+    // prerendered pages — both cookie and Accept-Language detection return null,
+    // so the redirect never fires anyway. Return early to avoid the Astro
+    // header-access warning.
+    if (!import.meta.env.PROD) return next();
+
     const { pathname } = new URL(request.url);
 
     // Skip static assets and Astro internals

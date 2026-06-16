@@ -22,11 +22,4 @@ export default defineConfig({
   server: {
     port: 5173,
   },
-  i18n: {
-    defaultLocale: "he",
-    locales: ["he", "en", "ar", "ru"],
-    routing: {
-      prefixDefaultLocale: false,
-    },
-  },
 });
