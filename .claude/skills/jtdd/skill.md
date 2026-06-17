@@ -21,9 +21,7 @@ Then ask: `Set to In Progress + ready-for-agent and continue? [y/n]`
 
 If no, stop.
 
-If yes, use the `linear-server` MCP tools to apply both changes in parallel:
-1. Update the issue's workflow state to `In Progress` (look up the state ID if needed via the team's workflow states).
-2. Add the label `ready-for-agent` to the issue (look up the label ID if needed via the team's labels).
+If yes, call `save_issue` **once** with `state: "In Progress"` and `labels` set to the issue's current labels (from Step 1) plus `ready-for-agent`. `save_issue` resolves state and label names directly — do not call `list_issue_statuses`/`list_issue_labels` to look up IDs first.
 
 ## Step 2 — TDD
 
@@ -35,6 +33,4 @@ Run the full red-green-refactor loop per the tdd skill instructions. When all te
 
 Ask: `TDD complete. Advance label ready-for-agent → ready-for-human? [y/n]`
 
-If yes, use the `linear-server` MCP tools to:
-1. Remove the label `ready-for-agent` from the issue.
-2. Add the label `ready-for-human` to the issue.
+If yes, call `save_issue` **once** with `labels` set to the issue's current labels (from Step 1) with `ready-for-agent` removed and `ready-for-human` added.

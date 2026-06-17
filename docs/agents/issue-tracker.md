@@ -9,8 +9,9 @@ The MCP is configured as an SSE server at `https://mcp.linear.app/sse` (server n
 - **Issue IDs**: `CHI-N` format (e.g. `CHI-18`). Accept bare numbers and normalize to `CHI-N`.
 - **Read an issue**: use the `linear-server` MCP to fetch the issue by ID.
 - **Search issues**: use the `linear-server` MCP search tools.
-- **Update workflow state**: use the `linear-server` MCP update tool; look up state IDs from the team's workflow states if needed.
-- **Add / remove labels**: use the `linear-server` MCP update tool; look up label IDs from the team's labels if needed.
+- **Update workflow state**: use `save_issue` with `state` set to the state name (e.g. `"In Progress"`) — it resolves names directly, no separate lookup call needed.
+- **Add / remove labels**: use `save_issue` with `labels` set to the full desired label array (names, not IDs) — it's a set operation, not append-only. Compute the array client-side from labels already fetched on the issue; don't call `list_issue_labels` just to resolve names to IDs.
+- **Batch state + label changes**: when both need to change, do it in a single `save_issue` call rather than sequential calls — fewer MCP round trips.
 
 ## Commit trailers
 

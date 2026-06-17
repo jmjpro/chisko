@@ -21,9 +21,7 @@ Then ask: `Set to In Progress + ready-for-human and continue? [y/n]`
 
 If no, stop.
 
-If yes, use the `linear-server` MCP tools to apply both changes in parallel:
-1. Update the issue's workflow state to `In Progress` (look up the state ID if needed via the team's workflow states).
-2. Add the label `ready-for-human` to the issue (look up the label ID if needed via the team's labels).
+If yes, call `save_issue` **once** with `state: "In Progress"` and `labels` set to the issue's current labels (from Step 0) plus `ready-for-human`. `save_issue` resolves state and label names directly — do not call `list_issue_statuses`/`list_issue_labels` to look up IDs first.
 
 ## Step 1 — Commit
 
@@ -39,11 +37,7 @@ Stop if any step fails and report what happened before proceeding.
 
 Ask: `Ship complete. Move CHI-N to Done and remove triage labels? [y/n]`
 
-If yes, use the `linear-server` MCP tools to:
-
-1. Update the issue's workflow state to `Done` (look up the state ID if needed via the team's workflow states).
-
-2. Remove all triage labels currently present on the issue. Check which of these are actually present (from Step 0 data) and remove only those:
+If yes, call `save_issue` **once** with `state: "Done"` and `labels` set to the issue's current labels (from Step 0) minus any of these triage labels that are present:
    - `needs-triage`
    - `needs-info`
    - `ready-for-agent`
