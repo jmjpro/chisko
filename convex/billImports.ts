@@ -7,6 +7,8 @@ import {
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
+import { withCapturedExceptions } from "./lib/sentry";
+import type { ActionCtx } from "./_generated/server";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public mutations
@@ -140,117 +142,125 @@ export const parseSmartMeterCsv = action({
     storageId: v.id("_storage"),
     sessionId: v.id("sessions"),
   },
-  handler: async (ctx, args): Promise<Id<"billImports">> => {
-    const exists = await ctx.runQuery(internal.billImports.sessionExists, {
+  handler: async (ctx, args): Promise<Id<"billImports">> =>
+    withCapturedExceptions(() => runParseSmartMeterCsv(ctx, args), {
       sessionId: args.sessionId,
-    });
-    if (!exists) throw new Error("Session not found");
-
-    const blob = await ctx.storage.get(args.storageId);
-    if (!blob) throw new Error("File not found in storage");
-    const text = await blob.text();
-
-    const taozData = await ctx.runQuery(
-      internal.billImports.getActiveIecTaozRates,
-    );
-
-    // Strip UTF-8 BOM if present
-    const cleaned = text.startsWith("﻿") ? text.slice(1) : text;
-    const lines = cleaned
-      .split("\n")
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0);
-
-    let kwhWeekdayDay = 0;
-    let kwhWeekdayNight = 0;
-    let kwhWeekendDay = 0;
-    let kwhWeekendNight = 0;
-    let kwhTaozSummerPeak = 0;
-    let kwhTaozSummerOffPeak = 0;
-    let kwhTaozWinterPeak = 0;
-    let kwhTaozWinterOffPeak = 0;
-    let totalKwh = 0;
-    let minDate = Infinity;
-    let maxDate = -Infinity;
-
-    for (const line of lines) {
-      // Format: "meterID","צריכה","DD/MM/YYYY","HH:MM",kWh,flag
-      const parts = line.split(",");
-      if (parts.length < 5) continue;
-
-      const type = parts[1].replace(/"/g, "").trim();
-      if (type !== "צריכה") continue;
-
-      const dateStr = parts[2].replace(/"/g, "").trim();
-      const timeStr = parts[3].replace(/"/g, "").trim();
-      const kwhStr = parts[4].replace(/"/g, "").trim();
-
-      const dateParts = dateStr.split("/");
-      if (dateParts.length !== 3) continue;
-      const day = parseInt(dateParts[0], 10);
-      const month = parseInt(dateParts[1], 10);
-      const year = parseInt(dateParts[2], 10);
-      if (isNaN(day) || isNaN(month) || isNaN(year)) continue;
-
-      const timeParts = timeStr.split(":");
-      const hour = parseInt(timeParts[0], 10);
-      if (isNaN(hour)) continue;
-
-      const kwh = parseFloat(kwhStr);
-      if (isNaN(kwh)) continue;
-
-      const dateTs = new Date(year, month - 1, day).getTime();
-      if (dateTs < minDate) minDate = dateTs;
-      if (dateTs > maxDate) maxDate = dateTs;
-
-      // 0=Sun…6=Sat; Israeli convention: Fri(5)+Sat(6) = weekend
-      const dayOfWeek = new Date(year, month - 1, day).getDay();
-      const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
-      const isDayBand = hour >= 7 && hour < 23;
-
-      if (isWeekend) {
-        if (isDayBand) kwhWeekendDay += kwh;
-        else kwhWeekendNight += kwh;
-      } else {
-        if (isDayBand) kwhWeekdayDay += kwh;
-        else kwhWeekdayNight += kwh;
-      }
-      totalKwh += kwh;
-
-      const bucket = getTaozBucket(month, hour, taozData.rows);
-      if (bucket === "summerPeak") kwhTaozSummerPeak += kwh;
-      else if (bucket === "summerOffPeak") kwhTaozSummerOffPeak += kwh;
-      else if (bucket === "winterPeak") kwhTaozWinterPeak += kwh;
-      else kwhTaozWinterOffPeak += kwh; // winterOffPeak + shoulderOffPeak
-    }
-
-    if (!isFinite(minDate)) throw new Error("No valid rows parsed from CSV");
-
-    return ctx.runMutation(internal.billImports.insertBillImport, {
-      sessionId: args.sessionId,
-      inputMode: "smartmeterCsv",
-      billingPeriodStart: minDate,
-      billingPeriodEnd: maxDate + 86_400_000,
-      totalKwh,
-      currentSupplierId: null,
-      currentPlanVersionId: null,
-      kwhWeekdayDay,
-      kwhWeekdayNight,
-      kwhWeekendDay,
-      kwhWeekendNight,
-      kwhTaozSummerPeak,
-      kwhTaozSummerOffPeak,
-      kwhTaozWinterPeak,
-      kwhTaozWinterOffPeak,
-      ...(taozData.effectiveFrom !== null
-        ? { iecTaozRatesEffectiveFrom: taozData.effectiveFrom }
-        : {}),
-      rawFileStorageId: args.storageId,
-      rawFileDeletedAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
-      parsedDataStorageId: null,
-      userConfirmed: null,
-      editedFieldCount: null,
-      confirmedAt: null,
-    });
-  },
+    }),
 });
+
+async function runParseSmartMeterCsv(
+  ctx: ActionCtx,
+  args: { storageId: Id<"_storage">; sessionId: Id<"sessions"> },
+): Promise<Id<"billImports">> {
+  const exists = await ctx.runQuery(internal.billImports.sessionExists, {
+    sessionId: args.sessionId,
+  });
+  if (!exists) throw new Error("Session not found");
+
+  const blob = await ctx.storage.get(args.storageId);
+  if (!blob) throw new Error("File not found in storage");
+  const text = await blob.text();
+
+  const taozData = await ctx.runQuery(
+    internal.billImports.getActiveIecTaozRates,
+  );
+
+  // Strip UTF-8 BOM if present
+  const cleaned = text.startsWith("﻿") ? text.slice(1) : text;
+  const lines = cleaned
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+
+  let kwhWeekdayDay = 0;
+  let kwhWeekdayNight = 0;
+  let kwhWeekendDay = 0;
+  let kwhWeekendNight = 0;
+  let kwhTaozSummerPeak = 0;
+  let kwhTaozSummerOffPeak = 0;
+  let kwhTaozWinterPeak = 0;
+  let kwhTaozWinterOffPeak = 0;
+  let totalKwh = 0;
+  let minDate = Infinity;
+  let maxDate = -Infinity;
+
+  for (const line of lines) {
+    // Format: "meterID","צריכה","DD/MM/YYYY","HH:MM",kWh,flag
+    const parts = line.split(",");
+    if (parts.length < 5) continue;
+
+    const type = parts[1].replace(/"/g, "").trim();
+    if (type !== "צריכה") continue;
+
+    const dateStr = parts[2].replace(/"/g, "").trim();
+    const timeStr = parts[3].replace(/"/g, "").trim();
+    const kwhStr = parts[4].replace(/"/g, "").trim();
+
+    const dateParts = dateStr.split("/");
+    if (dateParts.length !== 3) continue;
+    const day = parseInt(dateParts[0], 10);
+    const month = parseInt(dateParts[1], 10);
+    const year = parseInt(dateParts[2], 10);
+    if (isNaN(day) || isNaN(month) || isNaN(year)) continue;
+
+    const timeParts = timeStr.split(":");
+    const hour = parseInt(timeParts[0], 10);
+    if (isNaN(hour)) continue;
+
+    const kwh = parseFloat(kwhStr);
+    if (isNaN(kwh)) continue;
+
+    const dateTs = new Date(year, month - 1, day).getTime();
+    if (dateTs < minDate) minDate = dateTs;
+    if (dateTs > maxDate) maxDate = dateTs;
+
+    // 0=Sun…6=Sat; Israeli convention: Fri(5)+Sat(6) = weekend
+    const dayOfWeek = new Date(year, month - 1, day).getDay();
+    const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
+    const isDayBand = hour >= 7 && hour < 23;
+
+    if (isWeekend) {
+      if (isDayBand) kwhWeekendDay += kwh;
+      else kwhWeekendNight += kwh;
+    } else {
+      if (isDayBand) kwhWeekdayDay += kwh;
+      else kwhWeekdayNight += kwh;
+    }
+    totalKwh += kwh;
+
+    const bucket = getTaozBucket(month, hour, taozData.rows);
+    if (bucket === "summerPeak") kwhTaozSummerPeak += kwh;
+    else if (bucket === "summerOffPeak") kwhTaozSummerOffPeak += kwh;
+    else if (bucket === "winterPeak") kwhTaozWinterPeak += kwh;
+    else kwhTaozWinterOffPeak += kwh; // winterOffPeak + shoulderOffPeak
+  }
+
+  if (!isFinite(minDate)) throw new Error("No valid rows parsed from CSV");
+
+  return ctx.runMutation(internal.billImports.insertBillImport, {
+    sessionId: args.sessionId,
+    inputMode: "smartmeterCsv",
+    billingPeriodStart: minDate,
+    billingPeriodEnd: maxDate + 86_400_000,
+    totalKwh,
+    currentSupplierId: null,
+    currentPlanVersionId: null,
+    kwhWeekdayDay,
+    kwhWeekdayNight,
+    kwhWeekendDay,
+    kwhWeekendNight,
+    kwhTaozSummerPeak,
+    kwhTaozSummerOffPeak,
+    kwhTaozWinterPeak,
+    kwhTaozWinterOffPeak,
+    ...(taozData.effectiveFrom !== null
+      ? { iecTaozRatesEffectiveFrom: taozData.effectiveFrom }
+      : {}),
+    rawFileStorageId: args.storageId,
+    rawFileDeletedAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+    parsedDataStorageId: null,
+    userConfirmed: null,
+    editedFieldCount: null,
+    confirmedAt: null,
+  });
+}

@@ -1,6 +1,7 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { withCapturedExceptions } from "./lib/sentry";
 
 const http = httpRouter();
 
@@ -12,11 +13,13 @@ http.route({
     if (!secret || req.headers.get("Authorization") !== `Bearer ${secret}`) {
       return new Response("Unauthorized", { status: 401 });
     }
-    const result: string = await ctx.runAction(
-      internal.internal.seedAll.runAll,
-      {},
-    );
-    return new Response(result, { status: 200 });
+    return withCapturedExceptions(async () => {
+      const result: string = await ctx.runAction(
+        internal.internal.seedAll.runAll,
+        {},
+      );
+      return new Response(result, { status: 200 });
+    });
   }),
 });
 
