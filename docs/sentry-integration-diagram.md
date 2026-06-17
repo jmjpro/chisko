@@ -38,16 +38,13 @@ flowchart TB
 
     subgraph Build["Build chain (vercel.json, see ADR-0012)"]
         VERCEL_SHA["VERCEL_GIT_COMMIT_SHA"]
-        CONVEX_SET["npx convex env set SENTRY_RELEASE ...<br/>(threads SHA to backend)"]
         VITE_DEFINE["astro.config.mjs vite.define<br/>VITE_SENTRY_RELEASE ← VERCEL_GIT_COMMIT_SHA<br/>(threads SHA to frontend bundle)"]
         SOURCEMAPS["@sentry/astro Vite plugin<br/>uploads source maps<br/>(SENTRY_ORG / SENTRY_PROJECT / SENTRY_AUTH_TOKEN)"]
 
-        VERCEL_SHA --> CONVEX_SET
         VERCEL_SHA --> VITE_DEFINE
         VITE_DEFINE --> SOURCEMAPS
     end
 
-    CONVEX_SET -. "release tag" .-> SENTRY_BE
     SOURCEMAPS -. "release tag + resolved stack traces" .-> SENTRY_FE
     BE_NOACCESS -.->|"not reported to Sentry"| BE_NOACCESS
 ```
