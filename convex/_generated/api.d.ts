@@ -11,6 +11,7 @@
 import type * as billImports from "../billImports.js";
 import type * as crons from "../crons.js";
 import type * as homeProfiles from "../homeProfiles.js";
+import type * as http from "../http.js";
 import type * as internal_deployHooks from "../internal/deployHooks.js";
 import type * as internal_seedAll from "../internal/seedAll.js";
 import type * as israelPlaces from "../israelPlaces.js";
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   billImports: typeof billImports;
   crons: typeof crons;
   homeProfiles: typeof homeProfiles;
+  http: typeof http;
   "internal/deployHooks": typeof internal_deployHooks;
   "internal/seedAll": typeof internal_seedAll;
   israelPlaces: typeof israelPlaces;
