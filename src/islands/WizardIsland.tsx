@@ -9,7 +9,6 @@ import {
 } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
-import Header from "../components/header";
 import Footer from "../components/footer";
 import { generateSessionToken } from "../lib/sessionToken";
 import { rewriteStorageUrl } from "../lib/rewriteStorageUrl";
@@ -446,6 +445,8 @@ interface WizardIslandProps {
   convexUrl: string;
 }
 
+const RTL_LANGUAGES = ["he", "ar"];
+
 export default function WizardIsland({ locale, convexUrl }: WizardIslandProps) {
   const [convex] = useState(() => new ConvexReactClient(convexUrl));
 
@@ -453,14 +454,33 @@ export default function WizardIsland({ locale, convexUrl }: WizardIslandProps) {
     void i18n.changeLanguage(locale);
   }, [locale]);
 
+  useEffect(() => {
+    function syncDocumentAttrs(lang: string) {
+      document.documentElement.dir = RTL_LANGUAGES.includes(lang)
+        ? "rtl"
+        : "ltr";
+      document.documentElement.lang = lang;
+    }
+    syncDocumentAttrs(i18n.resolvedLanguage ?? locale);
+    i18n.on("languageChanged", syncDocumentAttrs);
+    return () => i18n.off("languageChanged", syncDocumentAttrs);
+  }, [locale]);
+
+  useEffect(() => {
+    function handleLangChange(e: Event) {
+      const { lang } = (e as CustomEvent<{ lang: string }>).detail;
+      void i18n.changeLanguage(lang);
+    }
+    window.addEventListener("chisko:lang-change", handleLangChange);
+    return () =>
+      window.removeEventListener("chisko:lang-change", handleLangChange);
+  }, []);
+
   return (
     <ConvexProvider client={convex}>
       <Suspense fallback={null}>
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <WizardPage convexUrl={convexUrl} />
-          <Footer />
-        </div>
+        <WizardPage convexUrl={convexUrl} />
+        <Footer />
       </Suspense>
     </ConvexProvider>
   );

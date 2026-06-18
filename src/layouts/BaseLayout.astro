@@ -1,5 +1,7 @@
 ---
 import "../index.css";
+import LogoMark from "../components/logoMark";
+import { Sun, Moon, Monitor, Check } from "lucide-react";
 
 interface Props {
   locale: string;
@@ -7,6 +9,7 @@ interface Props {
   description?: string;
   ogTitle?: string;
   ogDescription?: string;
+  langSwitchUrls?: Record<string, string>;
 }
 
 const {
@@ -15,9 +18,21 @@ const {
   description,
   ogTitle,
   ogDescription,
+  langSwitchUrls,
 } = Astro.props;
 
 const isRtl = ["he", "ar"].includes(locale);
+const homeUrl = locale === "he" ? "/" : `/${locale}/`;
+
+const LANGUAGES = [
+  { code: "en", label: "English" },
+  { code: "he", label: "עברית" },
+  { code: "ru", label: "Русский" },
+  { code: "ar", label: "العربية" },
+] as const;
+
+const common = (await import(`../../public/locales/${locale}/common.json`))
+  .default as Record<string, string>;
 ---
 
 <!doctype html>
@@ -33,8 +48,82 @@ const isRtl = ["he", "ar"].includes(locale);
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <slot name="head" />
   </head>
-  <body>
+  <body class="min-h-screen flex flex-col">
+    <header class="flex items-center justify-between px-6 py-4 border-b border-border">
+      <a href={homeUrl} aria-label="Chisko" class="flex items-center gap-2.5">
+        <LogoMark className="h-8 w-8" aria-hidden="true" />
+        <span class="text-xl font-bold tracking-tight">
+          <span class="text-foreground">Chi</span><span class="text-primary">sko</span>
+        </span>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <details class="relative">
+          <summary
+            aria-label={common.theme_menu_label}
+            class="flex items-center justify-center w-9 h-9 rounded-full list-none cursor-pointer text-muted-foreground hover:text-foreground hover:bg-muted transition-colors outline-none [&::-webkit-details-marker]:hidden"
+          >
+            <span data-theme-icon="system"><Monitor size={18} /></span>
+            <span data-theme-icon="light" hidden><Sun size={18} /></span>
+            <span data-theme-icon="dark" hidden><Moon size={18} /></span>
+          </summary>
+          <div
+            class="absolute end-0 mt-2 min-w-[9rem] rounded-lg border border-border bg-popover p-1 shadow-md text-popover-foreground z-10"
+          >
+            <button
+              type="button"
+              data-theme-option="light"
+              class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm text-start hover:bg-accent hover:text-accent-foreground"
+            >
+              <span class="text-muted-foreground"><Sun size={15} /></span>
+              <span class="flex-1">{common.theme_light}</span>
+              <span data-theme-check="light" hidden class="text-primary">
+                <Check size={13} />
+              </span>
+            </button>
+            <button
+              type="button"
+              data-theme-option="dark"
+              class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm text-start hover:bg-accent hover:text-accent-foreground"
+            >
+              <span class="text-muted-foreground"><Moon size={15} /></span>
+              <span class="flex-1">{common.theme_dark}</span>
+              <span data-theme-check="dark" hidden class="text-primary">
+                <Check size={13} />
+              </span>
+            </button>
+            <button
+              type="button"
+              data-theme-option="system"
+              class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm text-start hover:bg-accent hover:text-accent-foreground"
+            >
+              <span class="text-muted-foreground"><Monitor size={15} /></span>
+              <span class="flex-1">{common.theme_system}</span>
+              <span data-theme-check="system" hidden class="text-primary">
+                <Check size={13} />
+              </span>
+            </button>
+          </div>
+        </details>
+
+        <select
+          id="chisko-lang-select"
+          aria-label={common.language}
+          data-lang-mode={langSwitchUrls ? "navigate" : "event"}
+          data-lang-urls={langSwitchUrls ? JSON.stringify(langSwitchUrls) : undefined}
+          class="text-sm rounded-md border border-input bg-background px-2 py-1 text-foreground outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring transition-colors"
+        >
+          {LANGUAGES.map((lang) => (
+            <option value={lang.code} selected={lang.code === locale}>
+              {lang.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    </header>
+
     <slot />
+
     <script is:inline>
       // Restore theme before paint to avoid flash
       (function () {
@@ -43,6 +132,66 @@ const isRtl = ["he", "ar"].includes(locale);
           stored === "dark" ||
           (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
         if (dark) document.documentElement.classList.add("dark");
+      })();
+    </script>
+
+    <script is:inline>
+      (function () {
+        function showActiveIcon(mode) {
+          document.querySelectorAll("[data-theme-icon]").forEach((el) => {
+            el.hidden = el.getAttribute("data-theme-icon") !== mode;
+          });
+          document.querySelectorAll("[data-theme-check]").forEach((el) => {
+            el.hidden = el.getAttribute("data-theme-check") !== mode;
+          });
+        }
+
+        function applyTheme(mode) {
+          const dark =
+            mode === "dark" ||
+            (mode === "system" &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+          if (mode === "system") {
+            localStorage.removeItem("theme");
+          } else {
+            localStorage.setItem("theme", mode);
+          }
+          showActiveIcon(mode);
+        }
+
+        const initialTheme = localStorage.getItem("theme") || "system";
+        showActiveIcon(initialTheme);
+
+        document.querySelectorAll("[data-theme-option]").forEach((button) => {
+          button.addEventListener("click", () => {
+            applyTheme(button.getAttribute("data-theme-option"));
+            button.closest("details").removeAttribute("open");
+          });
+        });
+
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", (e) => {
+            if (localStorage.getItem("theme")) return;
+            document.documentElement.classList.toggle("dark", e.matches);
+          });
+
+        const select = document.getElementById("chisko-lang-select");
+        if (select) {
+          select.addEventListener("change", () => {
+            const lang = select.value;
+            document.cookie = `chisko_lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+            if (select.dataset.langMode === "navigate") {
+              const urls = JSON.parse(select.dataset.langUrls || "{}");
+              window.location.href = urls[lang] || "/";
+            } else {
+              window.dispatchEvent(
+                new CustomEvent("chisko:lang-change", { detail: { lang } }),
+              );
+            }
+          });
+        }
       })();
     </script>
   </body>

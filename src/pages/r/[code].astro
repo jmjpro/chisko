@@ -4,7 +4,6 @@ export const prerender = false;
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../convex/_generated/api";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import HeaderIsland from "../../islands/HeaderIsland";
 import Footer from "../../components/footer";
 import { getConvexUrl } from "../../lib/getConvexUrl";
 import heCommon from "../../../public/locales/he/common.json";
@@ -67,31 +66,29 @@ const ogDescription = savingsNis
   title={ogTitle}
   ogTitle={ogTitle}
   ogDescription={ogDescription}
+  langSwitchUrls={langSwitchUrls}
 >
-  <div class="min-h-screen flex flex-col">
-    <HeaderIsland client:only="react" locale={locale} langSwitchUrls={langSwitchUrls} />
-    <main class="flex-1 px-6 py-12 max-w-lg mx-auto w-full">
-      {
-        data ? (
-          <div class="space-y-4">
-            <h1 class="text-2xl font-bold">{data.supplierName} — {data.planName}</h1>
-            {savingsNis && (
-              <p class="text-muted-foreground">
-                {common.share_savings_description.replace("{{amount}}", savingsNis)}
-              </p>
-            )}
-          </div>
-        ) : (
-          <div class="text-center py-24">
-            <h1 class="text-2xl font-bold mb-2">{common.share_invalid_title}</h1>
-            <p class="text-muted-foreground">{common.share_invalid_message}</p>
-            <a href="/" class="mt-6 inline-block text-primary underline">
-              {common.back_to_home}
-            </a>
-          </div>
-        )
-      }
-    </main>
-    <Footer />
-  </div>
+  <main class="flex-1 px-6 py-12 max-w-lg mx-auto w-full">
+    {
+      data ? (
+        <div class="space-y-4">
+          <h1 class="text-2xl font-bold">{data.supplierName} — {data.planName}</h1>
+          {savingsNis && (
+            <p class="text-muted-foreground">
+              {common.share_savings_description.replace("{{amount}}", savingsNis)}
+            </p>
+          )}
+        </div>
+      ) : (
+        <div class="text-center py-24">
+          <h1 class="text-2xl font-bold mb-2">{common.share_invalid_title}</h1>
+          <p class="text-muted-foreground">{common.share_invalid_message}</p>
+          <a href="/" class="mt-6 inline-block text-primary underline">
+            {common.back_to_home}
+          </a>
+        </div>
+      )
+    }
+  </main>
+  <Footer />
 </BaseLayout>

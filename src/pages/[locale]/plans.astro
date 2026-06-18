@@ -2,7 +2,6 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../convex/_generated/api";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import HeaderIsland from "../../islands/HeaderIsland";
 import Footer from "../../components/footer";
 import { getConvexUrl } from "../../lib/getConvexUrl";
 
@@ -39,10 +38,12 @@ function formatHour(h: number) {
 }
 ---
 
-<BaseLayout locale={locale} title={`Chisko — ${common.plans_page_title}`}>
-  <div class="min-h-screen flex flex-col">
-    <HeaderIsland client:only="react" locale={locale} langSwitchUrls={langSwitchUrls} />
-    <main class="flex-1 px-6 py-8 overflow-x-auto">
+<BaseLayout
+  locale={locale}
+  title={`Chisko — ${common.plans_page_title}`}
+  langSwitchUrls={langSwitchUrls}
+>
+  <main class="flex-1 px-6 py-8 overflow-x-auto">
       <h1 class="text-2xl font-bold mb-6">{common.plans_page_title}</h1>
       <table class="w-full text-sm border-collapse">
         <thead>
@@ -85,7 +86,6 @@ function formatHour(h: number) {
           }
         </tbody>
       </table>
-    </main>
-    <Footer />
-  </div>
+  </main>
+  <Footer />
 </BaseLayout>

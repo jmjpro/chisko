@@ -2,7 +2,6 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import HeaderIsland from "../islands/HeaderIsland";
 import Footer from "../components/footer";
 import common from "../../public/locales/he/common.json";
 import suppliers from "../../public/locales/he/suppliers.json";
@@ -45,38 +44,39 @@ const processedRows = rows.map((row) => {
 });
 ---
 
-<BaseLayout locale={locale} title={`Chisko — ${common.plans_page_title}`}>
-  <div class="min-h-screen flex flex-col">
-    <HeaderIsland client:only="react" locale={locale} langSwitchUrls={langSwitchUrls} />
-    <main class="flex-1 px-6 py-8 overflow-x-auto">
-      <h1 class="text-2xl font-bold mb-6">{common.plans_page_title}</h1>
-      <table class="w-full text-sm border-collapse">
-        <thead>
-          <tr class="border-b text-start">
-            <th class="pb-2 pe-6 font-semibold text-start">{common.table_supplier}</th>
-            <th class="pb-2 pe-6 font-semibold text-start">{common.table_plan}</th>
-            <th class="pb-2 pe-6 font-semibold text-start">{common.table_type}</th>
-            <th class="pb-2 pe-6 font-semibold text-start">{common.table_discount}</th>
-            <th class="pb-2 pe-6 font-semibold text-start">{common.table_window}</th>
-            <th class="pb-2 font-semibold text-start">{common.table_weekday_only}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            processedRows.map((row) => (
-              <tr class="border-b last:border-0">
-                <td class="py-3 pe-6">{row.supplierLabel}</td>
-                <td class="py-3 pe-6">{row.planLabel}</td>
-                <td class="py-3 pe-6">{row.typeLabel}</td>
-                <td class="py-3 pe-6 tnum">{row.discountPercent}%</td>
-                <td class="py-3 pe-6">{row.window}</td>
-                <td class="py-3">{row.weekdayOnly}</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </main>
-    <Footer />
-  </div>
+<BaseLayout
+  locale={locale}
+  title={`Chisko — ${common.plans_page_title}`}
+  langSwitchUrls={langSwitchUrls}
+>
+  <main class="flex-1 px-6 py-8 overflow-x-auto">
+    <h1 class="text-2xl font-bold mb-6">{common.plans_page_title}</h1>
+    <table class="w-full text-sm border-collapse">
+      <thead>
+        <tr class="border-b text-start">
+          <th class="pb-2 pe-6 font-semibold text-start">{common.table_supplier}</th>
+          <th class="pb-2 pe-6 font-semibold text-start">{common.table_plan}</th>
+          <th class="pb-2 pe-6 font-semibold text-start">{common.table_type}</th>
+          <th class="pb-2 pe-6 font-semibold text-start">{common.table_discount}</th>
+          <th class="pb-2 pe-6 font-semibold text-start">{common.table_window}</th>
+          <th class="pb-2 font-semibold text-start">{common.table_weekday_only}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          processedRows.map((row) => (
+            <tr class="border-b last:border-0">
+              <td class="py-3 pe-6">{row.supplierLabel}</td>
+              <td class="py-3 pe-6">{row.planLabel}</td>
+              <td class="py-3 pe-6">{row.typeLabel}</td>
+              <td class="py-3 pe-6 tnum">{row.discountPercent}%</td>
+              <td class="py-3 pe-6">{row.window}</td>
+              <td class="py-3">{row.weekdayOnly}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </main>
+  <Footer />
 </BaseLayout>
