@@ -10,6 +10,10 @@ interface CsvDropzoneProps {
   loading?: boolean;
   success?: boolean;
   error?: string | null;
+  /** Upload percentage (0-100) shown while loading, replacing the indeterminate spinner. */
+  progress?: number;
+  /** Shows a "retrying" indicator while an automatic retry attempt is in flight. */
+  retrying?: boolean;
 }
 
 /**
@@ -48,6 +52,8 @@ export default function CsvDropzone({
   loading = false,
   success = false,
   error,
+  progress,
+  retrying = false,
 }: CsvDropzoneProps) {
   const { t: tw } = useTranslation("wizard");
   const [dragActive, setDragActive] = useState(false);
@@ -219,7 +225,11 @@ export default function CsvDropzone({
       {/* Primary text */}
       {loading ? (
         <p className="text-sm text-muted-foreground">
-          {tw("upload_processing")}
+          {retrying
+            ? tw("upload_retrying")
+            : progress !== undefined
+              ? tw("upload_progress", { percent: progress })
+              : tw("upload_processing")}
         </p>
       ) : success && !error ? (
         <p className="text-sm font-medium text-success">

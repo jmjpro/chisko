@@ -1,3 +1,4 @@
+import path from "path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -15,6 +16,19 @@ export default defineConfig({
           name: "node",
           include: ["scripts/**/*.test.ts", "src/**/*.test.ts"],
           environment: "node",
+        },
+      },
+      {
+        resolve: {
+          alias: {
+            "@": path.resolve(__dirname, "./src"),
+          },
+        },
+        test: {
+          name: "dom",
+          include: ["src/**/*.test.tsx"],
+          environment: "jsdom",
+          setupFiles: ["./src/vitest.setup.dom.ts"],
         },
       },
     ],

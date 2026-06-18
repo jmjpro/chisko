@@ -13,6 +13,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { generateSessionToken } from "../lib/sessionToken";
 import { rewriteStorageUrl } from "../lib/rewriteStorageUrl";
+import { uploadFileWithRetry } from "../lib/uploadFileWithRetry";
 import Wizard from "../components/Wizard";
 import MeterStep from "../components/wizard/MeterStep";
 import UploadStep from "../components/wizard/UploadStep";
@@ -79,6 +80,10 @@ function WizardPage({ convexUrl }: { convexUrl: string }) {
 
   // Upload / generation state
   const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | undefined>(
+    undefined,
+  );
+  const [uploadRetrying, setUploadRetrying] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [resultError, setResultError] = useState<string | null>(null);
@@ -210,22 +215,29 @@ function WizardPage({ convexUrl }: { convexUrl: string }) {
   async function handleFileUpload(file: File) {
     if (!sessionId) return;
     setUploadLoading(true);
+    setUploadProgress(undefined);
+    setUploadRetrying(false);
     setUploadError(null);
     try {
       const rawUploadUrl = await generateUploadUrl({});
       const uploadUrl = rewriteStorageUrl(rawUploadUrl, convexUrl);
-      const res = await fetch(uploadUrl, {
-        method: "POST",
-        body: file,
-        headers: { "Content-Type": "text/csv" },
+      const { storageId } = await uploadFileWithRetry(file, uploadUrl, {
+        onProgress: (percent) => {
+          setUploadRetrying(false);
+          setUploadProgress(percent);
+        },
+        onRetry: () => setUploadRetrying(true),
       });
-      const { storageId } = (await res.json()) as { storageId: Id<"_storage"> };
-      const id = await parseSmartMeterCsv({ storageId, sessionId });
+      const id = await parseSmartMeterCsv({
+        storageId: storageId as Id<"_storage">,
+        sessionId,
+      });
       setBillImportId(id);
     } catch {
       setUploadError(tw("upload_error"));
     } finally {
       setUploadLoading(false);
+      setUploadRetrying(false);
     }
   }
 
@@ -373,6 +385,8 @@ function WizardPage({ convexUrl }: { convexUrl: string }) {
           <UploadStep
             onFileUpload={(file) => void handleFileUpload(file)}
             uploadLoading={uploadLoading}
+            uploadProgress={uploadProgress}
+            uploadRetrying={uploadRetrying}
             billImportId={billImportId}
             uploadError={uploadError}
             setUploadError={setUploadError}
@@ -393,6 +407,8 @@ function WizardPage({ convexUrl }: { convexUrl: string }) {
             effectiveHasSmartMeter={effectiveHasSmartMeter}
             onFileUpload={(file) => void handleFileUpload(file)}
             uploadLoading={uploadLoading}
+            uploadProgress={uploadProgress}
+            uploadRetrying={uploadRetrying}
             billImportId={billImportId}
             uploadError={uploadError}
             setUploadError={setUploadError}

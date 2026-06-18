@@ -27,6 +27,8 @@
   "home_title": "منزلك",
   "usage_title": "كيف تستخدم الكهرباء",
   "upload_processing": "جارِ معالجة الملف…",
+  "upload_progress": "جارِ التحميل… {{percent}}%",
+  "upload_retrying": "مشكلة في الاتصال — جارٍ إعادة المحاولة…",
   "upload_error": "خطأ في معالجة الملف. يرجى المحاولة مرة أخرى.",
   "upload_success": "تمت معالجة الملف بنجاح ✓",
   "upload_drop_prompt": "اسحب ملف CSV هنا، أو انقر للاستعراض",

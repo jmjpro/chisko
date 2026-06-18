@@ -27,6 +27,8 @@
   "home_title": "הבית שלך",
   "usage_title": "איך אתה משתמש בחשמל",
   "upload_processing": "מעבד קובץ…",
+  "upload_progress": "מעלה… {{percent}}%",
+  "upload_retrying": "תקלת חיבור — מנסה שוב…",
   "upload_error": "שגיאה בעיבוד הקובץ. אנא נסה שוב.",
   "upload_success": "הקובץ עובד בהצלחה ✓",
   "upload_drop_prompt": "גרור לכאן את קובץ ה-CSV, או לחץ לבחירת קובץ",

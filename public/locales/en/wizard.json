@@ -27,6 +27,8 @@
   "home_title": "Your Home",
   "usage_title": "How You Use Electricity",
   "upload_processing": "Processing file…",
+  "upload_progress": "Uploading… {{percent}}%",
+  "upload_retrying": "Connection issue — retrying…",
   "upload_error": "Error processing file. Please try again.",
   "upload_success": "File processed successfully ✓",
   "upload_drop_prompt": "Drop your IEC CSV here, or click to browse",
