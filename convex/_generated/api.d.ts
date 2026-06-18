@@ -16,6 +16,7 @@ import type * as internal_deployHooks from "../internal/deployHooks.js";
 import type * as internal_seedAll from "../internal/seedAll.js";
 import type * as israelPlaces from "../israelPlaces.js";
 import type * as israelPlacesRefresh from "../israelPlacesRefresh.js";
+import type * as lib_sentry from "../lib/sentry.js";
 import type * as migrations from "../migrations.js";
 import type * as plans from "../plans.js";
 import type * as recommendations from "../recommendations.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   "internal/seedAll": typeof internal_seedAll;
   israelPlaces: typeof israelPlaces;
   israelPlacesRefresh: typeof israelPlacesRefresh;
+  "lib/sentry": typeof lib_sentry;
   migrations: typeof migrations;
   plans: typeof plans;
   recommendations: typeof recommendations;
