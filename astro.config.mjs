@@ -3,10 +3,21 @@ import react from "@astrojs/react";
 import vercel from "@astrojs/vercel";
 import sentry from "@sentry/astro";
 import tailwindcss from "@tailwindcss/vite";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// .env.local isn't loaded into process.env at config-eval time (Vite only
+// exposes it to app code via import.meta.env), so read it directly — lets
+// each git worktree pin its own dev server port without exporting shell vars.
+function devServerPort() {
+  const envPath = path.join(__dirname, ".env.local");
+  if (!existsSync(envPath)) return 5173;
+  const match = readFileSync(envPath, "utf-8").match(/^PORT=(\d+)\s*$/m);
+  return match ? Number(match[1]) : 5173;
+}
 
 export default defineConfig({
   output: "static",
@@ -36,6 +47,6 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: devServerPort(),
   },
 });
