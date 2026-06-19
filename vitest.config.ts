@@ -14,7 +14,11 @@ export default defineConfig({
       {
         test: {
           name: "node",
-          include: ["scripts/**/*.test.ts", "src/**/*.test.ts"],
+          include: [
+            "scripts/**/*.test.ts",
+            "src/**/*.test.ts",
+            "middleware.test.ts",
+          ],
           environment: "node",
         },
       },

@@ -1,10 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-
-vi.mock("astro:middleware", () => ({
-  defineMiddleware: (fn: unknown) => fn,
-}));
-
-import { parseAcceptLanguage } from "./middleware";
+import { describe, it, expect } from "vitest";
+import { parseAcceptLanguage } from "./locale";
 
 describe("parseAcceptLanguage", () => {
   it("returns 'he' when header is null", () => {
