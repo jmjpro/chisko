@@ -29,7 +29,7 @@ Explicit per-supplier permission granted by the user at the moment of Referral, 
 _Avoid_: Terms of service agreement, opt-in
 
 **Data Retention**:
-Parsed bill and usage data is retained indefinitely. Raw uploaded bill files are deleted after 30 days. Full user data deletion (contact info, Recommendations, parsed data) is available on request.
+Parsed bill and usage data is retained indefinitely. Smart-meter CSV data is parsed entirely on the user's device and never uploaded, so there is no raw file to retain or delete for that input mode. Raw PDF bill uploads are deleted after 30 days. Full user data deletion (contact info, Recommendations, parsed data) is available on request.
 _Avoid_: Privacy policy, data policy
 
 **Qualified Lead**:
