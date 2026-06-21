@@ -1,3 +1,3 @@
 {
-  "buildCommand": "npx convex deploy && npx convex deploy --cmd 'curl -fsS -X POST \"${VITE_CONVEX_URL/.convex.cloud/.convex.site}/seed\" -H \"Authorization: Bearer $SEED_SECRET\" && npm run build && echo DEBUG_MAP_LISTING_START && find dist .vercel/output -type f \\( -name \"*.js\" -o -name \"*.map\" \\) | sort && echo DEBUG_MAP_LISTING_END'"
+  "buildCommand": "npx convex deploy && npx convex deploy --cmd 'curl -fsS -X POST \"${VITE_CONVEX_URL/.convex.cloud/.convex.site}/seed\" -H \"Authorization: Bearer $SEED_SECRET\" && npm run build'"
 }
