@@ -12,19 +12,19 @@ Close a Linear issue and confirm it is resolved.
 
 2. Fetch the issue via the `linear-server` MCP to get its current state, title, and URL.
 
-3. Update the issue's workflow state to `Done` using the `linear-server` MCP (look up the state ID from the team's workflow states if needed).
+   If the state is already `Done` (e.g. a `Closes CHI-N` trailer in a merged commit auto-closed it via the Linear GitHub integration), report that and stop — skip step 3.
 
-4. Remove all triage labels currently present on the issue. Check which of these are present and remove only those:
+3. Call `save_issue` **once** with `state: "Done"` and `labels` set to the issue's current labels (from step 2) minus any triage labels present:
    - `needs-triage`
    - `needs-info`
    - `ready-for-agent`
    - `ready-for-human`
    - `wontfix`
 
-5. Confirm by fetching the issue again and report the state, title, and URL to the user.
+   `save_issue` resolves the state name directly — do not call `list_issue_statuses` to look up the ID first.
+
+4. Report the state, title, and URL from `save_issue`'s response — it already reflects the update, so don't re-fetch the issue just to confirm it.
 
 ## Notes
 
 - Do not reopen issues. Only close them.
-- If the issue is already in `Done` state, report that and skip the update.
-- If a `Closes CHI-N` trailer was used in a merged commit, Linear may have auto-closed the issue — the confirm step will verify this.
