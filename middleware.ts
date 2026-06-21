@@ -4,7 +4,7 @@ import {
   PREFIXED_LOCALES,
   parseAcceptLanguage,
   type Locale,
-} from "./src/lib/locale";
+} from "./src/lib/locale.js";
 
 export const config = {
   matcher: ["/((?!_astro/|locales/|_server-islands/).*)"],
