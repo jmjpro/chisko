@@ -1,0 +1,9 @@
+# Retrieve smart-meter history via IEC's emailed report, not per-day API polling
+
+While building CHI-43's extension, we found that IEC's `Consumption/RemoteReadingRange` API accepts a `resolution: "Day"` parameter that returns genuine quarter-hour interval data (96 readings/day) — the same granularity as the CSV IEC emails on request. We chose **not** to build the extension around looping this call, and kept the existing approach of triggering `SendConsumptionReportToMail` and retrieving the resulting attachment from the user's inbox instead.
+
+The deciding factor: `Day` resolution is locked to exactly one calendar day per call (a date-range request just returns the single most-recent-available day). Seasonal accuracy in the Recommendation engine's Taoz-bucket split requires summer/winter coverage, so replicating the ~2-year history IEC's own report already covers would mean roughly 730 sequential authenticated calls per user — a volume of automated traffic against a third party we don't control, plausible to trigger rate-limiting or anti-abuse flags on the user's real IEC account. The one-shot "email me the report" action is the same thing a human using IEC's own portal would trigger manually, so it doesn't stand out as automation-shaped traffic the way hundreds of scripted API calls would.
+
+## Consequences
+
+The extension still needs the OTP-detection and mail-provider (Gmail/Outlook/Yahoo/manual) automation from the original design — it isn't replaced by a simpler direct-API path. If a future need arises for a *short, recent* window of quarter-hour data (e.g., a quick preview before the full report arrives), the `Day`-resolution call is available for that narrower use without revisiting this decision, since a handful of calls for a recent window doesn't carry the same volume risk as reconstructing full history.

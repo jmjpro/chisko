@@ -28,6 +28,10 @@ _Avoid_: User, prospect, signup
 Explicit per-supplier permission granted by the user at the moment of Referral, authorizing their personal data to be shared with that specific supplier. Not a blanket upfront agreement.
 _Avoid_: Terms of service agreement, opt-in
 
+**Mail Access Authorization**:
+The one-time permission a user grants the IEC smart-meter retrieval extension, at extension setup, to read their Gmail/Outlook/Yahoo inbox — scoped strictly to detecting the IEC OTP code and the smart-meter report attachment. Distinct from Consent: it is not granted at a data-sharing moment and does not involve a Supplier.
+_Avoid_: Email access, inbox permission, OAuth scope
+
 **Data Retention**:
 Parsed bill and usage data is retained indefinitely. Smart-meter CSV data is parsed entirely on the user's device and never uploaded, so there is no raw file to retain or delete for that input mode. Raw PDF bill uploads are deleted after 30 days. Full user data deletion (contact info, Recommendations, parsed data) is available on request.
 _Avoid_: Privacy policy, data policy

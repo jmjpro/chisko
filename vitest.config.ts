@@ -23,6 +23,13 @@ export default defineConfig({
         },
       },
       {
+        test: {
+          name: "extension",
+          include: ["extension/**/*.test.ts"],
+          environment: "node",
+        },
+      },
+      {
         resolve: {
           alias: {
             "@": path.resolve(__dirname, "./src"),

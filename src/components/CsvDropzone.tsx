@@ -137,6 +137,7 @@ export default function CsvDropzone({
       role="button"
       tabIndex={isInteractive ? 0 : -1}
       aria-label={tw("upload_drop_prompt")}
+      data-testid="csv-dropzone"
       onClick={handleClick}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") handleClick();

@@ -22,17 +22,31 @@ import i18n from "../i18n";
 // Logical steps: 0=Meter, 1=Upload, 2=Home, 3=Usage, 4=Results
 // Upload step (1) is skipped for non-smart-meter users.
 
+// Entry point for the IEC smart-meter retrieval extension: it already
+// knows the user has a smart meter, so skip straight to Upload instead
+// of re-asking the Meter step.
+function isSmartMeterRetrievalEntry() {
+  return (
+    new URLSearchParams(window.location.search).get("entry") ===
+    "smartMeterRetrieval"
+  );
+}
+
 function WizardPage() {
   const { t: tw } = useTranslation("wizard");
 
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(() =>
+    isSmartMeterRetrievalEntry() ? 1 : 0,
+  );
   const [sessionId, setSessionId] = useState<Id<"sessions"> | null>(null);
   const [billImportId, setBillImportId] = useState<Id<"billImports"> | null>(
     null,
   );
 
   // Step 0: meter type
-  const [hasSmartMeter, setHasSmartMeter] = useState<"yes" | "no" | null>(null);
+  const [hasSmartMeter, setHasSmartMeter] = useState<"yes" | "no" | null>(() =>
+    isSmartMeterRetrievalEntry() ? "yes" : null,
+  );
   const [meterNotSure, setMeterNotSure] = useState(false);
   const [cascadeCityCode, setCascadeCityCode] = useState<number | null>(null);
   const [cascadeStreetCode, setCascadeStreetCode] = useState<number | null>(
