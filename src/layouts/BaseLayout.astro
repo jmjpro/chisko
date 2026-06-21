@@ -2,6 +2,8 @@
 import "../index.css";
 import LogoMark from "../components/logoMark";
 import { Sun, Moon, Monitor, Check } from "lucide-react";
+import { commonByLocale } from "../lib/commonLocale";
+import type { Locale } from "../lib/locale";
 
 interface Props {
   locale: string;
@@ -31,8 +33,7 @@ const LANGUAGES = [
   { code: "ar", label: "العربية" },
 ] as const;
 
-const common = (await import(`../../public/locales/${locale}/common.json`))
-  .default as Record<string, string>;
+const common = commonByLocale[locale as Locale];
 ---
 
 <!doctype html>
