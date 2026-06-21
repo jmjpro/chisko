@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import {
   ConvexProvider,
   ConvexReactClient,
-  useAction,
   useMutation,
   useQuery,
 } from "convex/react";
@@ -11,8 +10,7 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import Footer from "../components/footer";
 import { generateSessionToken } from "../lib/sessionToken";
-import { rewriteStorageUrl } from "../lib/rewriteStorageUrl";
-import { uploadFileWithRetry } from "../lib/uploadFileWithRetry";
+import { parseSmartMeterCsvText } from "../../convex/lib/smartMeterCsvParser";
 import Wizard from "../components/Wizard";
 import MeterStep from "../components/wizard/MeterStep";
 import UploadStep from "../components/wizard/UploadStep";
@@ -24,7 +22,7 @@ import i18n from "../i18n";
 // Logical steps: 0=Meter, 1=Upload, 2=Home, 3=Usage, 4=Results
 // Upload step (1) is skipped for non-smart-meter users.
 
-function WizardPage({ convexUrl }: { convexUrl: string }) {
+function WizardPage() {
   const { t: tw } = useTranslation("wizard");
 
   const [step, setStep] = useState(0);
@@ -79,19 +77,15 @@ function WizardPage({ convexUrl }: { convexUrl: string }) {
 
   // Upload / generation state
   const [uploadLoading, setUploadLoading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<number | undefined>(
-    undefined,
-  );
-  const [uploadRetrying, setUploadRetrying] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [resultError, setResultError] = useState<string | null>(null);
   const hasStartedGenerating = useRef(false);
 
-  // Convex mutations / actions
+  // Convex mutations / queries
   const getOrCreateSession = useMutation(api.sessions.getOrCreate);
-  const generateUploadUrl = useMutation(api.billImports.generateUploadUrl);
-  const parseSmartMeterCsv = useAction(api.billImports.parseSmartMeterCsv);
+  const submitSmartMeterCsv = useMutation(api.billImports.submitSmartMeterCsv);
+  const activeIecTaozRates = useQuery(api.billImports.getActiveIecTaozRates);
   const upsertHomeProfile = useMutation(api.homeProfiles.upsert);
   const generateRecommendation = useMutation(api.recommendations.generate);
   const suppliers = useQuery(api.suppliers.list);
@@ -212,31 +206,34 @@ function WizardPage({ convexUrl }: { convexUrl: string }) {
   }
 
   async function handleFileUpload(file: File) {
-    if (!sessionId) return;
+    if (!sessionId || !activeIecTaozRates) return;
     setUploadLoading(true);
-    setUploadProgress(undefined);
-    setUploadRetrying(false);
     setUploadError(null);
     try {
-      const rawUploadUrl = await generateUploadUrl({});
-      const uploadUrl = rewriteStorageUrl(rawUploadUrl, convexUrl);
-      const { storageId } = await uploadFileWithRetry(file, uploadUrl, {
-        onProgress: (percent) => {
-          setUploadRetrying(false);
-          setUploadProgress(percent);
-        },
-        onRetry: () => setUploadRetrying(true),
-      });
-      const id = await parseSmartMeterCsv({
-        storageId: storageId as Id<"_storage">,
+      const text = await file.text();
+      const parsed = parseSmartMeterCsvText(text, activeIecTaozRates.rows);
+      const id = await submitSmartMeterCsv({
         sessionId,
+        billingPeriodStart: parsed.billingPeriodStart,
+        billingPeriodEnd: parsed.billingPeriodEnd,
+        totalKwh: parsed.totalKwh,
+        kwhWeekdayDay: parsed.kwhWeekdayDay,
+        kwhWeekdayNight: parsed.kwhWeekdayNight,
+        kwhWeekendDay: parsed.kwhWeekendDay,
+        kwhWeekendNight: parsed.kwhWeekendNight,
+        kwhTaozSummerPeak: parsed.kwhTaozSummerPeak,
+        kwhTaozSummerOffPeak: parsed.kwhTaozSummerOffPeak,
+        kwhTaozWinterPeak: parsed.kwhTaozWinterPeak,
+        kwhTaozWinterOffPeak: parsed.kwhTaozWinterOffPeak,
+        ...(activeIecTaozRates.effectiveFrom !== null
+          ? { iecTaozRatesEffectiveFrom: activeIecTaozRates.effectiveFrom }
+          : {}),
       });
       setBillImportId(id);
     } catch {
       setUploadError(tw("upload_error"));
     } finally {
       setUploadLoading(false);
-      setUploadRetrying(false);
     }
   }
 
@@ -384,8 +381,6 @@ function WizardPage({ convexUrl }: { convexUrl: string }) {
           <UploadStep
             onFileUpload={(file) => void handleFileUpload(file)}
             uploadLoading={uploadLoading}
-            uploadProgress={uploadProgress}
-            uploadRetrying={uploadRetrying}
             billImportId={billImportId}
             uploadError={uploadError}
             setUploadError={setUploadError}
@@ -406,8 +401,6 @@ function WizardPage({ convexUrl }: { convexUrl: string }) {
             effectiveHasSmartMeter={effectiveHasSmartMeter}
             onFileUpload={(file) => void handleFileUpload(file)}
             uploadLoading={uploadLoading}
-            uploadProgress={uploadProgress}
-            uploadRetrying={uploadRetrying}
             billImportId={billImportId}
             uploadError={uploadError}
             setUploadError={setUploadError}
@@ -479,7 +472,7 @@ export default function WizardIsland({ locale, convexUrl }: WizardIslandProps) {
   return (
     <ConvexProvider client={convex}>
       <Suspense fallback={null}>
-        <WizardPage convexUrl={convexUrl} />
+        <WizardPage />
         <Footer />
       </Suspense>
     </ConvexProvider>
