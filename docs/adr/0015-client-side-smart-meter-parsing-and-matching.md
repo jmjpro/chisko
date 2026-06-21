@@ -1,0 +1,13 @@
+# Parse and match the smart-meter CSV entirely client-side — no upload
+
+CHI-47 raised that uploading the ~4MB smart-meter CSV (the file ADR 0013's wake-lock/retry fix was mitigating) cost both bandwidth and 30 days of raw-file retention, for data that's only ever reduced to 8 small aggregate numbers anyway. We moved CSV parsing into the browser (`convex/lib/smartMeterCsvParser.ts`) and, since a POC measured the full eligibility/savings match against the live plan catalog at 0.2ms and a ~9KB payload, moved the match (`convex/lib/recommendationEngine.ts`) client-side too — both modules have no Convex server/runtime imports so they can be shared as-is between server and browser bundles. The raw file never leaves the device; only the 8 aggregate usage numbers are sent to the server. Scope is the `smartmeterCsv` input mode only — `pdfExtraction` still requires a server-side LLM call and is unaffected.
+
+## Considered Options
+
+- **Parse client-side, keep matching server-side**: would have solved the bandwidth/retention problem alone, since matching only ever needed the 8 aggregates anyway. Rejected once the POC showed matching against the catalog is computationally free (0.2ms) and the catalog's commercially-sensitive-looking fields (discount %, time window, weekday-only) are already public, unauthenticated, on `/plans` via `api.plans.listActive` — so there was no real exposure cost to offset against the stated preference for the client doing the full calculation.
+- **WebAssembly for the engine** (the issue's original suggestion, to keep the catalog "secure"): rejected — WASM doesn't hide data a script must use as plain values to compute and display a result; it raises the cost of casual inspection by roughly nothing. Moot anyway once we confirmed most of the catalog is already public.
+- **Trust client-submitted final results when persisting a Recommendation**: rejected in favor of leaving `recommendations.generate` untouched. It already re-derives eligibility/savings server-side from a `billImportId` + `homeProfileId` rather than accepting a client-computed answer, so no new verification step was needed — the client-side engine is purely an instant in-wizard preview.
+
+## Consequences
+
+The new trust boundary is the aggregate-submission mutation: the server can no longer independently verify the 8 usage numbers came from a real CSV, since it no longer parses the file itself. This is a real (small) regression from today's smart-meter-CSV path, but it brings that input mode in line with the trust level the product already accepts for `manualEntry` and questionnaire-derived estimates — both already self-reported and unverified — rather than introducing a new category of risk.

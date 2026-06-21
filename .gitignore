@@ -30,6 +30,9 @@ playwright-report
 # Astro generated
 .astro/
 
+# Local Convex backend data (or a symlink to another worktree's, for shared local dev)
+.convex
+
 # Claude Code local memory
 .claude/projects/
 .vercel

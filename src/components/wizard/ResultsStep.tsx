@@ -52,8 +52,6 @@ export interface ResultsStepProps {
   effectiveHasSmartMeter: "yes" | "no" | null;
   onFileUpload: (file: File) => void;
   uploadLoading: boolean;
-  uploadProgress: number | undefined;
-  uploadRetrying: boolean;
   billImportId: Id<"billImports"> | null;
   uploadError: string | null;
   setUploadError: (err: string | null) => void;
@@ -78,8 +76,6 @@ export default function ResultsStep({
   effectiveHasSmartMeter,
   onFileUpload,
   uploadLoading,
-  uploadProgress,
-  uploadRetrying,
   billImportId,
   uploadError,
   setUploadError,
@@ -343,8 +339,6 @@ export default function ResultsStep({
                 onValidFile={(file) => onFileUpload(file)}
                 onError={setUploadError}
                 loading={uploadLoading}
-                progress={uploadProgress}
-                retrying={uploadRetrying}
                 success={!!billImportId}
                 error={uploadError}
               />

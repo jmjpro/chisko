@@ -10,29 +10,19 @@ vi.mock("react-i18next", () => ({
 }));
 
 describe("CsvDropzone", () => {
-  it("renders the upload progress percentage instead of the spinner", () => {
+  it("shows the processing message while loading", () => {
     render(
-      <CsvDropzone
-        onValidFile={vi.fn()}
-        onError={vi.fn()}
-        loading={true}
-        progress={42}
-      />,
+      <CsvDropzone onValidFile={vi.fn()} onError={vi.fn()} loading={true} />,
     );
 
-    expect(screen.getByText(/upload_progress/)).toHaveTextContent("42");
+    expect(screen.getByText("upload_processing")).toBeInTheDocument();
   });
 
-  it("shows a retrying indicator while loading and retrying", () => {
+  it("shows the success message once processed", () => {
     render(
-      <CsvDropzone
-        onValidFile={vi.fn()}
-        onError={vi.fn()}
-        loading={true}
-        retrying={true}
-      />,
+      <CsvDropzone onValidFile={vi.fn()} onError={vi.fn()} success={true} />,
     );
 
-    expect(screen.getByText("upload_retrying")).toBeInTheDocument();
+    expect(screen.getByText("upload_success")).toBeInTheDocument();
   });
 });

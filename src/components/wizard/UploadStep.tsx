@@ -6,8 +6,6 @@ import WizardStep from "@/components/WizardStep";
 export interface UploadStepProps {
   onFileUpload: (file: File) => void;
   uploadLoading: boolean;
-  uploadProgress: number | undefined;
-  uploadRetrying: boolean;
   billImportId: Id<"billImports"> | null;
   uploadError: string | null;
   setUploadError: (err: string | null) => void;
@@ -16,8 +14,6 @@ export interface UploadStepProps {
 export default function UploadStep({
   onFileUpload,
   uploadLoading,
-  uploadProgress,
-  uploadRetrying,
   billImportId,
   uploadError,
   setUploadError,
@@ -40,8 +36,6 @@ export default function UploadStep({
         onValidFile={(file) => onFileUpload(file)}
         onError={setUploadError}
         loading={uploadLoading}
-        progress={uploadProgress}
-        retrying={uploadRetrying}
         success={!!billImportId}
         error={uploadError}
       />
