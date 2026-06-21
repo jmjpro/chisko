@@ -6,26 +6,11 @@ import { api } from "../../../convex/_generated/api";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Footer from "../../components/footer";
 import { getConvexUrl } from "../../lib/getConvexUrl";
+import { LOCALES, parseAcceptLanguage, type Locale } from "../../lib/locale";
 import heCommon from "../../../public/locales/he/common.json";
 import enCommon from "../../../public/locales/en/common.json";
 import arCommon from "../../../public/locales/ar/common.json";
 import ruCommon from "../../../public/locales/ru/common.json";
-
-const LOCALES = ["he", "en", "ar", "ru"] as const;
-type Locale = (typeof LOCALES)[number];
-
-function parseAcceptLanguage(header: string | null): Locale {
-  if (!header) return "he";
-  const tags = header.split(",").map((entry) => {
-    const [tag, q] = entry.trim().split(";q=");
-    return { lang: tag.split("-")[0].toLowerCase(), q: q ? parseFloat(q) : 1 };
-  });
-  tags.sort((a, b) => b.q - a.q);
-  for (const { lang } of tags) {
-    if ((LOCALES as readonly string[]).includes(lang)) return lang as Locale;
-  }
-  return "he";
-}
 
 const { code } = Astro.params;
 
