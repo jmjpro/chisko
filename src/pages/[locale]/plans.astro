@@ -4,6 +4,8 @@ import { api } from "../../../convex/_generated/api";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Footer from "../../components/footer";
 import { getConvexUrl } from "../../lib/getConvexUrl";
+import { commonByLocale } from "../../lib/commonLocale";
+import type { Locale } from "../../lib/locale";
 
 export function getStaticPaths() {
   return [
@@ -15,10 +17,8 @@ export function getStaticPaths() {
 
 const { locale } = Astro.params;
 
-type LocaleKey = "en" | "ar" | "ru";
-
-const [common, suppliers, plans] = await Promise.all([
-  import(`../../../public/locales/${locale}/common.json`).then((m) => m.default as Record<string, string>),
+const common = commonByLocale[locale as Locale];
+const [suppliers, plans] = await Promise.all([
   import(`../../../public/locales/${locale}/suppliers.json`).then((m) => m.default as Record<string, string>),
   import(`../../../public/locales/${locale}/plans.json`).then((m) => m.default as Record<string, string>),
 ]);

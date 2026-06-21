@@ -27,5 +27,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "sentry.client.config.ts"]
+  "include": ["src", "sentry.client.config.ts", "sentry.server.config.ts"]
 }

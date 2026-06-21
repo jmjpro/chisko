@@ -7,10 +7,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Footer from "../../components/footer";
 import { getConvexUrl } from "../../lib/getConvexUrl";
 import { LOCALES, parseAcceptLanguage, type Locale } from "../../lib/locale";
-import heCommon from "../../../public/locales/he/common.json";
-import enCommon from "../../../public/locales/en/common.json";
-import arCommon from "../../../public/locales/ar/common.json";
-import ruCommon from "../../../public/locales/ru/common.json";
+import { commonByLocale } from "../../lib/commonLocale";
 
 const { code } = Astro.params;
 
@@ -19,7 +16,6 @@ const locale: Locale = (LOCALES as readonly string[]).includes(langParam ?? "")
   ? (langParam as Locale)
   : parseAcceptLanguage(Astro.request.headers.get("accept-language"));
 
-const commonByLocale = { he: heCommon, en: enCommon, ar: arCommon, ru: ruCommon };
 const common = commonByLocale[locale];
 
 const client = new ConvexHttpClient(getConvexUrl(import.meta.env.VITE_CONVEX_URL));
