@@ -1,6 +1,6 @@
 ---
 name: cpr
-description: Commit, Push, and Resolve — confirms issue is In Progress + ready-for-human in Linear, runs /commit then /push, then offers to mark the issue Done and strip triage labels.
+description: Commit, Push, and Resolve — confirms issue is In Progress + ready-for-human in Linear, runs /commit then /push, then /ship to open the PR and wait for a confirmed merge, then offers to mark the issue Done and strip triage labels.
 argument-hint: "<issue-id-or-number> [optional commit message hint]"
 ---
 
@@ -33,9 +33,17 @@ Invoke `/push` — pushes to origin; handles hook failures interactively before 
 
 Stop if any step fails and report what happened before proceeding.
 
-## Step 3 — Close
+## Step 3 — Ship
 
-Ask: `Ship complete. Move CHI-N to Done and remove triage labels? [y/n]`
+Invoke `/ship CHI-N` — opens the PR, polls the Vercel preview-build check, asks for merge confirmation, merges, and cleans up the worktree (if any).
+
+If the user declines the merge confirmation inside `/ship`, stop here — do not proceed to Step 4. The PR stays open and the issue stays in its current state.
+
+## Step 4 — Close
+
+Re-fetch the issue. If a `Closes CHI-N`/`Fixes CHI-N` trailer already auto-closed it via the Linear GitHub integration (state is already `Done`), report that it's already Done and skip the `save_issue` call below (same convention as the `resolve` skill).
+
+Otherwise ask: `Ship complete. Move CHI-N to Done and remove triage labels? [y/n]`
 
 If yes, call `save_issue` **once** with `state: "Done"` and `labels` set to the issue's current labels (from Step 0) minus any of these triage labels that are present:
    - `needs-triage`
