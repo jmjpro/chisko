@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import { convexTest } from "convex-test";
 import { expect, test, vi, beforeEach, afterEach } from "vitest";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.ts");
@@ -40,4 +40,43 @@ test("doRefresh reports the failure to Sentry and still rethrows", async () => {
     ([url]) => url === "https://o123.ingest.de.sentry.io/api/456/store/",
   );
   expect(sentryCall).toBeDefined();
+});
+
+function stubCsvFetch(csvLines: string[]) {
+  const csv = ["date header", "column header", ...csvLines].join("\n");
+  vi.stubGlobal(
+    "fetch",
+    vi.fn((url: string) => {
+      if (url === IEC_CSV_URL)
+        return Promise.resolve({
+          ok: true,
+          arrayBuffer: async () => new TextEncoder().encode(csv).buffer,
+        });
+      return Promise.resolve({ ok: true });
+    }),
+  );
+}
+
+test("doRefresh never deletes an address dropped from a later fetch, and never duplicates one still present", async () => {
+  const t = convexTest(schema, modules);
+
+  stubCsvFetch([
+    "TelAviv;Rothschild;1;5000;100",
+    "TelAviv;Rothschild;2;5000;100",
+  ]);
+  await t.action(internal.smartMeterRegistryRefresh.doRefresh, {});
+
+  // Second fetch drops house "2" but keeps house "1" — neither should change
+  // the live result: "1" must not duplicate, "2" must not disappear.
+  stubCsvFetch(["TelAviv;Rothschild;1;5000;100"]);
+  await t.action(internal.smartMeterRegistryRefresh.doRefresh, {});
+
+  const houseNumbers = await t.query(api.smartMeterRegistry.getHouseNumbers, {
+    cityCode: 5000,
+    streetCode: 100,
+  });
+  expect(houseNumbers).toEqual(["1", "2"]);
+
+  const cities = await t.query(api.smartMeterRegistry.getCities, {});
+  expect(cities).toMatchObject([{ cityCode: 5000, cityName: "TelAviv" }]);
 });

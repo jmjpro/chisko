@@ -123,7 +123,7 @@ A user's stated preference, captured late in the questionnaire, for whether they
 _Avoid_: Non-cash preference, app credit preference
 
 **Smart Meter Registry**:
-The IEC-sourced dataset of addresses in Israel where a smart meter has been installed. Used to determine smart meter status for households that are uncertain which meter type they have.
+The IEC-sourced dataset of addresses in Israel where a smart meter has been installed. Used to determine smart meter status for households that are uncertain which meter type they have. Refreshed weekly by adding newly-listed addresses; an address already in the Registry is never removed even if a later refresh's source data no longer lists it — see ADR 0021.
 _Avoid_: Mobility addresses, IEC address list, meter addresses
 
 **Place of Residence** (Hebrew: יישוב):

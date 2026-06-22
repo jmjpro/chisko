@@ -2,6 +2,7 @@
 
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
+import type { FunctionReference } from "convex/server";
 import { BATCH_SIZE } from "./smartMeterRegistry";
 import { withCapturedExceptions } from "./lib/sentry";
 import type { ActionCtx } from "./_generated/server";
@@ -11,6 +12,31 @@ const IEC_CSV_URL =
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+// Pages through one of the `existing*Keys` queries to build an in-memory Set
+// of keys already in the table — see ADR 0021.
+async function loadKeySet<T>(
+  ctx: ActionCtx,
+  queryRef: FunctionReference<
+    "query",
+    "internal",
+    { paginationOpts: { cursor: string | null; numItems: number } },
+    { keys: T[]; isDone: boolean; continueCursor: string }
+  >,
+): Promise<Set<T>> {
+  const keys = new Set<T>();
+  let cursor: string | null = null;
+  while (true) {
+    const result: { keys: T[]; isDone: boolean; continueCursor: string } =
+      await ctx.runQuery(queryRef, {
+        paginationOpts: { cursor, numItems: 4096 },
+      });
+    for (const key of result.keys) keys.add(key);
+    if (result.isDone) break;
+    cursor = result.continueCursor;
+  }
+  return keys;
+}
 
 export const doRefresh = internalAction({
   args: {},
@@ -85,77 +111,56 @@ async function runRefresh(ctx: ActionCtx) {
     `${ts()} Parsed: ${cities.length} cities, ${streets.length} streets, ${addresses.length.toLocaleString()} addresses`,
   );
 
-  // ── Clear existing data ──────────────────────────────────────────────────
-  let deletedAddresses = 0;
-  while (true) {
-    const n: number = await ctx.runMutation(
-      internal.smartMeterRegistry.deleteAddressBatch,
-      {},
-    );
-    deletedAddresses += n;
-    if (n === 0) break;
-    if (deletedAddresses % 10000 === 0) {
-      console.log(
-        `${ts()}   Clearing addresses: ${deletedAddresses.toLocaleString()} deleted…`,
-      );
-    }
-    await sleep(150);
-  }
-  if (deletedAddresses > 0)
-    console.log(
-      `${ts()}   Cleared ${deletedAddresses.toLocaleString()} addresses`,
-    );
-
-  let deletedStreets = 0;
-  while (true) {
-    const n: number = await ctx.runMutation(
-      internal.smartMeterRegistry.deleteStreetBatch,
-      {},
-    );
-    deletedStreets += n;
-    if (n === 0) break;
-    await sleep(150);
-  }
-  if (deletedStreets > 0)
-    console.log(`${ts()}   Cleared ${deletedStreets} streets`);
-
-  let deletedCities = 0;
-  while (true) {
-    const n: number = await ctx.runMutation(
-      internal.smartMeterRegistry.deleteCityBatch,
-      {},
-    );
-    deletedCities += n;
-    if (n === 0) break;
-    await sleep(150);
-  }
-  if (deletedCities > 0)
-    console.log(`${ts()}   Cleared ${deletedCities} cities`);
-
-  // ── Insert new data ──────────────────────────────────────────────────────
-  console.log(`${ts()} Inserting ${cities.length} cities…`);
-  for (let i = 0; i < cities.length; i += BATCH_SIZE) {
-    await ctx.runMutation(internal.smartMeterRegistry.insertCitiesBatch, {
-      rows: cities.slice(i, i + BATCH_SIZE),
-    });
-    await sleep(150);
-  }
-
-  console.log(`${ts()} Inserting ${streets.length} streets…`);
-  for (let i = 0; i < streets.length; i += BATCH_SIZE) {
-    await ctx.runMutation(internal.smartMeterRegistry.insertStreetsBatch, {
-      rows: streets.slice(i, i + BATCH_SIZE),
-    });
-    await sleep(150);
-  }
-
-  const totalAddressBatches = Math.ceil(addresses.length / BATCH_SIZE);
-  console.log(
-    `${ts()} Inserting ${addresses.length.toLocaleString()} addresses (${totalAddressBatches} batches)…`,
+  // ── Insert new data (existing keys are skipped, never deleted — ADR 0021) ─
+  const existingCityCodes = await loadKeySet(
+    ctx,
+    internal.smartMeterRegistry.existingCityCodes,
   );
-  for (let i = 0; i < addresses.length; i += BATCH_SIZE) {
+  const newCities = cities.filter((c) => !existingCityCodes.has(c.cityCode));
+  console.log(`${ts()} Inserting ${newCities.length} cities…`);
+  for (let i = 0; i < newCities.length; i += BATCH_SIZE) {
+    await ctx.runMutation(internal.smartMeterRegistry.insertCitiesBatch, {
+      rows: newCities.slice(i, i + BATCH_SIZE),
+    });
+    await sleep(150);
+  }
+
+  const existingStreetKeys = await loadKeySet(
+    ctx,
+    internal.smartMeterRegistry.existingStreetKeys,
+  );
+  const newStreets = streets.filter(
+    (s) => !existingStreetKeys.has(`${s.cityCode}:${s.streetCode}`),
+  );
+  console.log(`${ts()} Inserting ${newStreets.length} streets…`);
+  for (let i = 0; i < newStreets.length; i += BATCH_SIZE) {
+    await ctx.runMutation(internal.smartMeterRegistry.insertStreetsBatch, {
+      rows: newStreets.slice(i, i + BATCH_SIZE),
+    });
+    await sleep(150);
+  }
+
+  // Addresses aren't deduped while parsing the CSV, so the existing-keys Set
+  // also absorbs duplicate rows within this run as they're selected.
+  const existingAddressKeys = await loadKeySet(
+    ctx,
+    internal.smartMeterRegistry.existingAddressKeys,
+  );
+  const newAddresses: typeof addresses = [];
+  for (const addr of addresses) {
+    const key = `${addr.cityCode}:${addr.streetCode}:${addr.houseNumber}`;
+    if (existingAddressKeys.has(key)) continue;
+    existingAddressKeys.add(key);
+    newAddresses.push(addr);
+  }
+
+  const totalAddressBatches = Math.ceil(newAddresses.length / BATCH_SIZE);
+  console.log(
+    `${ts()} Inserting ${newAddresses.length.toLocaleString()} addresses (${totalAddressBatches} batches)…`,
+  );
+  for (let i = 0; i < newAddresses.length; i += BATCH_SIZE) {
     await ctx.runMutation(internal.smartMeterRegistry.insertAddressesBatch, {
-      rows: addresses.slice(i, i + BATCH_SIZE),
+      rows: newAddresses.slice(i, i + BATCH_SIZE),
     });
     await sleep(150);
     const batch = Math.floor(i / BATCH_SIZE) + 1;

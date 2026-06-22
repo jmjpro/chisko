@@ -1,5 +1,6 @@
 import { internalMutation, internalQuery, query } from "./_generated/server";
 import { v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 
 export const BATCH_SIZE = 2000;
 
@@ -18,17 +19,24 @@ export const getAll = query({
   },
 });
 
-export const deleteBatch = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const rows = await ctx.db.query("israelPlaces").take(BATCH_SIZE);
-    for (const row of rows) {
-      await ctx.db.delete("israelPlaces", row._id);
-    }
-    return rows.length;
+// Existing-key lookup for the refresh action's in-memory dedup — see ADR 0021
+// and the equivalent comment in smartMeterRegistry.ts.
+export const existingHeNames = internalQuery({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const result = await ctx.db
+      .query("israelPlaces")
+      .paginate(args.paginationOpts);
+    return {
+      keys: result.page.map((r) => r.he),
+      isDone: result.isDone,
+      continueCursor: result.continueCursor,
+    };
   },
 });
 
+// Insert-only: the action has already filtered out places that exist (see
+// above), so this is a plain batch insert (see ADR 0021).
 export const insertBatch = internalMutation({
   args: {
     rows: v.array(

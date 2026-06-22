@@ -1,5 +1,6 @@
 import { internalMutation, internalQuery, query } from "./_generated/server";
 import { v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 
 export const BATCH_SIZE = 2000;
 
@@ -36,7 +37,7 @@ export const getHouseNumbers = query({
   handler: async (ctx, args) => {
     const rows = await ctx.db
       .query("smartMeterAddresses")
-      .withIndex("by_city_and_street", (q) =>
+      .withIndex("by_city_street_and_house", (q) =>
         q.eq("cityCode", args.cityCode).eq("streetCode", args.streetCode),
       )
       .take(500);
@@ -77,40 +78,60 @@ export const getMeta = query({
   },
 });
 
+// ── Internal queries (existing-key lookup for the refresh action's in-memory
+// dedup — see ADR 0021) ────────────────────────────────────────────────────
+// The refresh action pages through these once per run to build a Set of
+// existing keys, then filters new rows against it in memory. This avoids an
+// indexed point-query per CSV row, which (at ~400k+ address rows) was slow
+// enough to blow past the Convex HTTP action time limit on a fresh seed.
+
+export const existingCityCodes = internalQuery({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const result = await ctx.db
+      .query("smartMeterCities")
+      .paginate(args.paginationOpts);
+    return {
+      keys: result.page.map((r) => r.cityCode),
+      isDone: result.isDone,
+      continueCursor: result.continueCursor,
+    };
+  },
+});
+
+export const existingStreetKeys = internalQuery({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const result = await ctx.db
+      .query("smartMeterStreets")
+      .paginate(args.paginationOpts);
+    return {
+      keys: result.page.map((r) => `${r.cityCode}:${r.streetCode}`),
+      isDone: result.isDone,
+      continueCursor: result.continueCursor,
+    };
+  },
+});
+
+export const existingAddressKeys = internalQuery({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const result = await ctx.db
+      .query("smartMeterAddresses")
+      .paginate(args.paginationOpts);
+    return {
+      keys: result.page.map(
+        (r) => `${r.cityCode}:${r.streetCode}:${r.houseNumber}`,
+      ),
+      isDone: result.isDone,
+      continueCursor: result.continueCursor,
+    };
+  },
+});
+
 // ── Internal mutations (called by the refresh action) ────────────────────────
-
-export const deleteAddressBatch = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const rows = await ctx.db.query("smartMeterAddresses").take(BATCH_SIZE);
-    for (const row of rows) {
-      await ctx.db.delete("smartMeterAddresses", row._id);
-    }
-    return rows.length;
-  },
-});
-
-export const deleteStreetBatch = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const rows = await ctx.db.query("smartMeterStreets").take(BATCH_SIZE);
-    for (const row of rows) {
-      await ctx.db.delete("smartMeterStreets", row._id);
-    }
-    return rows.length;
-  },
-});
-
-export const deleteCityBatch = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const rows = await ctx.db.query("smartMeterCities").take(BATCH_SIZE);
-    for (const row of rows) {
-      await ctx.db.delete("smartMeterCities", row._id);
-    }
-    return rows.length;
-  },
-});
+// Insert-only: the action has already filtered out rows that exist (see
+// above), so these are plain batch inserts (see ADR 0021).
 
 export const insertCitiesBatch = internalMutation({
   args: {
