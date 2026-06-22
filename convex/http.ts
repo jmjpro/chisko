@@ -13,10 +13,13 @@ http.route({
     if (!secret || req.headers.get("Authorization") !== `Bearer ${secret}`) {
       return new Response("Unauthorized", { status: 401 });
     }
+    const isProduction = process.env.SENTRY_ENVIRONMENT === "production";
+    const optedIn =
+      new URL(req.url).searchParams.get("seedRegistries") === "true";
     return withCapturedExceptions(async () => {
       const result: string = await ctx.runAction(
         internal.internal.seedAll.runAll,
-        {},
+        { seedRegistries: isProduction || optedIn },
       );
       return new Response(result, { status: 200 });
     });
