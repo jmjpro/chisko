@@ -1,5 +1,6 @@
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
+import type { FunctionReference } from "convex/server";
 import { BATCH_SIZE } from "./israelPlaces";
 import { withCapturedExceptions } from "./lib/sentry";
 import type { ActionCtx } from "./_generated/server";
@@ -9,6 +10,32 @@ const DATA_GOV_URL =
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+// Pages through `existingHeNames` to build an in-memory Set of names already
+// in the table — see ADR 0021 and the equivalent helper in
+// smartMeterRegistryRefresh.ts.
+async function loadKeySet(
+  ctx: ActionCtx,
+  queryRef: FunctionReference<
+    "query",
+    "internal",
+    { paginationOpts: { cursor: string | null; numItems: number } },
+    { keys: string[]; isDone: boolean; continueCursor: string }
+  >,
+): Promise<Set<string>> {
+  const keys = new Set<string>();
+  let cursor: string | null = null;
+  while (true) {
+    const result: { keys: string[]; isDone: boolean; continueCursor: string } =
+      await ctx.runQuery(queryRef, {
+        paginationOpts: { cursor, numItems: 4096 },
+      });
+    for (const key of result.keys) keys.add(key);
+    if (result.isDone) break;
+    cursor = result.continueCursor;
+  }
+  return keys;
+}
 
 export const doRefresh = internalAction({
   args: {},
@@ -47,24 +74,22 @@ async function runRefresh(ctx: ActionCtx) {
 
   console.log(`${ts()} Fetched ${places.length} places`);
 
-  // ── Clear existing data ──────────────────────────────────────────────────
-  let deleted = 0;
-  while (true) {
-    const n: number = await ctx.runMutation(
-      internal.israelPlaces.deleteBatch,
-      {},
-    );
-    deleted += n;
-    if (n === 0) break;
-    await sleep(150);
+  // ── Insert new data (existing keys are skipped, never deleted — ADR 0021) ─
+  const existingHeNames = await loadKeySet(
+    ctx,
+    internal.israelPlaces.existingHeNames,
+  );
+  const newPlaces: typeof places = [];
+  for (const place of places) {
+    if (existingHeNames.has(place.he)) continue;
+    existingHeNames.add(place.he);
+    newPlaces.push(place);
   }
-  if (deleted > 0) console.log(`${ts()}   Cleared ${deleted} places`);
 
-  // ── Insert new data ──────────────────────────────────────────────────────
-  console.log(`${ts()} Inserting ${places.length} places…`);
-  for (let i = 0; i < places.length; i += BATCH_SIZE) {
+  console.log(`${ts()} Inserting ${newPlaces.length} places…`);
+  for (let i = 0; i < newPlaces.length; i += BATCH_SIZE) {
     await ctx.runMutation(internal.israelPlaces.insertBatch, {
-      rows: places.slice(i, i + BATCH_SIZE),
+      rows: newPlaces.slice(i, i + BATCH_SIZE),
     });
     await sleep(150);
   }
