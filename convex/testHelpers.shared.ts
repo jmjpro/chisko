@@ -26,6 +26,7 @@ export async function seedSupplierAndPlan(
   return t.run(async (ctx) => {
     const supplierId = await ctx.db.insert("suppliers", {
       name: "Test Supplier",
+      logoFileName: "testSupplier.webp",
       isActive: true,
       supportedHandoffTypes: overrides.supportedHandoffTypes ?? ["formHandoff"],
       payoutTrigger: "perAcceptedLead",

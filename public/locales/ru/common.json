@@ -22,5 +22,21 @@
   "share_invalid_title": "Недействительная ссылка",
   "share_invalid_message": "Рекомендация не найдена или срок её действия истёк.",
   "back_to_home": "На главную",
-  "share_savings_description": "Ожидаемая годовая экономия: ₪{{amount}}"
+  "share_savings_description": "Ожидаемая годовая экономия: ₪{{amount}}",
+  "cta_switch_now": "Перейти сейчас",
+  "cta_leave_details": "Оставить контакты",
+  "lead_form_title": "Оставьте свои контакты",
+  "lead_form_name_label": "Полное имя",
+  "lead_form_phone_label": "Номер телефона",
+  "lead_form_email_label": "Email (необязательно)",
+  "lead_form_name_required": "Укажите имя",
+  "lead_form_phone_required": "Укажите номер телефона",
+  "lead_form_phone_invalid": "Введите действительный номер телефона",
+  "lead_form_email_invalid": "Введите действительный email",
+  "lead_form_submit": "Отправить",
+  "fan_out_title": "Поделиться также с этими поставщиками?",
+  "fan_out_description": "У этих поставщиков также есть тарифы, подходящие для вашего потребления. Снимите отметку с тех, кого хотите пропустить.",
+  "fan_out_confirm": "Поделиться также с этими поставщиками",
+  "fan_out_decline": "Нет, спасибо",
+  "fan_out_confirmation": "Заявка отправлена — с вами свяжутся {{count}} поставщик(ов)"
 }

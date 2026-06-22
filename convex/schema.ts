@@ -5,6 +5,7 @@ export default defineSchema({
   // Licensed electricity providers in Israel's open market
   suppliers: defineTable({
     name: v.string(), // English canonical name; translations in public/locales/{lang}/suppliers.json
+    logoFileName: v.string(), // filename within public/suppliers/, e.g. "electraPower.webp"
     isActive: v.boolean(),
     supportedHandoffTypes: v.array(
       v.union(

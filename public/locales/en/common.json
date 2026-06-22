@@ -22,5 +22,21 @@
   "share_invalid_title": "Invalid link",
   "share_invalid_message": "This recommendation was not found or has expired.",
   "back_to_home": "Back to home",
-  "share_savings_description": "Expected annual savings: ₪{{amount}}"
+  "share_savings_description": "Expected annual savings: ₪{{amount}}",
+  "cta_switch_now": "Switch now",
+  "cta_leave_details": "Leave details",
+  "lead_form_title": "Leave your details",
+  "lead_form_name_label": "Full name",
+  "lead_form_phone_label": "Phone number",
+  "lead_form_email_label": "Email (optional)",
+  "lead_form_name_required": "Name is required",
+  "lead_form_phone_required": "Phone number is required",
+  "lead_form_phone_invalid": "Enter a valid phone number",
+  "lead_form_email_invalid": "Enter a valid email address",
+  "lead_form_submit": "Submit",
+  "fan_out_title": "Also share with these suppliers?",
+  "fan_out_description": "These suppliers also have plans that match your usage. Uncheck any you'd like to skip.",
+  "fan_out_confirm": "Also share with these suppliers",
+  "fan_out_decline": "No thanks",
+  "fan_out_confirmation": "Request sent — {{count}} supplier(s) will contact you"
 }

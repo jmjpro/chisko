@@ -119,17 +119,18 @@ export const run = internalMutation({
     // ── 3. Suppliers (7) ──────────────────────────────────────────────────────
     const sup: Record<string, Id<"suppliers">> = {};
 
-    for (const [seedId, name] of [
-      ["bezek_energy", "Bezek Electricity"],
-      ["superpower_electra", "Electra Power"],
-      ["hot_energy", "HOT Energy"],
-      ["partner_power", "Partner Electricity"],
-      ["cellcom_energy", "Cellcom Energy"],
-      ["amisragas", "Amisragas Electricity"],
-      ["pazgaz", "Pazgaz Electricity"],
+    for (const [seedId, name, logoFileName] of [
+      ["bezek_energy", "Bezek Electricity", "bezekElectricity.webp"],
+      ["superpower_electra", "Electra Power", "electraPower.webp"],
+      ["hot_energy", "HOT Energy", "hotEnergy.webp"],
+      ["partner_power", "Partner Electricity", "partnerElectricity.webp"],
+      ["cellcom_energy", "Cellcom Energy", "cellcomEnergy.webp"],
+      ["amisragas", "Amisragas Electricity", "amisragasElectricity.webp"],
+      ["pazgaz", "Pazgaz Electricity", "pazgazElectricity.webp"],
     ] as const) {
       sup[seedId] = await ctx.db.insert("suppliers", {
         name,
+        logoFileName,
         isActive: true,
         supportedHandoffTypes:
           seedId === "superpower_electra"
