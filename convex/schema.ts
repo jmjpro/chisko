@@ -247,10 +247,12 @@ export default defineSchema({
     .index("by_recommendation", ["recommendationId"])
     .index("by_plan_version", ["planVersionId"]),
 
-  // A user who completed the recommendation flow and provided contact info
+  // A user who provided contact info via the lead-capture form, either after
+  // the recommendation flow (recommendationId set) or from the standalone
+  // plans page (recommendationId absent — see ADR-0021)
   leads: defineTable({
     sessionId: v.id("sessions"),
-    recommendationId: v.id("recommendations"),
+    recommendationId: v.optional(v.id("recommendations")),
     name: v.string(),
     phone: v.string(),
     email: v.union(v.string(), v.null()),
@@ -276,6 +278,22 @@ export default defineSchema({
     .index("by_lead", ["leadId"])
     .index("by_supplier", ["supplierId"])
     .index("by_lead_and_supplier", ["leadId", "supplierId"]),
+
+  // Tracks relaying a form-handoff Referral's details onward to the supplier
+  // (today: a notification email; see ADR-0022). One row per form-handoff
+  // Referral. Click-through and phone-based Referrals never get one.
+  formSubmissionDeliveries: defineTable({
+    referralId: v.id("referrals"),
+    state: v.union(
+      v.literal("open"),
+      v.literal("processing"),
+      v.literal("closed"),
+    ),
+    attempts: v.number(),
+    processingStartedAt: v.union(v.number(), v.null()),
+  })
+    .index("by_referral", ["referralId"])
+    .index("by_state", ["state"]),
 
   // Smart Meter Registry — deduped city list (from IEC mobility program CSV)
   smartMeterCities: defineTable({

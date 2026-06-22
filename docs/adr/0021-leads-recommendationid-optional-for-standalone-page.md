@@ -1,0 +1,3 @@
+# leads.recommendationId is optional to support standalone-page lead capture
+
+`leads.recommendationId` was a required field, but CONTEXT.md's Lead definition has always covered two surfaces: the wizard results step (which has a Recommendation) and the standalone plans browsing page (`src/pages/plans.astro`), which today has no session/Recommendation awareness — that's deferred to CHI-68. Rather than block standalone-page lead capture on CHI-68, or fabricate a placeholder Recommendation, `leads.recommendationId` becomes `v.optional(v.id("recommendations"))`. Wizard-originated Leads still always carry one.

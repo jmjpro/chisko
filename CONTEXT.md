@@ -21,7 +21,7 @@ The best Fixed Plan available for a household — shown alongside the Primary Re
 _Avoid_: Safe plan, safer plan, fallback plan
 
 **Lead**:
-A user who provided contact information via the lead-capture form — either after completing the recommendation flow or directly from the standalone plans browsing page. Explicit consent to share data with a specific supplier is obtained at the moment of each Referral, not upfront in ToS. A Lead is never created for anonymous click-through Referrals.
+A user who provided contact information via the lead-capture form — either after completing the recommendation flow or directly from the standalone plans browsing page. Explicit consent to share data with a specific supplier is obtained at the moment of each Referral, not upfront in ToS. A Lead is never created for anonymous click-through Referrals. A session is not limited to a single Lead — it may submit the lead-capture form more than once over its lifetime (e.g. once from the standalone plans page, later again from the wizard), creating a separate Lead each time.
 _Avoid_: User, prospect, signup
 
 **Consent**:
@@ -51,6 +51,10 @@ _Avoid_: Commission status, referral status
 **Referral**:
 The handoff event when a user is sent to a specific supplier, including timestamp, destination supplier, handoff type, and payout state. Three handoff types are supported: click-through (tracking link to supplier site), form handoff (lead details submitted on behalf of user to supplier), and phone-based (user's phone number passed to a supplier rep for outbound call). A Referral does not always have a Lead: click-through Referrals are anonymous, identified by session and a generated click ID rather than contact details, since the click-through flow never collects them. Form-handoff and phone-based Referrals always have a Lead.
 _Avoid_: Conversion, signup, click-through
+
+**Form Submission Delivery**:
+The internal record tracking whether a form-handoff Referral's details have been relayed onward to the supplier — for now via a notification email to a configurable internal address, standing in for direct supplier integration until one exists per Supplier. One Form Submission Delivery exists per form-handoff Referral, not per Lead or per dialog interaction — each Supplier Fan-Out Referral gets its own. Three states: `open` (queued), `processing` (claimed by a batch run, in flight), `closed` (terminal — either delivered, or permanently failed after exhausting retry attempts). A delivery that errors while `processing` reverts to `open` for retry, up to a capped number of attempts; one stuck in `processing` past a staleness threshold (an abandoned batch run) is also reclaimed back to `open`. Click-through and phone-based Referrals never get a Form Submission Delivery.
+_Avoid_: Form submission, submission status, delivery status, notification status
 
 **Supplier**:
 A licensed electricity provider in Israel's open market (not IEC the grid operator).

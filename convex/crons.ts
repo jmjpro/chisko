@@ -19,4 +19,13 @@ crons.cron(
   {},
 );
 
+// Relay open form submission deliveries to suppliers (currently a
+// notification email) every minute
+crons.interval(
+  "relay form submission deliveries",
+  { minutes: 1 },
+  internal.formSubmissionDeliveries.runBatch,
+  {},
+);
+
 export default crons;
