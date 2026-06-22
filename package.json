@@ -10,6 +10,7 @@
     "dev:client-only": "astro dev",
     "dev:mobile": "npx tsx scripts/devMobile.ts",
     "setup:worktree": "npx tsx scripts/setupWorktree.ts",
+    "teardown:worktree": "npx tsx scripts/teardownWorktree.ts",
     "build": "astro build",
     "lint": "tsc && eslint .  --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "astro preview",

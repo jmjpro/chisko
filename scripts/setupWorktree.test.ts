@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  convexPortsFor,
   findEnvLocalSource,
   parseWorktreePaths,
   withPort,
@@ -82,5 +83,11 @@ describe("withPort", () => {
   it("replaces an existing PORT line", () => {
     const result = withPort("FOO=bar\nPORT=5173\nBAZ=qux", "5180");
     expect(result).toBe("FOO=bar\nPORT=5180\nBAZ=qux");
+  });
+});
+
+describe("convexPortsFor", () => {
+  it("derives non-colliding cloud/site ports from the frontend port", () => {
+    expect(convexPortsFor("4322")).toEqual({ cloud: 14322, site: 14323 });
   });
 });
