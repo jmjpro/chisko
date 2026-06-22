@@ -37,3 +37,4 @@ playwright-report
 .claude/projects/
 .vercel
 .env*
+.zed
