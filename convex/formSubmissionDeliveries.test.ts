@@ -8,7 +8,7 @@ import {
   okFetch,
   seedSession,
   seedSupplierAndPlan,
-} from "./testHelpers";
+} from "./testHelpers.shared";
 
 const modules = import.meta.glob("./**/*.ts");
 

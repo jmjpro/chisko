@@ -7,7 +7,7 @@ import {
   okFetch,
   seedSession,
   seedSupplierAndPlan,
-} from "./testHelpers";
+} from "./testHelpers.shared";
 
 const modules = import.meta.glob("./**/*.ts");
 const RESEND_URL = "https://api.resend.com/emails";
