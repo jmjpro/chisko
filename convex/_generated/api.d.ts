@@ -10,12 +10,15 @@
 
 import type * as billImports from "../billImports.js";
 import type * as crons from "../crons.js";
+import type * as email from "../email.js";
+import type * as formSubmissionDeliveries from "../formSubmissionDeliveries.js";
 import type * as homeProfiles from "../homeProfiles.js";
 import type * as http from "../http.js";
 import type * as internal_deployHooks from "../internal/deployHooks.js";
 import type * as internal_seedAll from "../internal/seedAll.js";
 import type * as israelPlaces from "../israelPlaces.js";
 import type * as israelPlacesRefresh from "../israelPlacesRefresh.js";
+import type * as leads from "../leads.js";
 import type * as lib_recommendationEngine from "../lib/recommendationEngine.js";
 import type * as lib_sentry from "../lib/sentry.js";
 import type * as lib_smartMeterCsvParser from "../lib/smartMeterCsvParser.js";
@@ -37,12 +40,15 @@ import type {
 declare const fullApi: ApiFromModules<{
   billImports: typeof billImports;
   crons: typeof crons;
+  email: typeof email;
+  formSubmissionDeliveries: typeof formSubmissionDeliveries;
   homeProfiles: typeof homeProfiles;
   http: typeof http;
   "internal/deployHooks": typeof internal_deployHooks;
   "internal/seedAll": typeof internal_seedAll;
   israelPlaces: typeof israelPlaces;
   israelPlacesRefresh: typeof israelPlacesRefresh;
+  leads: typeof leads;
   "lib/recommendationEngine": typeof lib_recommendationEngine;
   "lib/sentry": typeof lib_sentry;
   "lib/smartMeterCsvParser": typeof lib_smartMeterCsvParser;
