@@ -131,7 +131,10 @@ export const run = internalMutation({
       sup[seedId] = await ctx.db.insert("suppliers", {
         name,
         isActive: true,
-        supportedHandoffTypes: ["clickThrough"],
+        supportedHandoffTypes:
+          seedId === "superpower_electra"
+            ? ["clickThrough", "formHandoff"]
+            : ["formHandoff"],
         payoutTrigger: "perSignedContract",
         payoutStates: PAYOUT_STATES,
         initialPayoutState: "pending",

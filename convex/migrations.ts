@@ -39,3 +39,27 @@ export const backfillBenefitFields = internalMutation({
     return { pvPatched, profilesPatched };
   },
 });
+
+/**
+ * One-time backfill: corrects supportedHandoffTypes on already-seeded
+ * supplier rows (CHI-71). All suppliers support formHandoff; only Electra
+ * additionally supports clickThrough. Run once per deployment, then drop.
+ */
+export const backfillSupplierHandoffTypes = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const suppliers = await ctx.db.query("suppliers").collect();
+    let patched = 0;
+    for (const supplier of suppliers) {
+      const supportedHandoffTypes =
+        supplier.name === "Electra Power"
+          ? (["clickThrough", "formHandoff"] as const)
+          : (["formHandoff"] as const);
+      await ctx.db.patch("suppliers", supplier._id, {
+        supportedHandoffTypes: [...supportedHandoffTypes],
+      });
+      patched++;
+    }
+    return { patched };
+  },
+});
