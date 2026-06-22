@@ -21,12 +21,16 @@ The best Fixed Plan available for a household — shown alongside the Primary Re
 _Avoid_: Safe plan, safer plan, fallback plan
 
 **Lead**:
-A user who completed the recommendation flow and provided contact information. Explicit consent to share data with a specific supplier is obtained at the moment of Referral, not upfront in ToS.
+A user who provided contact information via the lead-capture form — either after completing the recommendation flow or directly from the standalone plans browsing page. Explicit consent to share data with a specific supplier is obtained at the moment of each Referral, not upfront in ToS. A Lead is never created for anonymous click-through Referrals.
 _Avoid_: User, prospect, signup
 
 **Consent**:
-Explicit per-supplier permission granted by the user at the moment of Referral, authorizing their personal data to be shared with that specific supplier. Not a blanket upfront agreement.
+Explicit per-supplier permission granted by the user at the moment of Referral, authorizing their personal data to be shared with that specific supplier. Not a blanket upfront agreement. A single form submission can grant Consent for several suppliers at once — see Supplier Fan-Out.
 _Avoid_: Terms of service agreement, opt-in
+
+**Supplier Fan-Out**:
+A second, separate step offered after the initial lead-capture submission (which immediately creates the Lead and one form-handoff Referral for the clicked supplier). The dialog then lists every other supplier in the Fan-Out Scope individually (logo + name), each pre-checked; the user may uncheck any. Fan-Out requires its own explicit confirm action — dismissing the dialog after the initial submission, without confirming this step, creates no additional Referrals even though suppliers are pre-checked. When confirmed, one form-handoff Referral — each with its own Consent and timestamp — is created per checked supplier. _Fan-Out Scope_ is the Recommendation's full eligible-plan pool when a Recommendation exists for the session — including plans never rendered on screen, such as still-collapsed alternatives — or every active Supplier when no Recommendation exists for the session. Suppliers that don't support form handoff are excluded from the listed Fan-Out Scope entirely.
+_Avoid_: Bulk consent, mass referral, broadcast lead, all-suppliers toggle
 
 **Mail Access Authorization**:
 The one-time permission a user grants the IEC smart-meter retrieval extension, at extension setup, to read their Gmail/Outlook/Yahoo inbox — scoped strictly to detecting the IEC OTP code and the smart-meter report attachment. Distinct from Consent: it is not granted at a data-sharing moment and does not involve a Supplier.
@@ -45,7 +49,7 @@ The current status of a Referral's commission lifecycle. States are supplier-con
 _Avoid_: Commission status, referral status
 
 **Referral**:
-The handoff event when a lead is sent to a specific supplier, including timestamp, destination supplier, handoff type, and payout state. Three handoff types are supported: click-through (tracking link to supplier site), form handoff (lead details submitted on behalf of user to supplier), and phone-based (user's phone number passed to a supplier rep for outbound call).
+The handoff event when a user is sent to a specific supplier, including timestamp, destination supplier, handoff type, and payout state. Three handoff types are supported: click-through (tracking link to supplier site), form handoff (lead details submitted on behalf of user to supplier), and phone-based (user's phone number passed to a supplier rep for outbound call). A Referral does not always have a Lead: click-through Referrals are anonymous, identified by session and a generated click ID rather than contact details, since the click-through flow never collects them. Form-handoff and phone-based Referrals always have a Lead.
 _Avoid_: Conversion, signup, click-through
 
 **Supplier**:

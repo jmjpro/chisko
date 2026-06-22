@@ -1,0 +1,3 @@
+# Referral.leadId is optional to support anonymous click-through
+
+Click-through Referrals (e.g. Electra's direct "switch now" link) never collect a name or phone number, but Lead requires both. Rather than fabricate a placeholder Lead with empty contact fields, `referrals.leadId` is optional and click-through Referrals instead carry a `sessionId` (for later correlation if the same session goes on to submit the lead form) and a generated `clickId` (for supplier-side attribution in the redirect URL). This keeps Lead's meaning intact — "a user who provided real contact information" — and avoids polluting the leads table with empty records. Form-handoff and phone-based Referrals are unaffected and always have a Lead.
