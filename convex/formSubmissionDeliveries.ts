@@ -41,14 +41,20 @@ export const claimBatch = internalMutation({
 export const markDelivered = internalMutation({
   args: { deliveryId: v.id("formSubmissionDeliveries") },
   handler: async (ctx, args) => {
+    const delivery = await ctx.db.get(
+      "formSubmissionDeliveries",
+      args.deliveryId,
+    );
+    if (!delivery) return;
     await ctx.db.patch("formSubmissionDeliveries", args.deliveryId, {
       state: "closed",
+      attempts: delivery.attempts + 1,
     });
   },
 });
 
 export const markFailed = internalMutation({
-  args: { deliveryId: v.id("formSubmissionDeliveries") },
+  args: { deliveryId: v.id("formSubmissionDeliveries"), error: v.string() },
   handler: async (ctx, args) => {
     const delivery = await ctx.db.get(
       "formSubmissionDeliveries",
@@ -60,12 +66,14 @@ export const markFailed = internalMutation({
       await ctx.db.patch("formSubmissionDeliveries", args.deliveryId, {
         state: "closed",
         attempts,
+        lastError: args.error,
       });
     } else {
       await ctx.db.patch("formSubmissionDeliveries", args.deliveryId, {
         state: "open",
         attempts,
         processingStartedAt: null,
+        lastError: args.error,
       });
     }
   },
@@ -86,9 +94,10 @@ export const runBatch = internalAction({
         await ctx.runMutation(internal.formSubmissionDeliveries.markDelivered, {
           deliveryId,
         });
-      } catch {
+      } catch (err) {
         await ctx.runMutation(internal.formSubmissionDeliveries.markFailed, {
           deliveryId,
+          error: err instanceof Error ? err.message : String(err),
         });
       }
     }

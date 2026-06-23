@@ -255,7 +255,12 @@ test("getFanOutScope with a recommendation returns the eligible-plan pool, exclu
   });
 
   expect(scope).toEqual([
-    { supplierId: otherSupplierId, planVersionId: otherPlanVersionId },
+    {
+      supplierId: otherSupplierId,
+      planVersionId: otherPlanVersionId,
+      supplierName: "Test Supplier",
+      logoFileName: "testSupplier.webp",
+    },
   ]);
 });
 
@@ -283,9 +288,53 @@ test("getFanOutScope without a recommendation returns every other active formHan
   });
 
   expect(scope).toEqual([
-    { supplierId: otherSupplierId, planVersionId: otherPlanVersionId },
+    {
+      supplierId: otherSupplierId,
+      planVersionId: otherPlanVersionId,
+      supplierName: "Test Supplier",
+      logoFileName: "testSupplier.webp",
+    },
   ]);
   expect(scope.some((s) => s.supplierId === inactiveSupplierId)).toBe(false);
+});
+
+test("getFanOutScope excludes suppliers already referred earlier in the same session", async () => {
+  const t = convexTest(schema, modules);
+  const sessionId = await seedSession(t);
+  const { supplierId: referredSupplierId } = await seedSupplierAndPlan(t);
+  const {
+    supplierId: priorReferralSupplierId,
+    planVersionId: priorReferralPlanVersionId,
+  } = await seedSupplierAndPlan(t);
+  const {
+    supplierId: untouchedSupplierId,
+    planVersionId: untouchedPlanVersionId,
+  } = await seedSupplierAndPlan(t);
+
+  // An earlier Lead in this session already holds a Referral to
+  // priorReferralSupplierId (e.g. from a Fan-Out confirmed on another card).
+  await t.mutation(api.leads.submitLeadForm, {
+    sessionId,
+    supplierId: priorReferralSupplierId,
+    planVersionId: priorReferralPlanVersionId,
+    name: "Dana",
+    phone: "0507654321",
+    email: null,
+  });
+
+  const scope = await t.query(api.leads.getFanOutScope, {
+    sessionId,
+    excludeSupplierId: referredSupplierId,
+  });
+
+  expect(scope).toEqual([
+    {
+      supplierId: untouchedSupplierId,
+      planVersionId: untouchedPlanVersionId,
+      supplierName: "Test Supplier",
+      logoFileName: "testSupplier.webp",
+    },
+  ]);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
