@@ -1,6 +1,7 @@
 import { internalAction, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import { isConvexCloudEnabled } from "./lib/convexCloud";
 
 export const STALENESS_THRESHOLD_MS = 10 * 60 * 1000;
 export const MAX_ATTEMPTS = 3;
@@ -82,6 +83,11 @@ export const markFailed = internalMutation({
 export const runBatch = internalAction({
   args: {},
   handler: async (ctx) => {
+    if (!isConvexCloudEnabled()) {
+      console.log("ENABLE_CONVEX_CLOUD=false — skipping");
+      return;
+    }
+
     const claimed = await ctx.runMutation(
       internal.formSubmissionDeliveries.claimBatch,
       {},

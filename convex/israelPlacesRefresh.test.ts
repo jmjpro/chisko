@@ -42,6 +42,16 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+test("doRefresh no-ops when ENABLE_CONVEX_CLOUD is false", async () => {
+  const t = convexTest(schema, modules);
+  vi.stubEnv("ENABLE_CONVEX_CLOUD", "false");
+  stubPlacesFetch([]);
+
+  await t.action(internal.israelPlacesRefresh.doRefresh, {});
+
+  expect(fetch).not.toHaveBeenCalled();
+});
+
 test("doRefresh never deletes a place dropped from a later fetch, and never duplicates one still present", async () => {
   const t = convexTest(schema, modules);
 

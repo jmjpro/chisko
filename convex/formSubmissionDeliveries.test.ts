@@ -94,6 +94,19 @@ test("claimBatch reclaims stale processing deliveries past the staleness thresho
 // runBatch
 // ─────────────────────────────────────────────────────────────────────────────
 
+test("runBatch no-ops when ENABLE_CONVEX_CLOUD is false", async () => {
+  const t = convexTest(schema, modules);
+  const referralId = await seedOpenDelivery(t);
+  vi.stubEnv("ENABLE_CONVEX_CLOUD", "false");
+  vi.stubGlobal("fetch", okFetch());
+
+  await t.action(internal.formSubmissionDeliveries.runBatch, {});
+
+  expect(fetch).not.toHaveBeenCalled();
+  const delivery = await getDeliveryByReferral(t, referralId);
+  expect(delivery).toMatchObject({ state: "open" });
+});
+
 test("runBatch closes a delivery once the notification email sends successfully", async () => {
   const t = convexTest(schema, modules);
   const referralId = await seedOpenDelivery(t);

@@ -5,6 +5,7 @@ import { internal } from "./_generated/api";
 import type { FunctionReference } from "convex/server";
 import { BATCH_SIZE } from "./smartMeterRegistry";
 import { withCapturedExceptions } from "./lib/sentry";
+import { isConvexCloudEnabled } from "./lib/convexCloud";
 import type { ActionCtx } from "./_generated/server";
 
 const IEC_CSV_URL =
@@ -40,7 +41,13 @@ async function loadKeySet<T>(
 
 export const doRefresh = internalAction({
   args: {},
-  handler: async (ctx) => withCapturedExceptions(() => runRefresh(ctx)),
+  handler: async (ctx) => {
+    if (!isConvexCloudEnabled()) {
+      console.log("ENABLE_CONVEX_CLOUD=false — skipping");
+      return;
+    }
+    return withCapturedExceptions(() => runRefresh(ctx));
+  },
 });
 
 async function runRefresh(ctx: ActionCtx) {

@@ -3,6 +3,7 @@ import { internal } from "./_generated/api";
 import type { FunctionReference } from "convex/server";
 import { BATCH_SIZE } from "./israelPlaces";
 import { withCapturedExceptions } from "./lib/sentry";
+import { isConvexCloudEnabled } from "./lib/convexCloud";
 import type { ActionCtx } from "./_generated/server";
 
 const DATA_GOV_URL =
@@ -39,7 +40,13 @@ async function loadKeySet(
 
 export const doRefresh = internalAction({
   args: {},
-  handler: async (ctx) => withCapturedExceptions(() => runRefresh(ctx)),
+  handler: async (ctx) => {
+    if (!isConvexCloudEnabled()) {
+      console.log("ENABLE_CONVEX_CLOUD=false — skipping");
+      return;
+    }
+    return withCapturedExceptions(() => runRefresh(ctx));
+  },
 });
 
 async function runRefresh(ctx: ActionCtx) {
