@@ -1,3 +1,3 @@
 {
-  "buildCommand": "npx convex deploy && npx convex deploy --cmd 'curl -fsS -X POST \"${VITE_CONVEX_URL/.convex.cloud/.convex.site}/seed\" -H \"Authorization: Bearer $SEED_SECRET\" && npm run build'"
+  "buildCommand": "if [ \"$ENABLE_CONVEX_CLOUD\" = \"false\" ]; then echo \"ENABLE_CONVEX_CLOUD=false — refusing to deploy a new Convex preview backend\" && exit 1; fi && npx convex deploy && npx convex deploy --cmd 'curl -fsS -X POST \"${VITE_CONVEX_URL/.convex.cloud/.convex.site}/seed\" -H \"Authorization: Bearer $SEED_SECRET\" && npm run build'"
 }
