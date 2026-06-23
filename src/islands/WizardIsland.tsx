@@ -9,7 +9,7 @@ import {
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import Footer from "../components/footer";
-import { generateSessionToken } from "../lib/sessionToken";
+import { getOrCreateSessionToken } from "../lib/sessionToken";
 import { parseSmartMeterCsvText } from "../../convex/lib/smartMeterCsvParser";
 import Wizard from "../components/Wizard";
 import MeterStep from "../components/wizard/MeterStep";
@@ -153,13 +153,7 @@ function WizardPage() {
 
   // Initialize session from localStorage
   useEffect(() => {
-    const key = "ec2-session-token";
-    let token = localStorage.getItem(key);
-    if (!token) {
-      token = generateSessionToken();
-      localStorage.setItem(key, token);
-    }
-    getOrCreateSession({ sessionToken: token })
+    getOrCreateSession({ sessionToken: getOrCreateSessionToken() })
       .then(setSessionId)
       .catch(console.error);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -407,6 +401,7 @@ function WizardPage() {
       case 4:
         return (
           <ResultsStep
+            sessionId={sessionId}
             rec={rec}
             evaluatedPlans={evaluatedPlans}
             generating={generating}

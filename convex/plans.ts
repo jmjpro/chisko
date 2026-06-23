@@ -16,6 +16,7 @@ export const listActive = query({
         if (!supplier) return null;
         return {
           pvId: pv._id,
+          supplierId: supplier._id,
           supplierName: supplier.name,
           planName: plan.name,
           planType: plan.planType,

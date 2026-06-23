@@ -1,3 +1,15 @@
+export const SESSION_TOKEN_STORAGE_KEY = "ec2-session-token";
+
+// Shared across the wizard and standalone plans page, so both resolve to
+// the same underlying session — a session is not limited to one surface.
+export function getOrCreateSessionToken(): string {
+  const existing = localStorage.getItem(SESSION_TOKEN_STORAGE_KEY);
+  if (existing) return existing;
+  const token = generateSessionToken();
+  localStorage.setItem(SESSION_TOKEN_STORAGE_KEY, token);
+  return token;
+}
+
 export function generateSessionToken(): string {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);

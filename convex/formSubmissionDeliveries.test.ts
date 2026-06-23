@@ -102,7 +102,7 @@ test("runBatch closes a delivery once the notification email sends successfully"
   await t.action(internal.formSubmissionDeliveries.runBatch, {});
 
   const delivery = await getDeliveryByReferral(t, referralId);
-  expect(delivery).toMatchObject({ state: "closed", attempts: 0 });
+  expect(delivery).toMatchObject({ state: "closed", attempts: 1 });
 });
 
 test("runBatch reverts a delivery to open with attempts incremented when the email send fails", async () => {
@@ -120,7 +120,18 @@ test("runBatch reverts a delivery to open with attempts incremented when the ema
   });
 });
 
-test("runBatch permanently closes a delivery after exhausting the retry cap", async () => {
+test("runBatch records the failure's error message on the delivery", async () => {
+  const t = convexTest(schema, modules);
+  const referralId = await seedOpenDelivery(t);
+  vi.stubGlobal("fetch", failingFetch("invalid recipient"));
+
+  await t.action(internal.formSubmissionDeliveries.runBatch, {});
+
+  const delivery = await getDeliveryByReferral(t, referralId);
+  expect(delivery!.lastError).toBe("Resend error: invalid recipient");
+});
+
+test("runBatch permanently closes a delivery after exhausting the retry cap, with the final error retained", async () => {
   const t = convexTest(schema, modules);
   const referralId = await seedOpenDelivery(t);
   vi.stubGlobal("fetch", failingFetch("invalid recipient"));
@@ -132,6 +143,7 @@ test("runBatch permanently closes a delivery after exhausting the retry cap", as
 
   const delivery = await getDeliveryByReferral(t, referralId);
   expect(delivery).toMatchObject({ state: "closed", attempts: 3 });
+  expect(delivery!.lastError).toBe("Resend error: invalid recipient");
 });
 
 test("claimBatch never claims closed deliveries", async () => {

@@ -292,6 +292,7 @@ export default defineSchema({
     ),
     attempts: v.number(),
     processingStartedAt: v.union(v.number(), v.null()),
+    lastError: v.optional(v.string()),
   })
     .index("by_referral", ["referralId"])
     .index("by_state", ["state"]),
