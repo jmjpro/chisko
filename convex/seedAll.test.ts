@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 import { convexTest } from "convex-test";
 import { expect, test, vi, beforeEach, afterEach } from "vitest";
+import { existsSync } from "node:fs";
 import { internal } from "./_generated/api";
 import schema from "./schema";
 
@@ -65,6 +66,13 @@ test("runAll seeds catalog data and refreshes empty registry/places tables when 
 
   expect(fetch).toHaveBeenCalledWith(IEC_CSV_URL);
   expect(fetch).toHaveBeenCalledWith(DATA_GOV_URL);
+
+  for (const supplier of suppliers) {
+    expect(
+      existsSync(`public/suppliers/${supplier.logoFileName}`),
+      `missing logo file for supplier "${supplier.name}": public/suppliers/${supplier.logoFileName}`,
+    ).toBe(true);
+  }
 });
 
 test("runAll skips refreshing registry/places tables that are already populated", async () => {

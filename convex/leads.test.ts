@@ -129,6 +129,7 @@ test("getFanOutScope with a recommendation returns the eligible-plan pool, exclu
     async (ctx) => {
       const supplierId = await ctx.db.insert("suppliers", {
         name: "Click Through Only",
+        logoFileName: "clickThroughOnly.webp",
         isActive: true,
         supportedHandoffTypes: ["clickThrough"],
         payoutTrigger: "perAcceptedLead",
@@ -267,6 +268,7 @@ test("getFanOutScope without a recommendation returns every other active formHan
   const inactiveSupplierId = await t.run((ctx) =>
     ctx.db.insert("suppliers", {
       name: "Inactive Supplier",
+      logoFileName: "inactiveSupplier.webp",
       isActive: false,
       supportedHandoffTypes: ["formHandoff"],
       payoutTrigger: "perAcceptedLead",

@@ -22,5 +22,21 @@
   "share_invalid_title": "رابط غير صالح",
   "share_invalid_message": "لم يتم العثور على هذه التوصية أو انتهت صلاحيتها.",
   "back_to_home": "العودة إلى الصفحة الرئيسية",
-  "share_savings_description": "المدخرات السنوية المتوقعة: ₪{{amount}}"
+  "share_savings_description": "المدخرات السنوية المتوقعة: ₪{{amount}}",
+  "cta_switch_now": "التبديل الآن",
+  "cta_leave_details": "اترك بياناتك",
+  "lead_form_title": "اترك بياناتك",
+  "lead_form_name_label": "الاسم الكامل",
+  "lead_form_phone_label": "رقم الهاتف",
+  "lead_form_email_label": "البريد الإلكتروني (اختياري)",
+  "lead_form_name_required": "الاسم مطلوب",
+  "lead_form_phone_required": "رقم الهاتف مطلوب",
+  "lead_form_phone_invalid": "أدخل رقم هاتف صالحًا",
+  "lead_form_email_invalid": "أدخل بريدًا إلكترونيًا صالحًا",
+  "lead_form_submit": "إرسال",
+  "fan_out_title": "هل تريد المشاركة مع هؤلاء الموردين أيضًا؟",
+  "fan_out_description": "لدى هؤلاء الموردين أيضًا خطط تناسب استخدامك. يمكنك إلغاء تحديد أي مورد لا يهمك.",
+  "fan_out_confirm": "شارك أيضًا مع هؤلاء الموردين",
+  "fan_out_decline": "لا، شكرًا",
+  "fan_out_confirmation": "تم إرسال الطلب — سيتواصل معك {{count}} من الموردين"
 }

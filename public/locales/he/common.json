@@ -22,5 +22,21 @@
   "share_invalid_title": "הקישור אינו תקף",
   "share_invalid_message": "המלצה זו לא נמצאה או שפגה תוקפה.",
   "back_to_home": "חזרה לדף הבית",
-  "share_savings_description": "חיסכון שנתי צפוי: ₪{{amount}}"
+  "share_savings_description": "חיסכון שנתי צפוי: ₪{{amount}}",
+  "cta_switch_now": "מעבר עכשיו",
+  "cta_leave_details": "השאירו פרטים",
+  "lead_form_title": "השאירו את הפרטים שלכם",
+  "lead_form_name_label": "שם מלא",
+  "lead_form_phone_label": "מספר טלפון",
+  "lead_form_email_label": "אימייל (לא חובה)",
+  "lead_form_name_required": "שם הוא שדה חובה",
+  "lead_form_phone_required": "מספר טלפון הוא שדה חובה",
+  "lead_form_phone_invalid": "יש להזין מספר טלפון תקין",
+  "lead_form_email_invalid": "יש להזין כתובת אימייל תקינה",
+  "lead_form_submit": "שליחה",
+  "fan_out_title": "לשתף גם עם הספקים האלה?",
+  "fan_out_description": "לספקים האלה יש גם תוכניות שמתאימות לצריכה שלכם. אפשר להסיר סימון מכל ספק שלא מעניין אתכם.",
+  "fan_out_confirm": "שתפו גם עם הספקים האלה",
+  "fan_out_decline": "לא, תודה",
+  "fan_out_confirmation": "הפנייה נשלחה — {{count}} ספקים יצרו איתכם קשר"
 }
