@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { parseAcceptLanguage } from "./locale";
+import {
+  parseAcceptLanguage,
+  localeStaticPaths,
+  buildLangSwitchUrls,
+} from "./locale";
 
 describe("parseAcceptLanguage", () => {
   it("returns 'he' when header is null", () => {
@@ -40,5 +44,35 @@ describe("parseAcceptLanguage", () => {
 
   it("parses a realistic Chrome Accept-Language header for Arabic", () => {
     expect(parseAcceptLanguage("ar-SA,ar;q=0.9,en;q=0.8")).toBe("ar");
+  });
+});
+
+describe("localeStaticPaths", () => {
+  it("returns one params entry per prefixed locale", () => {
+    expect(localeStaticPaths()).toEqual([
+      { params: { locale: "en" } },
+      { params: { locale: "ar" } },
+      { params: { locale: "ru" } },
+    ]);
+  });
+});
+
+describe("buildLangSwitchUrls", () => {
+  it("maps each locale to the path, with 'he' unprefixed and others locale-prefixed", () => {
+    expect(buildLangSwitchUrls("/plans")).toEqual({
+      he: "/plans",
+      en: "/en/plans",
+      ar: "/ar/plans",
+      ru: "/ru/plans",
+    });
+  });
+
+  it("treats the home path '/' as a special case (no double slash)", () => {
+    expect(buildLangSwitchUrls("/")).toEqual({
+      he: "/",
+      en: "/en/",
+      ar: "/ar/",
+      ru: "/ru/",
+    });
   });
 });

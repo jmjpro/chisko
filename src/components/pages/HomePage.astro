@@ -1,0 +1,56 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Footer from "../footer";
+import ChiskiMascot from "../chiskiMascot";
+
+interface Props {
+  locale: string;
+  title: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  ctaWizardLabel: string;
+  ctaPlansLabel: string;
+  wizardHref: string;
+  plansHref: string;
+  langSwitchUrls: Record<string, string>;
+}
+
+const {
+  locale,
+  title,
+  heroTitle,
+  heroSubtitle,
+  ctaWizardLabel,
+  ctaPlansLabel,
+  wizardHref,
+  plansHref,
+  langSwitchUrls,
+} = Astro.props;
+---
+
+<BaseLayout locale={locale} title={title} langSwitchUrls={langSwitchUrls}>
+  <main class="flex-1 flex flex-col items-center justify-center px-6 py-16 text-center">
+    <ChiskiMascot className="w-40 h-40 mb-8 drop-shadow-md" />
+    <h1 class="text-4xl font-extrabold tracking-tight mb-4 max-w-md">
+      {heroTitle}
+    </h1>
+    <p class="text-lg text-muted-foreground mb-10 max-w-sm">
+      {heroSubtitle}
+    </p>
+    <div class="flex gap-4 flex-wrap justify-center">
+      <a
+        href={wizardHref}
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
+      >
+        {ctaWizardLabel}
+      </a>
+      <a
+        href={plansHref}
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
+      >
+        {ctaPlansLabel}
+      </a>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>

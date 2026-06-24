@@ -39,3 +39,37 @@ test.describe("Locale routing — wizard", () => {
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
   });
 });
+
+test.describe("Locale routing — page titles", () => {
+  test("home page title per locale", async ({ page }) => {
+    await page.goto("/");
+    await expect(page).toHaveTitle("Chisko — שלם פחות על אותו חשמל");
+
+    await page.goto("/en/");
+    await expect(page).toHaveTitle(
+      "Chisko — Pay less for the same electricity",
+    );
+
+    await page.goto("/ar/");
+    await expect(page).toHaveTitle("Chisko — ادفع أقل مقابل نفس الكهرباء");
+
+    await page.goto("/ru/");
+    await expect(page).toHaveTitle(
+      "Chisko — Платите меньше за ту же электроэнергию",
+    );
+  });
+
+  test("wizard page title per locale", async ({ page }) => {
+    await page.goto("/wizard");
+    await expect(page).toHaveTitle("Chisko — אשף");
+
+    await page.goto("/en/wizard");
+    await expect(page).toHaveTitle("Chisko — Wizard");
+
+    await page.goto("/ar/wizard");
+    await expect(page).toHaveTitle("Chisko — المعالج");
+
+    await page.goto("/ru/wizard");
+    await expect(page).toHaveTitle("Chisko — Мастер");
+  });
+});

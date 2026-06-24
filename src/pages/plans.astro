@@ -1,141 +1,33 @@
 ---
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Footer from "../components/footer";
-import LeaveDetailsIsland from "../islands/LeaveDetailsIsland";
-import ClickThroughIsland from "../islands/ClickThroughIsland";
+import PlansPage from "../components/pages/PlansPage.astro";
 import common from "../../public/locales/he/common.json";
 import suppliers from "../../public/locales/he/suppliers.json";
 import plans from "../../public/locales/he/plans.json";
 import { getConvexUrl } from "../lib/getConvexUrl";
+import { buildLangSwitchUrls } from "../lib/locale";
+import { buildPlanRows } from "../lib/buildPlanRows";
 
 const locale = "he";
 const convexUrl = getConvexUrl(import.meta.env.VITE_CONVEX_URL);
-const langSwitchUrls: Record<string, string> = {
-  he: "/plans",
-  en: "/en/plans",
-  ar: "/ar/plans",
-  ru: "/ru/plans",
-};
+const langSwitchUrls = buildLangSwitchUrls("/plans");
 
-const client = new ConvexHttpClient(getConvexUrl(import.meta.env.VITE_CONVEX_URL));
+const client = new ConvexHttpClient(convexUrl);
 const rows = await client.query(api.plans.listActive);
 
-function formatHour(h: number) {
-  return `${String(h).padStart(2, "0")}:00`;
-}
-
-const s = suppliers as Record<string, string>;
-const p = plans as Record<string, string>;
-const c = common as Record<string, string>;
-const processedRows = rows.map((row) => {
-  const isFixed = row.planType === "fixed";
-  const window =
-    !isFixed && row.discountWindowStartHour !== null && row.discountWindowEndHour !== null
-      ? `${formatHour(row.discountWindowStartHour)}–${formatHour(row.discountWindowEndHour)}`
-      : common.all_day;
-  const weekdayOnly = isFixed ? common.no : row.weekdayWindowOnly ? common.yes : common.all_week;
-  return {
-    ...row,
-    window,
-    weekdayOnly,
-    supplierLabel: s[row.supplierName] ?? row.supplierName,
-    planLabel: p[row.planName] ?? row.planName,
-    typeLabel: c[`plan_type_${row.planType}`] ?? row.planType,
-  };
-});
+const processedRows = buildPlanRows(
+  rows,
+  common as Record<string, string>,
+  suppliers as Record<string, string>,
+  plans as Record<string, string>,
+);
 ---
 
-<BaseLayout
+<PlansPage
   locale={locale}
-  title={`Chisko — ${common.plans_page_title}`}
+  convexUrl={convexUrl}
+  common={common as Record<string, string>}
+  rows={processedRows}
   langSwitchUrls={langSwitchUrls}
->
-  <main class="flex-1 px-6 py-8 overflow-x-auto">
-    <h1 class="text-2xl font-bold mb-6">{common.plans_page_title}</h1>
-    <div class="md:hidden flex flex-col gap-4">
-      {
-        processedRows.map((row) => (
-          <div
-            data-testid="plan-card"
-            class="border rounded-lg p-4 flex flex-col gap-3"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <div class="font-semibold">{row.supplierLabel}</div>
-                <div class="text-sm text-gray-600">{row.planLabel}</div>
-              </div>
-              <span class="tnum shrink-0 rounded-full bg-green-100 text-green-800 font-semibold px-2.5 py-1 text-sm">
-                {row.discountPercent}%
-              </span>
-            </div>
-            <dl class="text-sm grid grid-cols-2 gap-y-1">
-              <dt class="text-gray-600">{common.table_type}</dt>
-              <dd class="text-end">{row.typeLabel}</dd>
-              <dt class="text-gray-600">{common.table_window}</dt>
-              <dd class="text-end">{row.window}</dd>
-              <dt class="text-gray-600">{common.table_weekday_only}</dt>
-              <dd class="text-end">{row.weekdayOnly}</dd>
-            </dl>
-            <LeaveDetailsIsland
-              client:only="react"
-              locale={locale}
-              convexUrl={convexUrl}
-              supplierId={row.supplierId}
-              planVersionId={row.pvId}
-            />
-          </div>
-        ))
-      }
-    </div>
-    <table class="hidden md:table w-full text-sm border-collapse">
-      <thead>
-        <tr class="border-b text-start">
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_supplier}</th>
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_plan}</th>
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_type}</th>
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_discount}</th>
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_window}</th>
-          <th class="pb-2 font-semibold text-start">{common.table_weekday_only}</th>
-          <th class="pb-2 w-[158px]"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {
-          processedRows.map((row) => (
-            <tr class="border-b last:border-0">
-              <td class="py-3 pe-6">{row.supplierLabel}</td>
-              <td class="py-3 pe-6">{row.planLabel}</td>
-              <td class="py-3 pe-6">{row.typeLabel}</td>
-              <td class="py-3 pe-6 tnum">{row.discountPercent}%</td>
-              <td class="py-3 pe-6">{row.window}</td>
-              <td class="py-3 pe-6">{row.weekdayOnly}</td>
-              <td class="py-3 w-[158px]">
-                <div class="h-8 flex gap-2">
-                  {row.supportedHandoffTypes.includes("clickThrough") && (
-                    <ClickThroughIsland
-                      client:only="react"
-                      locale={locale}
-                      convexUrl={convexUrl}
-                      supplierId={row.supplierId}
-                      planVersionId={row.pvId}
-                    />
-                  )}
-                  <LeaveDetailsIsland
-                    client:only="react"
-                    locale={locale}
-                    convexUrl={convexUrl}
-                    supplierId={row.supplierId}
-                    planVersionId={row.pvId}
-                  />
-                </div>
-              </td>
-            </tr>
-          ))
-        }
-      </tbody>
-    </table>
-  </main>
-  <Footer />
-</BaseLayout>
+/>
