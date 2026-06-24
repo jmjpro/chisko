@@ -3,7 +3,7 @@ import { v } from "convex/values";
 
 /**
  * Plans of a given supplier that currently have an active plan version —
- * powers the Current Plan Baseline picker (ADR-0024).
+ * powers the Current Plan Baseline picker (ADR-0025).
  */
 export const listForSupplier = query({
   args: { supplierId: v.id("suppliers") },
@@ -41,6 +41,7 @@ export const listActive = query({
         if (!supplier) return null;
         return {
           pvId: pv._id,
+          supplierId: supplier._id,
           supplierName: supplier.name,
           planName: plan.name,
           planType: plan.planType,

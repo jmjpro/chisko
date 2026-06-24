@@ -42,6 +42,15 @@ test("doRefresh reports the failure to Sentry and still rethrows", async () => {
   expect(sentryCall).toBeDefined();
 });
 
+test("doRefresh no-ops when ENABLE_CONVEX_CLOUD is false", async () => {
+  const t = convexTest(schema, modules);
+  vi.stubEnv("ENABLE_CONVEX_CLOUD", "false");
+
+  await t.action(internal.smartMeterRegistryRefresh.doRefresh, {});
+
+  expect(fetch).not.toHaveBeenCalled();
+});
+
 function stubCsvFetch(csvLines: string[]) {
   const csv = ["date header", "column header", ...csvLines].join("\n");
   vi.stubGlobal(

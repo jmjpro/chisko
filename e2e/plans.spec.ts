@@ -29,3 +29,58 @@ test.describe("Plans page — build-time data fetch", () => {
     await expect(rows.first()).toBeVisible();
   });
 });
+
+test.describe("Plans page — Leave details CTA", () => {
+  test("submitting step 1 and confirming fan-out reports suppliers contacted", async ({
+    page,
+  }) => {
+    await page.goto("/en/plans");
+
+    const firstRow = page.locator("tbody tr").first();
+    const leaveDetails = firstRow.getByRole("button", {
+      name: "Leave details",
+    });
+    await leaveDetails.waitFor({ state: "visible", timeout: 15000 });
+    await leaveDetails.click();
+
+    await expect(page.getByText("Leave your details")).toBeVisible();
+    await page.getByLabel("Full name").fill("Playwright Tester");
+    await page.getByLabel("Phone number").fill("0501234567");
+    await page.getByRole("button", { name: "Submit" }).click();
+
+    await expect(
+      page.getByText("Also share with these suppliers?"),
+    ).toBeVisible({ timeout: 10000 });
+    await page
+      .getByRole("button", { name: "Also share with these suppliers" })
+      .click();
+
+    await expect(page.getByText("will contact you")).toBeVisible({
+      timeout: 10000,
+    });
+  });
+
+  test("declining the fan-out step closes the dialog", async ({ page }) => {
+    await page.goto("/en/plans");
+
+    const firstRow = page.locator("tbody tr").first();
+    const leaveDetails = firstRow.getByRole("button", {
+      name: "Leave details",
+    });
+    await leaveDetails.waitFor({ state: "visible", timeout: 15000 });
+    await leaveDetails.click();
+
+    await page.getByLabel("Full name").fill("Playwright Decliner");
+    await page.getByLabel("Phone number").fill("0507654321");
+    await page.getByRole("button", { name: "Submit" }).click();
+
+    await expect(
+      page.getByText("Also share with these suppliers?"),
+    ).toBeVisible({ timeout: 10000 });
+    await page.getByRole("button", { name: "No thanks" }).click();
+
+    await expect(
+      page.getByText("Also share with these suppliers?"),
+    ).not.toBeVisible();
+  });
+});

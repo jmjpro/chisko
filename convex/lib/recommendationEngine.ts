@@ -153,7 +153,7 @@ export function computeWindowFractions(
 }
 
 /**
- * The Current Plan Baseline (ADR-0024): the household's current plan, evaluated
+ * The Current Plan Baseline (ADR-0025): the household's current plan, evaluated
  * through the same savings-vs-IEC-Rate calculation as any candidate. Returns 0
  * (no adjustment, IEC Rate baseline applies) when the current plan is unknown
  * or has no active plan version.

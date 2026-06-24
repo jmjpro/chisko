@@ -198,7 +198,7 @@ export const generate = mutation({
       }
     }
 
-    // ── Current Plan Baseline (ADR-0024) ─────────────────────────────────────
+    // ── Current Plan Baseline (ADR-0025) ─────────────────────────────────────
     const currentPv = profile.currentPlanId
       ? (activePvs.find((pv) => pv.planId === profile.currentPlanId) ?? null)
       : null;

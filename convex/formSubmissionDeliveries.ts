@@ -1,6 +1,7 @@
 import { internalAction, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import { isConvexCloudEnabled } from "./lib/convexCloud";
 
 export const STALENESS_THRESHOLD_MS = 10 * 60 * 1000;
 export const MAX_ATTEMPTS = 3;
@@ -41,14 +42,20 @@ export const claimBatch = internalMutation({
 export const markDelivered = internalMutation({
   args: { deliveryId: v.id("formSubmissionDeliveries") },
   handler: async (ctx, args) => {
+    const delivery = await ctx.db.get(
+      "formSubmissionDeliveries",
+      args.deliveryId,
+    );
+    if (!delivery) return;
     await ctx.db.patch("formSubmissionDeliveries", args.deliveryId, {
       state: "closed",
+      attempts: delivery.attempts + 1,
     });
   },
 });
 
 export const markFailed = internalMutation({
-  args: { deliveryId: v.id("formSubmissionDeliveries") },
+  args: { deliveryId: v.id("formSubmissionDeliveries"), error: v.string() },
   handler: async (ctx, args) => {
     const delivery = await ctx.db.get(
       "formSubmissionDeliveries",
@@ -60,12 +67,14 @@ export const markFailed = internalMutation({
       await ctx.db.patch("formSubmissionDeliveries", args.deliveryId, {
         state: "closed",
         attempts,
+        lastError: args.error,
       });
     } else {
       await ctx.db.patch("formSubmissionDeliveries", args.deliveryId, {
         state: "open",
         attempts,
         processingStartedAt: null,
+        lastError: args.error,
       });
     }
   },
@@ -74,6 +83,11 @@ export const markFailed = internalMutation({
 export const runBatch = internalAction({
   args: {},
   handler: async (ctx) => {
+    if (!isConvexCloudEnabled()) {
+      console.log("ENABLE_CONVEX_CLOUD=false — skipping");
+      return;
+    }
+
     const claimed = await ctx.runMutation(
       internal.formSubmissionDeliveries.claimBatch,
       {},
@@ -86,9 +100,10 @@ export const runBatch = internalAction({
         await ctx.runMutation(internal.formSubmissionDeliveries.markDelivered, {
           deliveryId,
         });
-      } catch {
+      } catch (err) {
         await ctx.runMutation(internal.formSubmissionDeliveries.markFailed, {
           deliveryId,
+          error: err instanceof Error ? err.message : String(err),
         });
       }
     }

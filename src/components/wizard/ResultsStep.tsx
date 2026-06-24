@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import CsvDropzone from "@/components/CsvDropzone";
+import LeaveDetailsDialog from "@/components/LeaveDetailsDialog";
 import WizardStep from "@/components/WizardStep";
 import HomeFields, { type HomeFieldsProps } from "./HomeFields";
 import UsageFields, { type UsageFieldsProps } from "./UsageFields";
@@ -38,12 +39,13 @@ type EvaluatedPlan = {
   planVersionId: Id<"planVersions">;
   isEligible: boolean;
   annualSavingsAgorot: number;
-  supplier?: { name: string } | null;
+  supplier?: { _id: Id<"suppliers">; name: string } | null;
   plan?: { name: string; planType: "fixed" | "day" | "night" } | null;
   planVersion?: PlanVersionMechanics | null;
 };
 
 export interface ResultsStepProps {
+  sessionId: Id<"sessions"> | null;
   rec: Rec | undefined;
   evaluatedPlans: EvaluatedPlan[] | undefined;
   generating: boolean;
@@ -69,6 +71,7 @@ function formatAgorot(agorot: number): string {
 }
 
 export default function ResultsStep({
+  sessionId,
   rec,
   evaluatedPlans,
   generating,
@@ -86,6 +89,7 @@ export default function ResultsStep({
 }: ResultsStepProps) {
   const { t: tw } = useTranslation("wizard");
   const { t: tr } = useTranslation("recommendations");
+  const { t: tc } = useTranslation("common");
 
   const [primarySheetOpen, setPrimarySheetOpen] = useState(false);
   const [noChangeSheetOpen, setNoChangeSheetOpen] = useState(false);
@@ -163,6 +167,7 @@ export default function ResultsStep({
     isPrimary: boolean,
     sheetOpen: boolean,
     setSheetOpen: (open: boolean) => void,
+    recommendationId: Id<"recommendations">,
   ): React.ReactNode {
     if (!plan) return null;
     const planType = plan.plan?.planType;
@@ -234,6 +239,18 @@ export default function ResultsStep({
             {renderSavingsBreakdown(annualSavingsAgorot)}
           </SheetContent>
         </Sheet>
+
+        {plan.supplier && sessionId && (
+          <div className="mt-3">
+            <LeaveDetailsDialog
+              sessionId={sessionId}
+              recommendationId={recommendationId}
+              supplierId={plan.supplier._id}
+              planVersionId={plan.planVersionId}
+              trigger={<Button size="sm">{tc("cta_leave_details")}</Button>}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -282,6 +299,7 @@ export default function ResultsStep({
           true,
           primarySheetOpen,
           setPrimarySheetOpen,
+          rec._id,
         )}
 
         {alternatives.length > 0 && (
@@ -310,6 +328,7 @@ export default function ResultsStep({
                     next[i] = open;
                     return next;
                   }),
+                rec._id,
               )}
             </React.Fragment>
           ))}
@@ -323,6 +342,7 @@ export default function ResultsStep({
             false,
             noChangeSheetOpen,
             setNoChangeSheetOpen,
+            rec._id,
           )}
       </>
     );

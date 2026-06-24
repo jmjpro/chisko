@@ -196,3 +196,41 @@ test.describe("Usage step — Off-Bill Benefit Willingness question", () => {
     ).toBeChecked();
   });
 });
+
+test.describe("Results step — Leave details CTA", () => {
+  async function navigateToResultsStep(page: Page) {
+    await navigateToUsageStep(page);
+    await page.getByRole("button", { name: "Get My Recommendation" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Your Recommendation" }),
+    ).toBeVisible({ timeout: 20000 });
+  }
+
+  test("opens the lead-capture dialog wired to the primary card", async ({
+    page,
+  }) => {
+    await navigateToResultsStep(page);
+
+    const leaveDetails = page
+      .getByRole("button", { name: "Leave details" })
+      .first();
+    await expect(leaveDetails).toBeVisible({ timeout: 10000 });
+    await leaveDetails.click();
+
+    await expect(page.getByText("Leave your details")).toBeVisible();
+    await page.getByLabel("Full name").fill("Wizard Tester");
+    await page.getByLabel("Phone number").fill("0509998888");
+    await page.getByRole("button", { name: "Submit" }).click();
+
+    await expect(
+      page.getByText("Also share with these suppliers?"),
+    ).toBeVisible({ timeout: 10000 });
+    await page
+      .getByRole("button", { name: "Also share with these suppliers" })
+      .click();
+
+    await expect(page.getByText("will contact you")).toBeVisible({
+      timeout: 10000,
+    });
+  });
+});
