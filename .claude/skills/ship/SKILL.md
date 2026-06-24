@@ -30,8 +30,17 @@ Otherwise, proceed to Step 3 as normal.
 Poll `gh pr view <PR-number> --json statusCheckRollup` every ~15-20s, up to a ~10 minute timeout, reading only the `context: "Vercel"` entry's `state`.
 
 - `state: "SUCCESS"` within the timeout → result is "passed".
-- `state: "FAILURE"` (or similar terminal failure state) → result is "failed", capture its `targetUrl`.
+- `state: "FAILURE"` (or similar terminal failure state) → capture its `targetUrl`, then check whether it's the Convex-cloud kill switch (below) before treating it as a real failure.
 - Still `PENDING` after the timeout → stop polling, tell the user it's taking longer than expected, treat result as "pending".
+
+### Detect the `ENABLE_CONVEX_CLOUD=false` kill switch
+
+`ENABLE_CONVEX_CLOUD` is a Sensitive Vercel env var (Preview scope) — its value can never be read back via `vercel env ls`/`pull` or the API, only consumed at build time. `vercel.json`'s `buildCommand` deliberately runs `exit 1` when it's `"false"`, after echoing `"ENABLE_CONVEX_CLOUD=false — refusing to deploy a new Convex preview backend"`. That makes the build check fail by design, not because of anything in the PR.
+
+So whenever Step 3 yields `FAILURE`, fetch that deployment's build log with `mcp__plugin_vercel_vercel__get_deployment_build_logs` (idOrUrl: the current PR's deployment ID, teamId from `list_teams`) and check for that sentinel line (case-insensitive match on `ENABLE_CONVEX_CLOUD=false` or `refusing to deploy a new Convex preview backend`).
+
+- Sentinel found → result is "skipped (convex cloud disabled)". Skip Step 4 entirely (there's no real build to diff). Go to Step 5.
+- Sentinel not found → it's a genuine failure. Result is "failed". Proceed to Step 4 as normal (the log-diff subagent's summary is still useful context for a real failure).
 
 ## Step 4 — Diff the build log against main for newly introduced warnings/errors
 
@@ -50,6 +59,7 @@ A `SUCCESS` build can still emit new warnings (or non-fatal errors) worth catchi
 Combine the build-check skip status (Step 2), check result (Step 3), and log diff (Step 4):
 
 - **Skipped (docs/tooling-only)**: `PR opened at <url>. Changes are tooling/docs-only (.claude/, docs/) — skipping the Vercel check. Merge it? [y/n]`
+- **Skipped (convex cloud disabled)**: `PR opened at <url>. Vercel build failed by design — ENABLE_CONVEX_CLOUD=false is refusing to deploy a new Convex preview backend, unrelated to this PR's content. Skipping the build check. Merge it? [y/n]`
 - **Passed, no new warnings/errors**: `PR opened at <url>. Vercel check passed, no new build warnings/errors. Merge it? [y/n]`
 - **Passed, but new warnings/errors found**: show the subagent's summary, then `Vercel check passed but the build log has <N> new warning(s)/error(s) not present in main (<deployment-url>):\n<summary>\nMerge anyway? [y/n]`
 - **Failed**: show the failure summary and its URL (plus the log-diff summary if it found anything beyond the failure itself), then `Vercel preview build FAILED (<url>). Merge anyway? [y/n]` — never silently refuse, same override pattern as `/push`'s hook-failure prompt.
