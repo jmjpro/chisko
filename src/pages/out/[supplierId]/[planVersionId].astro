@@ -1,0 +1,55 @@
+---
+export const prerender = false;
+
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Footer from "../../../components/footer";
+import { getConvexUrl } from "../../../lib/getConvexUrl";
+import { LOCALES, parseAcceptLanguage, type Locale } from "../../../lib/locale";
+import { commonByLocale } from "../../../lib/commonLocale";
+
+const { supplierId, planVersionId } = Astro.params;
+const sessionId = Astro.url.searchParams.get("sessionId");
+
+const langParam = Astro.url.searchParams.get("lang");
+const locale: Locale = (LOCALES as readonly string[]).includes(langParam ?? "")
+  ? (langParam as Locale)
+  : parseAcceptLanguage(Astro.request.headers.get("accept-language"));
+
+const common = commonByLocale[locale];
+
+let result: { clickId: string; affiliateUrl: string } | null = null;
+if (supplierId && planVersionId && sessionId) {
+  const client = new ConvexHttpClient(getConvexUrl(import.meta.env.VITE_CONVEX_URL));
+  try {
+    result = await client.mutation(api.referrals.recordClickThrough, {
+      sessionId: sessionId as Id<"sessions">,
+      supplierId: supplierId as Id<"suppliers">,
+      planVersionId: planVersionId as Id<"planVersions">,
+    });
+  } catch {
+    result = null;
+  }
+}
+
+if (result) {
+  return Astro.redirect(result.affiliateUrl, 302);
+}
+
+Astro.response.status = 404;
+---
+
+<BaseLayout locale={locale} title={common.out_link_invalid_title}>
+  <main class="flex-1 px-6 py-12 max-w-lg mx-auto w-full">
+    <div class="text-center py-24">
+      <h1 class="text-2xl font-bold mb-2">{common.out_link_invalid_title}</h1>
+      <p class="text-muted-foreground">{common.out_link_invalid_message}</p>
+      <a href="/" class="mt-6 inline-block text-primary underline">
+        {common.back_to_home}
+      </a>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>

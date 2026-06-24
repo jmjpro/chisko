@@ -227,3 +227,47 @@ describe("ResultsStep — leave-details CTA wiring", () => {
     );
   });
 });
+
+describe("ResultsStep — click-through CTA", () => {
+  it("shows the click-through CTA alongside Leave Details when the supplier supports clickThrough", () => {
+    render(
+      <ResultsStep
+        {...baseProps({
+          evaluatedPlans: [
+            {
+              planVersionId: primaryPlanVersionId,
+              isEligible: true,
+              annualSavingsAgorot: 100000,
+              supplier: {
+                _id: primarySupplierId,
+                name: "Acme Energy",
+                supportedHandoffTypes: ["clickThrough", "formHandoff"],
+              },
+              plan: { name: "Acme Fixed", planType: "fixed" },
+              planVersion: {
+                discountPercent: 7,
+                weekdayWindowOnly: false,
+                benefitDelivery: "billDiscount",
+              },
+            },
+          ],
+        })}
+      />,
+    );
+
+    const cta = screen.getByText("cta_click_through");
+    expect(cta).toBeInTheDocument();
+    expect(cta.closest("a")).toHaveAttribute(
+      "href",
+      `/out/${primarySupplierId}/${primaryPlanVersionId}?sessionId=${sessionId}`,
+    );
+    expect(screen.getByText("cta_leave_details")).toBeInTheDocument();
+  });
+
+  it("does not show the click-through CTA when the supplier doesn't support clickThrough", () => {
+    render(<ResultsStep {...baseProps()} />);
+
+    expect(screen.queryByText("cta_click_through")).not.toBeInTheDocument();
+    expect(screen.getByText("cta_leave_details")).toBeInTheDocument();
+  });
+});

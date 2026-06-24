@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import CsvDropzone from "@/components/CsvDropzone";
+import ClickThroughCta from "@/components/ClickThroughCta";
 import LeaveDetailsDialog from "@/components/LeaveDetailsDialog";
 import WizardStep from "@/components/WizardStep";
 import HomeFields, { type HomeFieldsProps } from "./HomeFields";
@@ -39,7 +40,11 @@ type EvaluatedPlan = {
   planVersionId: Id<"planVersions">;
   isEligible: boolean;
   annualSavingsAgorot: number;
-  supplier?: { _id: Id<"suppliers">; name: string } | null;
+  supplier?: {
+    _id: Id<"suppliers">;
+    name: string;
+    supportedHandoffTypes?: ("clickThrough" | "formHandoff" | "phoneBased")[];
+  } | null;
   plan?: { name: string; planType: "fixed" | "day" | "night" } | null;
   planVersion?: PlanVersionMechanics | null;
 };
@@ -243,7 +248,14 @@ export default function ResultsStep({
         </Sheet>
 
         {plan.supplier && sessionId && (
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap gap-2">
+            {plan.supplier.supportedHandoffTypes?.includes("clickThrough") && (
+              <ClickThroughCta
+                sessionId={sessionId}
+                supplierId={plan.supplier._id}
+                planVersionId={plan.planVersionId}
+              />
+            )}
             <LeaveDetailsDialog
               sessionId={sessionId}
               recommendationId={recommendationId}

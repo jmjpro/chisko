@@ -21,6 +21,7 @@ export async function seedSupplierAndPlan(
   t: ConvexTestInstance,
   overrides: {
     supportedHandoffTypes?: ("clickThrough" | "formHandoff" | "phoneBased")[];
+    affiliateUrl?: string;
   } = {},
 ): Promise<{ supplierId: Id<"suppliers">; planVersionId: Id<"planVersions"> }> {
   return t.run(async (ctx) => {
@@ -51,6 +52,7 @@ export async function seedSupplierAndPlan(
         residentialOnly: true,
         coverageAreas: [],
       },
+      affiliateUrl: overrides.affiliateUrl,
     });
     return { supplierId, planVersionId };
   });

@@ -4,6 +4,7 @@ import { api } from "../../../convex/_generated/api";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Footer from "../../components/footer";
 import LeaveDetailsIsland from "../../islands/LeaveDetailsIsland";
+import ClickThroughIsland from "../../islands/ClickThroughIsland";
 import { getConvexUrl } from "../../lib/getConvexUrl";
 import { commonByLocale } from "../../lib/commonLocale";
 import type { Locale } from "../../lib/locale";
@@ -121,7 +122,16 @@ const viewRows = rows.map((row) => {
                 <td class="py-3 pe-6">{row.window}</td>
                 <td class="py-3 pe-6">{row.weekdayOnly}</td>
                 <td class="py-3 w-[158px]">
-                  <div class="h-8">
+                  <div class="h-8 flex gap-2">
+                    {row.supportedHandoffTypes.includes("clickThrough") && (
+                      <ClickThroughIsland
+                        client:only="react"
+                        locale={locale}
+                        convexUrl={convexUrl}
+                        supplierId={row.supplierId}
+                        planVersionId={row.pvId}
+                      />
+                    )}
                     <LeaveDetailsIsland
                       client:only="react"
                       locale={locale}

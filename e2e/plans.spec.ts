@@ -199,3 +199,39 @@ test.describe("Plans page — Leave details CTA", () => {
     ).not.toBeVisible();
   });
 });
+
+test.describe("Plans page — click-through CTA", () => {
+  test("Electra row shows both the click-through and Leave details CTAs", async ({
+    page,
+  }) => {
+    await page.goto("/en/plans");
+
+    const electraRow = page
+      .locator("tbody tr")
+      .filter({ hasText: "Electra Power" })
+      .first();
+    await expect(
+      electraRow.getByRole("button", { name: "Switch without an agent" }),
+    ).toBeVisible({ timeout: 15000 });
+    await expect(
+      electraRow.getByRole("button", { name: "Leave details" }),
+    ).toBeVisible();
+  });
+
+  test("a formHandoff-only row does not show the click-through CTA", async ({
+    page,
+  }) => {
+    await page.goto("/en/plans");
+
+    const otherRow = page
+      .locator("tbody tr")
+      .filter({ hasNotText: "Electra Power" })
+      .first();
+    await expect(
+      otherRow.getByRole("button", { name: "Leave details" }),
+    ).toBeVisible({ timeout: 15000 });
+    await expect(
+      otherRow.getByRole("button", { name: "Switch without an agent" }),
+    ).not.toBeVisible();
+  });
+});
