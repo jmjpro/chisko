@@ -227,11 +227,13 @@ export default function ResultsStep({
         )}
 
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <button className="text-sm text-muted-foreground underline underline-offset-2 mt-2 hover:text-foreground transition-colors">
-              {tw("savings_breakdown_title")}
-            </button>
-          </SheetTrigger>
+          <SheetTrigger
+            render={
+              <button className="text-sm text-muted-foreground underline underline-offset-2 mt-2 hover:text-foreground transition-colors">
+                {tw("savings_breakdown_title")}
+              </button>
+            }
+          />
           <SheetContent side="bottom" className="max-h-[60vh] overflow-y-auto">
             <SheetHeader className="mb-4">
               <SheetTitle>{tw("savings_breakdown_title")}</SheetTitle>
