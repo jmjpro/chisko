@@ -94,7 +94,11 @@ A plan with a ~20% discount applied only during 23:00–07:00, Sunday–Thursday
 _Avoid_: Nighttime plan, off-peak plan
 
 **IEC Rate**:
-The Israel Electric Corporation's published reference tariff. All supplier discounts are expressed as a percentage reduction from this rate. It is the cost baseline for every Recommendation calculation.
+The Israel Electric Corporation's published reference tariff. All supplier discounts are expressed as a percentage reduction from this rate. It is the cost baseline for a Recommendation calculation whenever a Current Plan Baseline isn't available.
+
+**Current Plan Baseline**:
+The household's actual current plan, used instead of the IEC Rate as the cost baseline for a Recommendation when known. Computed by treating the current plan as just another evaluated Plan Version — deriving its own savings-vs-IEC-Rate the same way every candidate's savings are calculated — then subtracting that from both the baseline cost and every candidate's displayed savings, so all savings figures end up relative to what the household is actually paying today rather than the published tariff. Captured via an optional current-plan selection (covering all of that supplier's Plan Types) shown only when the Home Profile's current supplier is a real, non-IEC supplier; skipping it, or the supplier being IEC or "don't know", falls back to the IEC Rate baseline — explained to the user via a popover (hover on desktop, tap on mobile). Independent of whether a Bill Import exists: a Bill Import's data only affects usage-estimation Confidence Level, never which baseline is used. A candidate can come out with negative savings under this baseline (switching would cost more than staying) — still shown as the closest/least-bad candidate, clearly labeled as costing more, rather than hidden or excluded. See ADR-0024.
+_Avoid_: Current plan comparison, real baseline, actual cost baseline
 
 ## Plan Version Attributes
 
@@ -112,7 +116,7 @@ A Plan Version may carry any combination of these eligibility requirements, eval
 
 **Smart Meter Required**: Day and Night plans require an IEC smart meter (hourly/quarter-hourly metering). Households without one are ineligible for time-of-use plans regardless of usage pattern.
 
-**Membership Required**: Some plans are restricted to customers of a bundled service (e.g., HOT e-Triple requires HOT triple + HOT Mobile subscription). The Home Profile must capture relevant bundle memberships.
+**Membership Required**: Some plans are restricted to customers of a bundled service. Two list formats are supported, distinguished by separator: a `+`-separated list means every named membership is required (e.g., a plan requiring "HOT triple + HOT Mobile"); a `, or`-separated list means any one of them suffices (e.g., HOT Fixed Savers requires "HOT triple, or HOT Mobile"). The Home Profile must capture relevant bundle memberships.
 
 **Residential Only**: All plans in scope are residential. Non-residential accounts are out of scope for this product.
 
@@ -137,11 +141,11 @@ _Avoid_: Cities table, places list
 ## Inputs
 
 **Home Profile**:
-A household's self-reported characteristics captured via questionnaire. Fields: smart meter (yes/no — determined at the start of the wizard, never unknown after completion), place of residence (a multilingual snapshot of the selected יישוב), street, house number (street and house number populated only when collected via Smart Meter Registry lookup), bundle memberships (HOT triple, Cellcom, etc.), current supplier + plan (if no bill uploaded), approximate monthly kWh (if no bill uploaded), work-from-home pattern, EV charging (yes/no + timing), washer/dryer timing, AC usage level, willingness to shift appliance usage to save more (yes/no), and Off-Bill Benefit Willingness (yes/no — asked late in the questionnaire). When the current supplier is IEC (or unknown), both are represented as a null supplier reference — the Recommendation engine uses the full IEC Rate as the cost baseline in either case.
+A household's self-reported characteristics captured via questionnaire. Fields: smart meter (yes/no — determined at the start of the wizard, never unknown after completion), place of residence (a multilingual snapshot of the selected יישוב), street, house number (street and house number populated only when collected via Smart Meter Registry lookup), bundle memberships (HOT triple, HOT Mobile, Cellcom, Amisragas, etc.), current supplier, current plan (asked only when the current supplier is a real, non-IEC supplier — see Current Plan Baseline), approximate monthly kWh (if no Bill Import), work-from-home pattern, EV charging (yes/no + timing), washer/dryer timing, AC usage level, willingness to shift appliance usage to save more (yes/no), and Off-Bill Benefit Willingness (yes/no — asked late in the questionnaire). When the current supplier is IEC or "don't know", both current supplier and current plan are represented as a null reference, and the Recommendation falls back to the IEC Rate baseline.
 _Avoid_: User profile, household, account
 
 **Bill Import**:
-A parsed electricity bill or IEC smart-meter CSV upload, including billing period, total kWh, current supplier, current plan, and hourly intervals if present. The current supplier and plan from a Bill Import are the baseline for Recommendation savings calculations. Three input modes are supported: IEC smart-meter CSV (structured, reliable), LLM-based PDF extraction (with mandatory user confirmation until parsing confidence exceeds threshold), and manual entry.
+A parsed electricity bill or IEC smart-meter CSV upload, including billing period, total kWh, and hourly intervals if present. Schema also reserves a current-supplier/current-plan pair on the Bill Import itself (for a future PDF-extraction flow where the bill document states the supplier), but it's never populated today — the smart-meter CSV parser always writes it as null, and the Current Plan Baseline instead reads current supplier/plan from the Home Profile, independent of any Bill Import. Of the three input modes named in the schema — IEC smart-meter CSV (structured, reliable), LLM-based PDF extraction, and manual entry — only the smart-meter CSV path is actually implemented; PDF extraction and manual entry exist only as schema literals with no parser, mutation, or upload UI behind them yet.
 _Avoid_: Upload, file, usage data
 
 **Parsing Confidence**:

@@ -458,7 +458,7 @@ export const run = internalMutation({
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
-          membershipRequired: "HOT, Next, or HOT Mobile",
+          membershipRequired: "HOT triple, or HOT Mobile",
           residentialOnly: true,
           coverageAreas: [],
         },

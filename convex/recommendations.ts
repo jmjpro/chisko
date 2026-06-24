@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { Doc, Id } from "./_generated/dataModel";
 import {
   buildAssumptions,
+  calcCurrentPlanSavingsAgorot,
   calcSavingsAgorot,
   checkEligibility,
   computeWindowFractions,
@@ -14,6 +15,7 @@ import {
 
 export {
   buildAssumptions,
+  calcCurrentPlanSavingsAgorot,
   calcSavingsAgorot,
   checkEligibility,
   computeWindowFractions,
@@ -137,7 +139,7 @@ export const generate = mutation({
       );
     const iecRate = iecRateDoc.rateAgorotPerKwh;
 
-    const baselineAnnualCostAgorot = Math.round(annualKwh * iecRate);
+    const flatBaselineAnnualCostAgorot = Math.round(annualKwh * iecRate);
 
     // ── TAOZ baseline (smart-meter CSV with all four TAOZ buckets only) ───────
     let taozBaselineAnnualCostAgorot: number | null = null;
@@ -196,6 +198,26 @@ export const generate = mutation({
       }
     }
 
+    // ── Current Plan Baseline (ADR-0024) ─────────────────────────────────────
+    const currentPv = profile.currentPlanId
+      ? (activePvs.find((pv) => pv.planId === profile.currentPlanId) ?? null)
+      : null;
+    const currentPlan = currentPv
+      ? (planCache.get(currentPv.planId) ?? null)
+      : null;
+    const currentPlanSavingsAgorot = calcCurrentPlanSavingsAgorot(
+      currentPv,
+      currentPlan,
+      annualKwh,
+      weekdayDay,
+      weekdayNight,
+      weekendDay,
+      weekendNight,
+      iecRate,
+    );
+    const baselineAnnualCostAgorot =
+      flatBaselineAnnualCostAgorot - currentPlanSavingsAgorot;
+
     // ── Evaluate each plan version ───────────────────────────────────────────
     type Evaluated = {
       pvId: Id<"planVersions">;
@@ -233,7 +255,7 @@ export const generate = mutation({
             weekendDay,
             weekendNight,
             iecRate,
-          )
+          ) - currentPlanSavingsAgorot
         : 0;
 
       evaluated.push({

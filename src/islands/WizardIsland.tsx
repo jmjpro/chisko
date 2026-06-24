@@ -70,6 +70,7 @@ function WizardPage() {
   const [currentSupplierId, setCurrentSupplierId] =
     useState<Id<"suppliers"> | null>(null);
   const [supplierSelectValue, setSupplierSelectValue] = useState("iec");
+  const [currentPlanId, setCurrentPlanId] = useState<Id<"plans"> | null>(null);
 
   // Usage fields
   const [workFromHome, setWorkFromHome] = useState<
@@ -94,7 +95,12 @@ function WizardPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [resultError, setResultError] = useState<string | null>(null);
+  const [noChangeNotice, setNoChangeNotice] = useState(false);
   const hasStartedGenerating = useRef(false);
+  const previousPrimaryRef = useRef<{
+    pvId: Id<"planVersions">;
+    savings: number;
+  } | null>(null);
 
   // Convex mutations / queries
   const getOrCreateSession = useMutation(api.sessions.getOrCreate);
@@ -103,6 +109,10 @@ function WizardPage() {
   const upsertHomeProfile = useMutation(api.homeProfiles.upsert);
   const generateRecommendation = useMutation(api.recommendations.generate);
   const suppliers = useQuery(api.suppliers.list);
+  const plansForCurrentSupplier = useQuery(
+    api.plans.listForSupplier,
+    currentSupplierId ? { supplierId: currentSupplierId } : "skip",
+  );
   const rec = useQuery(
     api.recommendations.getForSession,
     sessionId && step === 4 ? { sessionId } : "skip",
@@ -171,6 +181,18 @@ function WizardPage() {
     void handleGenerateRecommendation();
   }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // After a recalculate, flag when the new recommendation didn't change
+  useEffect(() => {
+    if (rec === undefined || rec === null) return;
+    const prev = previousPrimaryRef.current;
+    if (!prev) return;
+    setNoChangeNotice(
+      rec.primaryPlanVersionId === prev.pvId &&
+        rec.primaryAnnualSavingsAgorot === prev.savings,
+    );
+    previousPrimaryRef.current = null;
+  }, [rec]);
+
   // ── Handlers ─────────────────────────────────────────────────────────────
 
   function handleMeterChoice(choice: "yes" | "no") {
@@ -211,6 +233,7 @@ function WizardPage() {
     setCurrentSupplierId(
       rawValue && rawValue !== "iec" ? (rawValue as Id<"suppliers">) : null,
     );
+    setCurrentPlanId(null);
   }
 
   function toggleMembership(name: string, checked: boolean) {
@@ -253,8 +276,15 @@ function WizardPage() {
 
   async function handleGenerateRecommendation() {
     if (!sessionId) return;
+    const previousPrimary = rec
+      ? {
+          pvId: rec.primaryPlanVersionId,
+          savings: rec.primaryAnnualSavingsAgorot,
+        }
+      : null;
     setGenerating(true);
     setResultError(null);
+    setNoChangeNotice(false);
     try {
       const hpId = await upsertHomeProfile({
         sessionId,
@@ -264,7 +294,7 @@ function WizardPage() {
         ...(cascadeStreetName ? { street: cascadeStreetName } : {}),
         ...(cascadeHouseNumber ? { houseNumber: cascadeHouseNumber } : {}),
         currentSupplierId,
-        currentPlanId: null,
+        currentPlanId,
         approximateMonthlyKwh: null,
         workFromHome,
         hasEv,
@@ -279,6 +309,7 @@ function WizardPage() {
         homeProfileId: hpId,
         billImportId,
       });
+      previousPrimaryRef.current = previousPrimary;
     } catch {
       setResultError(tw("result_error"));
     } finally {
@@ -334,6 +365,11 @@ function WizardPage() {
     toggleMembership,
     clearMemberships: () => setBundleMemberships([]),
     israelPlaces,
+    currentSupplierId,
+    currentPlanId,
+    onCurrentPlanChange: (planId: string | null) =>
+      setCurrentPlanId(planId as Id<"plans"> | null),
+    plansForCurrentSupplier,
   };
 
   const usageFieldsProps = {
@@ -411,6 +447,7 @@ function WizardPage() {
             evaluatedPlans={evaluatedPlans}
             generating={generating}
             resultError={resultError}
+            noChangeNotice={noChangeNotice}
             onRecalculate={() => void handleGenerateRecommendation()}
             effectiveHasSmartMeter={effectiveHasSmartMeter}
             onFileUpload={(file) => void handleFileUpload(file)}

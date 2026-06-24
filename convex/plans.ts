@@ -1,4 +1,29 @@
 import { query } from "./_generated/server";
+import { v } from "convex/values";
+
+/**
+ * Plans of a given supplier that currently have an active plan version —
+ * powers the Current Plan Baseline picker (ADR-0024).
+ */
+export const listForSupplier = query({
+  args: { supplierId: v.id("suppliers") },
+  handler: async (ctx, { supplierId }) => {
+    const plans = await ctx.db
+      .query("plans")
+      .withIndex("by_supplier", (q) => q.eq("supplierId", supplierId))
+      .collect();
+
+    const activePvs = await ctx.db
+      .query("planVersions")
+      .withIndex("by_effective_to", (q) => q.eq("effectiveTo", null))
+      .collect();
+    const activePlanIds = new Set(activePvs.map((pv) => pv.planId));
+
+    return plans
+      .filter((p) => activePlanIds.has(p._id))
+      .map((p) => ({ _id: p._id, name: p.name, planType: p.planType }));
+  },
+});
 
 export const listActive = query({
   args: {},
