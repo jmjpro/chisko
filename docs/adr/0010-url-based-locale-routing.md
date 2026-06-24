@@ -42,9 +42,9 @@ The Astro middleware is compiled as a **Vercel Edge route handler**, not a globa
 
 ## Astro 6 Dev Mode Caveat
 
-In Astro 6 dev mode, the middleware receives an **empty headers object** for requests to prerendered pages. `request.headers.get("accept-language")` returns `null` in dev, so the redirect never fires locally. This is a known dev-mode limitation: the Astro dev server does not replicate edge middleware header forwarding. In the Vercel production deployment the edge function receives the full request headers and the redirect works correctly.
+In Astro 6 dev mode, Astro's own route handling receives an **empty headers object** for requests to prerendered pages, so `request.headers.get("accept-language")` would return `null` if `middleware.ts` were invoked through Astro's normal pipeline. `localeDevMiddleware.ts` (an `astro:server:setup` integration registered in `astro.config.mjs`) works around this by running `middleware.ts` directly against the dev server's raw Connect request — which still has real headers — before Astro's pipeline ever sees it. This makes the locale redirect observable under `npm run dev` / `astro dev`, matching the Vercel production edge function, without changing the compiled production middleware at all.
 
-As a result, the `parseAcceptLanguage` logic is covered by unit tests (`src/middleware.test.ts`) rather than e2e tests, which cannot observe the redirect in the local dev environment.
+As a result, the `parseAcceptLanguage` logic is covered by unit tests (`middleware.test.ts`) and can also be exercised manually (or via e2e) against the local dev server.
 
 ## Consequences
 
