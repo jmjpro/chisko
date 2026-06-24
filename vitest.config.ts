@@ -18,6 +18,7 @@ export default defineConfig({
             "scripts/**/*.test.ts",
             "src/**/*.test.ts",
             "middleware.test.ts",
+            "localeDevMiddleware.test.ts",
           ],
           environment: "node",
         },

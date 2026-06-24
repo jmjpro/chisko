@@ -6,6 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import localeDevMiddleware from "./localeDevMiddleware.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -24,6 +25,7 @@ export default defineConfig({
   adapter: vercel(),
   integrations: [
     react(),
+    localeDevMiddleware(),
     // Runtime SDK options (dsn, environment, beforeSend, replay sampling) live in
     // sentry.client.config.ts. org/project/authToken are read from SENTRY_ORG /
     // SENTRY_PROJECT / SENTRY_AUTH_TOKEN — source maps only upload when a token is set.
