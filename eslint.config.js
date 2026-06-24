@@ -13,6 +13,7 @@ export default defineConfig([
       "dist",
       ".astro",
       ".vercel",
+      ".claude/worktrees",
       "eslint.config.js",
       "convex/_generated",
       "postcss.config.js",
