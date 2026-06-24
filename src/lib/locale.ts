@@ -4,6 +4,20 @@ export const PREFIXED_LOCALES = ["en", "ar", "ru"] as const;
 
 export const LANG_COOKIE = "chisko_lang";
 
+export function localeStaticPaths() {
+  return PREFIXED_LOCALES.map((locale) => ({ params: { locale } }));
+}
+
+export function buildLangSwitchUrls(path: string): Record<Locale, string> {
+  const suffix = path === "/" ? "/" : path;
+  return {
+    he: path,
+    en: `/en${suffix}`,
+    ar: `/ar${suffix}`,
+    ru: `/ru${suffix}`,
+  };
+}
+
 export function parseAcceptLanguage(header: string | null): Locale {
   if (!header) return "he";
   const tags = header.split(",").map((entry) => {

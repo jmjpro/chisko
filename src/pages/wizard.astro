@@ -2,11 +2,12 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WizardIsland from "../islands/WizardIsland";
 import { getConvexUrl } from "../lib/getConvexUrl";
+import { wizardByLocale } from "../lib/wizardLocale";
 
 const locale = "he";
 const convexUrl = getConvexUrl(import.meta.env.VITE_CONVEX_URL);
 ---
 
-<BaseLayout locale={locale} title="Chisko — אשף">
+<BaseLayout locale={locale} title={`Chisko — ${wizardByLocale[locale].page_title}`}>
   <WizardIsland client:only="react" locale={locale} convexUrl={convexUrl} />
 </BaseLayout>

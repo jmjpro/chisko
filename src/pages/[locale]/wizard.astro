@@ -2,26 +2,18 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import WizardIsland from "../../islands/WizardIsland";
 import { getConvexUrl } from "../../lib/getConvexUrl";
+import { localeStaticPaths, type Locale } from "../../lib/locale";
+import { wizardByLocale } from "../../lib/wizardLocale";
 
 export function getStaticPaths() {
-  return [
-    { params: { locale: "en" } },
-    { params: { locale: "ar" } },
-    { params: { locale: "ru" } },
-  ];
+  return localeStaticPaths();
 }
 
 const { locale } = Astro.params;
 
-const titles: Record<string, string> = {
-  en: "Chisko — Wizard",
-  ar: "Chisko — المعالج",
-  ru: "Chisko — Мастер",
-};
-
 const convexUrl = getConvexUrl(import.meta.env.VITE_CONVEX_URL);
 ---
 
-<BaseLayout locale={locale} title={titles[locale] ?? "Chisko"}>
+<BaseLayout locale={locale} title={`Chisko — ${wizardByLocale[locale as Locale].page_title}`}>
   <WizardIsland client:only="react" locale={locale} convexUrl={convexUrl} />
 </BaseLayout>
