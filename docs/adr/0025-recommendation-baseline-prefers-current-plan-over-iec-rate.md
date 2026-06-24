@@ -1,0 +1,13 @@
+# Recommendation savings baseline prefers the user's current plan over the flat IEC rate
+
+CHI-25 started as a "Recalculate seems to have no effect" bug report. Investigation showed several Home Profile fields editable on the results review panel — current supplier, current plan, bundle memberships — had no path into the recommendation engine at all: `generate()` always computed `baselineAnnualCostAgorot` from the flat IEC rate (`annualKwh * iecRate`), regardless of what the user was actually paying today. Editing "current supplier" could never change anything, by construction.
+
+Decided: when the Home Profile records a known current plan (`currentPlanId`), the baseline and every candidate plan's displayed savings are computed relative to that plan's actual cost instead of the IEC rate — reusing the existing `calcSavingsAgorot` function to derive the current plan's own savings-vs-IEC, then subtracting that from both the baseline and every candidate's savings. When no current plan is known (supplier is IEC, "don't know", or the user skips plan selection), the baseline falls back to the flat IEC rate exactly as today. This choice is independent of whether a Bill Import (smart-meter CSV) is present — bill data only affects usage-estimation confidence (annual kWh, day/night buckets), not which baseline is used; the two are orthogonal.
+
+A consequence of comparing against a real current plan: a candidate can now show *negative* savings (switching would cost more than staying), which was structurally impossible against the always-beatable flat IEC rate. Decided to still surface the closest/least-bad candidate in that case, clearly labeled as costing more than the current plan, rather than hiding the Primary Recommendation card or silently excluding negative-savings plans via `checkEligibility`.
+
+## Considered Options
+
+- **Optional current-plan selection, IEC fallback (chosen)**: new plan-picker step on the Home step, shown only when a non-IEC/non-"don't know" supplier is selected, covering all of that supplier's plan types (Fixed/Day/Night). Skipping it (or not knowing the exact plan) keeps today's IEC-rate behavior, explained to the user via a popover. Lowest friction; degrades gracefully like `approximateMonthlyKwh` already does.
+- **Require current-plan selection whenever a real supplier is picked**: rejected — forces users who don't know their exact plan name to either guess or get stuck, for a comparison that's a nice-to-have, not the product's core value.
+- **Exclude negative-savings candidates as ineligible**: rejected — would make the Primary Recommendation card disappear entirely for users who are already on a good plan, which reads as broken rather than reassuring.

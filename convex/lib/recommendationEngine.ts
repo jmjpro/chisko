@@ -92,9 +92,16 @@ export function checkEligibility(
   }
 
   if (e.membershipRequired !== null) {
-    // Compound requirements use " + " as separator, e.g. "HOT triple + HOT Mobile"
-    const required = e.membershipRequired.split(" + ");
-    if (!required.every((r) => p.bundleMemberships.includes(r))) {
+    // " + "-separated means every named membership is required;
+    // ", or"-separated means any one of them suffices.
+    const isAnyOf = e.membershipRequired.includes(", or");
+    const required = isAnyOf
+      ? e.membershipRequired.split(", or").map((r) => r.trim())
+      : e.membershipRequired.split(" + ");
+    const satisfied = isAnyOf
+      ? required.some((r) => p.bundleMemberships.includes(r))
+      : required.every((r) => p.bundleMemberships.includes(r));
+    if (!satisfied) {
       return {
         isEligible: false,
         ineligibilityReason: JSON.stringify({
@@ -143,6 +150,35 @@ export function computeWindowFractions(
     dayFraction: dayHours / DAY_HOURS,
     nightFraction: (totalHours - dayHours) / NIGHT_HOURS,
   };
+}
+
+/**
+ * The Current Plan Baseline (ADR-0025): the household's current plan, evaluated
+ * through the same savings-vs-IEC-Rate calculation as any candidate. Returns 0
+ * (no adjustment, IEC Rate baseline applies) when the current plan is unknown
+ * or has no active plan version.
+ */
+export function calcCurrentPlanSavingsAgorot(
+  currentPv: PlanVersion | null,
+  currentPlan: Plan | null,
+  annualKwh: number,
+  weekdayDay: number,
+  weekdayNight: number,
+  weekendDay: number,
+  weekendNight: number,
+  iecRate: number,
+): number {
+  if (!currentPv || !currentPlan) return 0;
+  return calcSavingsAgorot(
+    currentPv,
+    currentPlan,
+    annualKwh,
+    weekdayDay,
+    weekdayNight,
+    weekendDay,
+    weekendNight,
+    iecRate,
+  );
 }
 
 export function calcSavingsAgorot(

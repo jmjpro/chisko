@@ -50,6 +50,7 @@ export interface ResultsStepProps {
   evaluatedPlans: EvaluatedPlan[] | undefined;
   generating: boolean;
   resultError: string | null;
+  noChangeNotice: boolean;
   onRecalculate: () => void;
   effectiveHasSmartMeter: "yes" | "no" | null;
   onFileUpload: (file: File) => void;
@@ -75,6 +76,7 @@ export default function ResultsStep({
   evaluatedPlans,
   generating,
   resultError,
+  noChangeNotice,
   onRecalculate,
   effectiveHasSmartMeter,
   onFileUpload,
@@ -258,7 +260,11 @@ export default function ResultsStep({
       return <p className="text-destructive">{resultError}</p>;
     }
 
-    if (generating || rec === undefined) {
+    if (
+      generating ||
+      rec === undefined ||
+      (rec !== null && evaluatedPlans === undefined)
+    ) {
       return (
         <div className="text-center py-12">
           <p className="text-muted-foreground text-lg">
@@ -378,6 +384,11 @@ export default function ResultsStep({
         >
           {tw("recalculate")}
         </Button>
+        {noChangeNotice && (
+          <p className="text-sm text-muted-foreground mt-2 text-center">
+            {tw("recalculate_no_effect")}
+          </p>
+        )}
       </div>
     </WizardStep>
   );

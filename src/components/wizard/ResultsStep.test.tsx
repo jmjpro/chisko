@@ -51,7 +51,9 @@ const recommendationId = "rec1" as Id<"recommendations">;
 const primaryPlanVersionId = "pv1" as Id<"planVersions">;
 const primarySupplierId = "supplier1" as Id<"suppliers">;
 
-function baseProps(): ResultsStepProps {
+function baseProps(
+  overrides: Partial<ResultsStepProps> = {},
+): ResultsStepProps {
   const homeFields = {
     placeOfResidence: null,
     setPlaceOfResidence: vi.fn(),
@@ -63,6 +65,10 @@ function baseProps(): ResultsStepProps {
     toggleMembership: vi.fn(),
     clearMemberships: vi.fn(),
     israelPlaces: [],
+    currentSupplierId: null,
+    currentPlanId: null,
+    onCurrentPlanChange: vi.fn(),
+    plansForCurrentSupplier: undefined,
   };
   const usageFields = {
     workFromHome: "sometimes" as const,
@@ -110,6 +116,7 @@ function baseProps(): ResultsStepProps {
     ],
     generating: false,
     resultError: null,
+    noChangeNotice: false,
     onRecalculate: vi.fn(),
     effectiveHasSmartMeter: null,
     onFileUpload: vi.fn(),
@@ -119,8 +126,74 @@ function baseProps(): ResultsStepProps {
     setUploadError: vi.fn(),
     homeFields,
     usageFields,
+    ...overrides,
   };
 }
+
+const rec: ResultsStepProps["rec"] = {
+  _id: "rec1" as Id<"recommendations">,
+  primaryPlanVersionId: "pv1" as Id<"planVersions">,
+  primaryAnnualSavingsAgorot: 5000,
+  noChangePlanVersionId: "pv1" as Id<"planVersions">,
+  noChangePlanAnnualSavingsAgorot: 5000,
+  showNoChangeSeparately: false,
+  confidenceLevel: "high",
+  assumptions: "[]",
+  baselineAnnualCostAgorot: 100_000,
+};
+
+describe("ResultsStep recalculate flicker", () => {
+  it("keeps showing the loading state while evaluatedPlans re-subscribes after rec changes, instead of dropping the card", () => {
+    render(
+      <ResultsStep
+        {...baseProps({ rec, evaluatedPlans: undefined, generating: false })}
+      />,
+    );
+
+    expect(screen.getByText("result_loading")).toBeInTheDocument();
+  });
+
+  it("renders the primary plan card once both rec and evaluatedPlans have settled", () => {
+    render(
+      <ResultsStep
+        {...baseProps({
+          rec,
+          evaluatedPlans: [
+            {
+              planVersionId: rec.primaryPlanVersionId,
+              isEligible: true,
+              annualSavingsAgorot: 5000,
+              supplier: { name: "Acme Power" },
+              plan: { name: "Acme Fixed", planType: "fixed" },
+              planVersion: {
+                discountPercent: 7,
+                weekdayWindowOnly: false,
+              },
+            },
+          ],
+          generating: false,
+        })}
+      />,
+    );
+
+    expect(screen.queryByText("result_loading")).not.toBeInTheDocument();
+    expect(screen.getByText(/Acme Power/)).toBeInTheDocument();
+  });
+});
+
+describe("ResultsStep recalculate no-effect notice", () => {
+  it("shows a notice when recalculating produced the same recommendation", () => {
+    render(<ResultsStep {...baseProps({ rec, noChangeNotice: true })} />);
+
+    expect(screen.getByText("recalculate_no_effect")).toBeInTheDocument();
+  });
+
+  it("does not show the notice by default", () => {
+    render(<ResultsStep {...baseProps({ rec })} />);
+
+    expect(screen.queryByText("recalculate_no_effect")).not.toBeInTheDocument();
+  });
+});
 
 describe("ResultsStep — leave-details CTA wiring", () => {
   it("opens the lead-capture dialog wired to the clicked card's supplier and plan", async () => {

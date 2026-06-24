@@ -294,6 +294,40 @@ describe("checkEligibility", () => {
     expect(isEligible).toBe(true);
   });
 
+  it("any-of membership (', or'-separated) — one matches → eligible", () => {
+    const { isEligible } = checkEligibility(
+      planVersion({
+        eligibility: {
+          requiresSmartMeter: false,
+          membershipRequired: "HOT triple, or HOT Mobile",
+          residentialOnly: true,
+          coverageAreas: [],
+        },
+      }),
+      plan("fixed"),
+      profile({ bundleMemberships: ["HOT Mobile"] }),
+      "high",
+    );
+    expect(isEligible).toBe(true);
+  });
+
+  it("any-of membership (', or'-separated) — none match → ineligible", () => {
+    const { isEligible } = checkEligibility(
+      planVersion({
+        eligibility: {
+          requiresSmartMeter: false,
+          membershipRequired: "HOT triple, or HOT Mobile",
+          residentialOnly: true,
+          coverageAreas: [],
+        },
+      }),
+      plan("fixed"),
+      profile({ bundleMemberships: ["Cellcom"] }),
+      "high",
+    );
+    expect(isEligible).toBe(false);
+  });
+
   it("compound membership — partial → ineligible", () => {
     const { isEligible } = checkEligibility(
       planVersion({
