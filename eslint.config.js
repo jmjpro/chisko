@@ -77,6 +77,18 @@ export default defineConfig([
       // Allow async functions without await
       // for consistency (esp. Convex `handler`s)
       "@typescript-eslint/require-await": "off",
+
+      // This project uses Base UI, not Radix — Base UI primitives take a
+      // `render` prop instead of `asChild` and silently ignore `asChild`,
+      // which causes nested-element hydration bugs (see CHI-79).
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "JSXAttribute[name.name=\"asChild\"]",
+          message:
+            "asChild is a Radix prop and has no effect on this project's Base UI primitives. Use the `render` prop instead.",
+        },
+      ],
     },
   },
   ...convexPlugin.configs.recommended,
