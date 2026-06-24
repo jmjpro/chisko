@@ -337,6 +337,45 @@ test("getFanOutScope excludes suppliers already referred earlier in the same ses
   ]);
 });
 
+test("getFanOutScope excludes a supplier already click-through-referred earlier in the same session", async () => {
+  const t = convexTest(schema, modules);
+  const sessionId = await seedSession(t);
+  const { supplierId: referredSupplierId } = await seedSupplierAndPlan(t);
+  const {
+    supplierId: clickThroughSupplierId,
+    planVersionId: clickThroughPlanVersionId,
+  } = await seedSupplierAndPlan(t, {
+    supportedHandoffTypes: ["clickThrough", "formHandoff"],
+    affiliateUrl: "https://onboarding.super-power.co.il/?refcode=abc&refid=def",
+  });
+  const {
+    supplierId: untouchedSupplierId,
+    planVersionId: untouchedPlanVersionId,
+  } = await seedSupplierAndPlan(t);
+
+  // A click-through click earlier in this session already holds a Referral
+  // to clickThroughSupplierId — no Lead involved.
+  await t.mutation(api.referrals.recordClickThrough, {
+    sessionId,
+    supplierId: clickThroughSupplierId,
+    planVersionId: clickThroughPlanVersionId,
+  });
+
+  const scope = await t.query(api.leads.getFanOutScope, {
+    sessionId,
+    excludeSupplierId: referredSupplierId,
+  });
+
+  expect(scope).toEqual([
+    {
+      supplierId: untouchedSupplierId,
+      planVersionId: untouchedPlanVersionId,
+      supplierName: "Test Supplier",
+      logoFileName: "testSupplier.webp",
+    },
+  ]);
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // confirmSupplierFanOut
 // ─────────────────────────────────────────────────────────────────────────────

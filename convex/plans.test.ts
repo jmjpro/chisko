@@ -135,3 +135,17 @@ test("listActive includes the supplierId for each row, for lead-capture CTA wiri
   expect(rows).toHaveLength(1);
   expect(rows[0]).toMatchObject({ supplierId, supplierName: "Test Supplier" });
 });
+
+test("listActive includes supportedHandoffTypes for each row, for the click-through CTA gate", async () => {
+  const t = convexTest(schema, modules);
+  await seedSupplierAndPlan(t, {
+    supportedHandoffTypes: ["clickThrough", "formHandoff"],
+  });
+
+  const rows = await t.query(api.plans.listActive, {});
+
+  expect(rows).toHaveLength(1);
+  expect(rows[0]).toMatchObject({
+    supportedHandoffTypes: ["clickThrough", "formHandoff"],
+  });
+});

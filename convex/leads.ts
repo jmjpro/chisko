@@ -107,6 +107,17 @@ async function getAlreadyReferredSupplierIds(
       supplierIds.add(referral.supplierId);
     }
   }
+
+  // Click-through Referrals have no Lead — they're tied to the session
+  // directly, so they need their own lookup to be excluded from Fan-Out.
+  const sessionReferrals = await ctx.db
+    .query("referrals")
+    .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
+    .collect();
+  for (const referral of sessionReferrals) {
+    supplierIds.add(referral.supplierId);
+  }
+
   return supplierIds;
 }
 
@@ -219,6 +230,10 @@ export const getReferralEmailDetails = internalQuery({
   handler: async (ctx, args) => {
     const referral = await ctx.db.get("referrals", args.referralId);
     if (!referral) throw new Error(`Referral ${args.referralId} not found`);
+    // Only formSubmissionDeliveries rows trigger this query, and those only
+    // ever exist for form-handoff Referrals, which always have a leadId.
+    if (!referral.leadId)
+      throw new Error(`Referral ${args.referralId} has no leadId`);
     const lead = await ctx.db.get("leads", referral.leadId);
     if (!lead) throw new Error(`Lead ${referral.leadId} not found`);
     const supplier = await ctx.db.get("suppliers", referral.supplierId);

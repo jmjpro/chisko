@@ -186,6 +186,7 @@ export const run = internalMutation({
       discountPercent: number;
       annualSavingsCapAgorot?: number;
       benefitDelivery: "billDiscount" | "appCredit";
+      affiliateUrl?: string; // click-through handoff only — see ADR-0026
       discountWindowStartHour?: number;
       discountWindowEndHour?: number;
       weekdayWindowOnly: boolean;
@@ -244,6 +245,8 @@ export const run = internalMutation({
         planSeedId: "electra_fixed_6_5",
         discountPercent: 6.5,
         benefitDelivery: "billDiscount",
+        affiliateUrl:
+          "https://onboarding.super-power.co.il/?refcode=a8FSq0000009W0fMAE&refid=005Sq000000gGbRIAU",
         weekdayWindowOnly: false,
         eligibility: {
           requiresSmartMeter: false,
@@ -487,6 +490,9 @@ export const run = internalMutation({
           annualSavingsCapAgorot: pv.annualSavingsCapAgorot,
         }),
         benefitDelivery: pv.benefitDelivery,
+        ...(pv.affiliateUrl !== undefined && {
+          affiliateUrl: pv.affiliateUrl,
+        }),
         ...(pv.discountWindowStartHour !== undefined && {
           discountWindowStartHour: pv.discountWindowStartHour,
         }),

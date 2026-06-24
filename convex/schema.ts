@@ -24,7 +24,6 @@ export default defineSchema({
     ),
     initialPayoutState: v.string(),
     // Handoff config
-    trackingUrlTemplate: v.optional(v.string()), // click-through
     formHandoffWebhookUrl: v.optional(v.string()), // form handoff
   }),
 
@@ -98,6 +97,12 @@ export default defineSchema({
       residentialOnly: v.boolean(),
       coverageAreas: v.array(v.string()),
     }),
+    // Affiliate Reference (click-through handoff only) — the complete outbound
+    // URL with the supplier's tracking params already applied, e.g.
+    // "https://onboarding.super-power.co.il/?refcode=...&refid=...". Lives here
+    // rather than on suppliers since a plan revision can need a new one even
+    // when discount terms don't change (see ADR-0026).
+    affiliateUrl: v.optional(v.string()),
   })
     .index("by_plan", ["planId"])
     .index("by_plan_and_effective_from", ["planId", "effectiveFrom"])
@@ -263,8 +268,13 @@ export default defineSchema({
 
   // A handoff event when a lead is sent to a specific supplier.
   // Per-supplier consent is captured at this moment (not upfront in ToS).
+  // Click-through Referrals are anonymous: no leadId, identified instead by
+  // sessionId + clickId. Form-handoff and phone-based Referrals always have
+  // a leadId and no sessionId/clickId.
   referrals: defineTable({
-    leadId: v.id("leads"),
+    leadId: v.optional(v.id("leads")),
+    sessionId: v.optional(v.id("sessions")),
+    clickId: v.optional(v.string()),
     supplierId: v.id("suppliers"),
     planVersionId: v.id("planVersions"),
     handoffType: v.union(
@@ -278,7 +288,9 @@ export default defineSchema({
   })
     .index("by_lead", ["leadId"])
     .index("by_supplier", ["supplierId"])
-    .index("by_lead_and_supplier", ["leadId", "supplierId"]),
+    .index("by_lead_and_supplier", ["leadId", "supplierId"])
+    .index("by_session", ["sessionId"])
+    .index("by_click_id", ["clickId"]),
 
   // Tracks relaying a form-handoff Referral's details onward to the supplier
   // (today: a notification email; see ADR-0022). One row per form-handoff
