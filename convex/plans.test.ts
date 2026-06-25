@@ -136,6 +136,16 @@ test("listActive includes the supplierId for each row, for lead-capture CTA wiri
   expect(rows[0]).toMatchObject({ supplierId, supplierName: "Test Supplier" });
 });
 
+test("listActive includes the supplier's logoFileName for each row, to render the supplier logo", async () => {
+  const t = convexTest(schema, modules);
+  await seedSupplierAndPlan(t);
+
+  const rows = await t.query(api.plans.listActive, {});
+
+  expect(rows).toHaveLength(1);
+  expect(rows[0]).toMatchObject({ logoFileName: "testSupplier.webp" });
+});
+
 test("listActive includes supportedHandoffTypes for each row, for the click-through CTA gate", async () => {
   const t = convexTest(schema, modules);
   await seedSupplierAndPlan(t, {

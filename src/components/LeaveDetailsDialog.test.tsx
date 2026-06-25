@@ -105,6 +105,39 @@ describe("LeaveDetailsDialog", () => {
     expect(screen.getByText("Other Supplier")).toBeInTheDocument();
   });
 
+  it("renders each fan-out supplier's logo with a meaningful alt, lazy loading, and explicit dimensions", async () => {
+    mockSubmitLeadForm.mockResolvedValue({
+      leadId: "lead1" as Id<"leads">,
+      referralId: "referral1" as Id<"referrals">,
+    });
+    mockConvexQuery.mockResolvedValue([
+      {
+        supplierId: otherSupplierId,
+        planVersionId: otherPlanVersionId,
+        supplierName: "Other Supplier",
+        logoFileName: "other.webp",
+      },
+    ]);
+
+    await openDialog();
+    await userEvent.type(
+      screen.getByLabelText("lead_form_name_label"),
+      "Yossi",
+    );
+    await userEvent.type(
+      screen.getByLabelText("lead_form_phone_label"),
+      "0501234567",
+    );
+    await userEvent.click(screen.getByText("lead_form_submit"));
+    await screen.findByText("fan_out_title");
+
+    const logo = screen.getByAltText("Other Supplier");
+    expect(logo).toHaveAttribute("src", "/suppliers/other.webp");
+    expect(logo).toHaveAttribute("loading", "lazy");
+    expect(logo).toHaveAttribute("width", "40");
+    expect(logo).toHaveAttribute("height", "40");
+  });
+
   it("blocks submission and shows errors for missing name/phone, without calling submitLeadForm", async () => {
     await openDialog();
 

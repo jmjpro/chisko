@@ -13,6 +13,7 @@ interface PlanRow {
   supportedHandoffTypes: string[];
   planType: string;
   supplierName: string;
+  logoFileName: string;
   discountPercent: number;
   window: string;
   weekdayOnly: string;
@@ -84,7 +85,17 @@ const filterOptions = buildFilterOptions(rows, common);
               class="plan-row border rounded-lg p-4 md:rounded-none md:border-0 md:border-b md:p-0 last:md:border-0"
             >
               <div role="cell" class="cell-supplier font-semibold md:font-normal md:pe-6 md:py-3">
-                {row.supplierLabel}
+                <div class="flex items-center gap-3">
+                  <img
+                    src={`/suppliers/${row.logoFileName}`}
+                    alt={row.supplierLabel}
+                    loading="lazy"
+                    width={48}
+                    height={48}
+                    class="h-12 w-12 md:h-10 md:w-10 object-contain shrink-0"
+                  />
+                  {row.supplierLabel}
+                </div>
               </div>
               <div role="cell" class="cell-plan text-sm text-gray-600 md:text-foreground md:pe-6 md:py-3">
                 {row.planLabel}
@@ -137,6 +148,10 @@ const filterOptions = buildFilterOptions(rows, common);
 
 <style>
   .plan-header-row {
+    display: none;
+  }
+
+  .plan-row.hidden {
     display: none;
   }
 

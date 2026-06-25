@@ -27,8 +27,16 @@ function baseFilterOptions() {
       { value: "night", label: "Night" },
     ],
     suppliers: [
-      { value: "Bezek Electricity", label: "Bezek Electricity Co." },
-      { value: "Acme Power", label: "Acme Power" },
+      {
+        value: "Bezek Electricity",
+        label: "Bezek Electricity Co.",
+        logoFileName: "bezek.webp",
+      },
+      {
+        value: "Acme Power",
+        label: "Acme Power",
+        logoFileName: "acme.webp",
+      },
     ],
   };
 }
@@ -97,11 +105,28 @@ describe("PlanFilterSortIsland", () => {
     expect(screen.getByRole("checkbox", { name: "Day" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Night" })).toBeInTheDocument();
     expect(
-      screen.getByRole("checkbox", { name: "Bezek Electricity Co." }),
+      screen.getByRole("checkbox", { name: /Bezek Electricity Co\./ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("checkbox", { name: "Acme Power" }),
+      screen.getByRole("checkbox", { name: /Acme Power/ }),
     ).toBeInTheDocument();
+  });
+
+  it("renders a logo before each supplier label, sized for the filter checkboxes", () => {
+    render(
+      <PlanFilterSortIsland locale="en" filterOptions={baseFilterOptions()} />,
+    );
+
+    const label = screen
+      .getByRole("checkbox", { name: /Bezek Electricity Co\./ })
+      .closest("label");
+    const logo = label?.querySelector("img");
+
+    expect(logo).toHaveAttribute("src", "/suppliers/bezek.webp");
+    expect(logo).toHaveAttribute("alt", "Bezek Electricity Co.");
+    expect(logo).toHaveAttribute("loading", "lazy");
+    expect(logo).toHaveAttribute("width", "40");
+    expect(logo).toHaveAttribute("height", "40");
   });
 
   it("renders a mobile sort-by select listing discount, supplier, and plan type", () => {
@@ -154,7 +179,7 @@ describe("PlanFilterSortIsland", () => {
     ).not.toHaveClass("hidden");
 
     await userEvent.click(
-      screen.getByRole("checkbox", { name: "Bezek Electricity Co." }),
+      screen.getByRole("checkbox", { name: /Bezek Electricity Co\./ }),
     );
 
     expect(

@@ -20,6 +20,22 @@ test.describe("Plans page — build-time data fetch", () => {
     const firstRow = page.getByTestId("plan-row").first();
     await expect(firstRow).toBeVisible();
   });
+
+  test("a plan row shows the supplier's logo before the supplier name", async ({
+    page,
+  }) => {
+    await page.goto("/en/plans");
+
+    const row = page
+      .getByTestId("plan-row")
+      .filter({ hasText: "Bezek Electricity" })
+      .first();
+    await expect(row).toBeVisible();
+
+    const logo = row.locator("img").first();
+    await expect(logo).toHaveAttribute("src", /\/suppliers\/.+\.webp$/);
+    await expect(logo).toHaveAttribute("alt", "Bezek Electricity");
+  });
 });
 
 test.describe("Plans page — responsive layout (Hebrew default route)", () => {
@@ -82,6 +98,23 @@ test.describe("Plans page — responsive layout", () => {
 
     // Column header row becomes visible at desktop
     await expect(page.locator('[role="columnheader"]').first()).toBeVisible();
+  });
+
+  test("a plan row shows the supplier's logo at both mobile and desktop viewports", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 600, height: 800 });
+    await page.goto("/en/plans");
+
+    const row = page
+      .getByTestId("plan-row")
+      .filter({ hasText: "Bezek Electricity" })
+      .first();
+    await expect(row).toBeVisible();
+
+    const logo = row.locator("img").first();
+    await expect(logo).toHaveAttribute("src", /\/suppliers\/.+\.webp$/);
+    await expect(logo).toHaveAttribute("alt", "Bezek Electricity");
   });
 
   test("a day/night plan row shows supplier, plan, discount, type, window, and weekday fields", async ({

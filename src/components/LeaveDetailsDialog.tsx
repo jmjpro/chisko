@@ -214,8 +214,11 @@ export default function LeaveDetailsDialog({
                     />
                     <img
                       src={`/suppliers/${item.logoFileName}`}
-                      alt=""
-                      className="h-6 w-6 object-contain"
+                      alt={item.supplierName}
+                      loading="lazy"
+                      width={40}
+                      height={40}
+                      className="h-10 w-10 object-contain"
                     />
                     {item.supplierName}
                   </label>
