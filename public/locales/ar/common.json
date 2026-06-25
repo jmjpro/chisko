@@ -42,5 +42,14 @@
   "fan_out_description": "لدى هؤلاء الموردين أيضًا خطط تناسب استخدامك. يمكنك إلغاء تحديد أي مورد لا يهمك.",
   "fan_out_confirm": "شارك أيضًا مع هؤلاء الموردين",
   "fan_out_decline": "لا، شكرًا",
-  "fan_out_confirmation": "تم إرسال الطلب — سيتواصل معك {{count}} من الموردين"
+  "fan_out_confirmation": "تم إرسال الطلب — سيتواصل معك {{count}} من الموردين",
+  "filter_plan_type_label": "نوع الخطة",
+  "filter_supplier_label": "المورد",
+  "sort_by_label": "الترتيب حسب",
+  "sort_option_discount": "نسبة الخصم",
+  "sort_option_supplier": "اسم المورد",
+  "sort_option_type": "نوع الخطة",
+  "filter_empty_state_message": "لا توجد خطط تطابق عوامل التصفية المحددة.",
+  "filter_clear_button": "إزالة التصفية",
+  "filter_result_count": "عرض {{count}} من {{total}} خطة"
 }

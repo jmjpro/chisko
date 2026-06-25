@@ -42,5 +42,14 @@
   "fan_out_description": "לספקים האלה יש גם תוכניות שמתאימות לצריכה שלכם. אפשר להסיר סימון מכל ספק שלא מעניין אתכם.",
   "fan_out_confirm": "שתפו גם עם הספקים האלה",
   "fan_out_decline": "לא, תודה",
-  "fan_out_confirmation": "הפנייה נשלחה — {{count}} ספקים יצרו איתכם קשר"
+  "fan_out_confirmation": "הפנייה נשלחה — {{count}} ספקים יצרו איתכם קשר",
+  "filter_plan_type_label": "סוג תוכנית",
+  "filter_supplier_label": "ספק",
+  "sort_by_label": "מיון לפי",
+  "sort_option_discount": "אחוז הנחה",
+  "sort_option_supplier": "שם ספק",
+  "sort_option_type": "סוג תוכנית",
+  "filter_empty_state_message": "אין תוכניות שתואמות את הסינון שבחרתם.",
+  "filter_clear_button": "ניקוי סינון",
+  "filter_result_count": "מוצגות {{count}} מתוך {{total}} תוכניות"
 }

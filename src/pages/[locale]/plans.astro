@@ -6,6 +6,7 @@ import { getConvexUrl } from "../../lib/getConvexUrl";
 import { commonByLocale } from "../../lib/commonLocale";
 import { localeStaticPaths, buildLangSwitchUrls, type Locale } from "../../lib/locale";
 import { buildPlanRows } from "../../lib/buildPlanRows";
+import { sortPlanRowsByDiscountDesc } from "../../lib/sortPlanRows";
 
 export function getStaticPaths() {
   return localeStaticPaths();
@@ -25,7 +26,9 @@ const convexUrl = getConvexUrl(import.meta.env.VITE_CONVEX_URL);
 const client = new ConvexHttpClient(convexUrl);
 const rows = await client.query(api.plans.listActive);
 
-const viewRows = buildPlanRows(rows, common, suppliers, plans);
+const viewRows = sortPlanRowsByDiscountDesc(
+  buildPlanRows(rows, common, suppliers, plans),
+);
 ---
 
 <PlansPage

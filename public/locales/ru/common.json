@@ -42,5 +42,14 @@
   "fan_out_description": "У этих поставщиков также есть тарифы, подходящие для вашего потребления. Снимите отметку с тех, кого хотите пропустить.",
   "fan_out_confirm": "Поделиться также с этими поставщиками",
   "fan_out_decline": "Нет, спасибо",
-  "fan_out_confirmation": "Заявка отправлена — с вами свяжутся {{count}} поставщик(ов)"
+  "fan_out_confirmation": "Заявка отправлена — с вами свяжутся {{count}} поставщик(ов)",
+  "filter_plan_type_label": "Тип тарифа",
+  "filter_supplier_label": "Поставщик",
+  "sort_by_label": "Сортировать по",
+  "sort_option_discount": "Скидка %",
+  "sort_option_supplier": "Название поставщика",
+  "sort_option_type": "Тип тарифа",
+  "filter_empty_state_message": "Нет тарифов, соответствующих выбранным фильтрам.",
+  "filter_clear_button": "Сбросить фильтры",
+  "filter_result_count": "Показано {{count}} из {{total}} тарифов"
 }

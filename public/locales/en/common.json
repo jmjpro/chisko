@@ -42,5 +42,14 @@
   "fan_out_description": "These suppliers also have plans that match your usage. Uncheck any you'd like to skip.",
   "fan_out_confirm": "Also share with these suppliers",
   "fan_out_decline": "No thanks",
-  "fan_out_confirmation": "Request sent — {{count}} supplier(s) will contact you"
+  "fan_out_confirmation": "Request sent — {{count}} supplier(s) will contact you",
+  "filter_plan_type_label": "Plan type",
+  "filter_supplier_label": "Supplier",
+  "sort_by_label": "Sort by",
+  "sort_option_discount": "Discount %",
+  "sort_option_supplier": "Supplier name",
+  "sort_option_type": "Plan type",
+  "filter_empty_state_message": "No plans match your filters.",
+  "filter_clear_button": "Clear filters",
+  "filter_result_count": "Showing {{count}} of {{total}} plans"
 }

@@ -3,12 +3,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Footer from "../footer";
 import LeaveDetailsIsland from "../../islands/LeaveDetailsIsland";
 import ClickThroughIsland from "../../islands/ClickThroughIsland";
+import PlanFilterSortIsland from "../../islands/PlanFilterSortIsland";
+import { buildFilterOptions } from "../../lib/buildFilterOptions";
 import type { Id } from "../../../convex/_generated/dataModel";
 
 interface PlanRow {
   pvId: Id<"planVersions">;
   supplierId: Id<"suppliers">;
   supportedHandoffTypes: string[];
+  planType: string;
+  supplierName: string;
   discountPercent: number;
   window: string;
   weekdayOnly: string;
@@ -26,6 +30,7 @@ interface Props {
 }
 
 const { locale, convexUrl, common, rows, langSwitchUrls } = Astro.props;
+const filterOptions = buildFilterOptions(rows, common);
 ---
 
 <BaseLayout
@@ -35,11 +40,21 @@ const { locale, convexUrl, common, rows, langSwitchUrls } = Astro.props;
 >
   <main class="flex-1 px-6 py-8 overflow-x-auto">
     <h1 class="text-2xl font-bold mb-6">{common.plans_page_title}</h1>
-    <div class="md:hidden flex flex-col gap-4">
+    <PlanFilterSortIsland
+      client:only="react"
+      locale={locale}
+      filterOptions={filterOptions}
+    />
+    <div id="plan-card-list" class="md:hidden flex flex-col gap-4">
       {
         rows.map((row) => (
           <div
             data-testid="plan-card"
+            data-row-id={row.pvId}
+            data-plan-type={row.planType}
+            data-supplier={row.supplierName}
+            data-supplier-label={row.supplierLabel}
+            data-discount={row.discountPercent}
             class="border rounded-lg p-4 flex flex-col gap-3"
           >
             <div class="flex items-start justify-between gap-3">
@@ -73,19 +88,42 @@ const { locale, convexUrl, common, rows, langSwitchUrls } = Astro.props;
     <table class="hidden md:table w-full text-sm border-collapse">
       <thead>
         <tr class="border-b text-start">
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_supplier}</th>
+          <th class="pb-2 pe-6 font-semibold text-start" aria-sort="none">
+            <button type="button" data-sort-field="supplier" class="inline-flex items-center gap-1">
+              {common.table_supplier}
+              <span data-sort-indicator aria-hidden="true" class="text-gray-400">↕</span>
+            </button>
+          </th>
           <th class="pb-2 pe-6 font-semibold text-start">{common.table_plan}</th>
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_type}</th>
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_discount}</th>
+          <th class="pb-2 pe-6 font-semibold text-start" aria-sort="none">
+            <button type="button" data-sort-field="type" class="inline-flex items-center gap-1">
+              {common.table_type}
+              <span data-sort-indicator aria-hidden="true" class="text-gray-400">↕</span>
+            </button>
+          </th>
+          <th class="pb-2 pe-6 font-semibold text-start" aria-sort="descending">
+            <button type="button" data-sort-field="discount" class="inline-flex items-center gap-1">
+              {common.table_discount}
+              <span data-sort-indicator aria-hidden="true" class="text-gray-700">↓</span>
+            </button>
+          </th>
           <th class="pb-2 pe-6 font-semibold text-start">{common.table_window}</th>
           <th class="pb-2 font-semibold text-start">{common.table_weekday_only}</th>
           <th class="pb-2 w-[158px]"></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="plan-table-body">
         {
           rows.map((row) => (
-            <tr class="border-b last:border-0">
+            <tr
+              data-testid="plan-row"
+              data-row-id={row.pvId}
+              data-plan-type={row.planType}
+              data-supplier={row.supplierName}
+              data-supplier-label={row.supplierLabel}
+              data-discount={row.discountPercent}
+              class="border-b last:border-0"
+            >
               <td class="py-3 pe-6">{row.supplierLabel}</td>
               <td class="py-3 pe-6">{row.planLabel}</td>
               <td class="py-3 pe-6">{row.typeLabel}</td>
