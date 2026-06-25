@@ -95,6 +95,7 @@
   "savings_breakdown_saving": "التوفير السنوي: ₪{{amount}}",
   "rank_label": "#{{rank}}",
   "show_more_options_one": "عرض خيار إضافي واحد",
+  "show_more_options_two": "عرض خيارين إضافيين",
   "show_more_options_other": "عرض {{count}} خيارات إضافية",
   "hide_options": "إخفاء الخيارات"
 }
