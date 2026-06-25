@@ -15,6 +15,7 @@ export function getChangedFiles(baseRef: string = BASE_REF): string[] {
       "--name-only",
       "--diff-filter=d",
       mergeBase,
+      "HEAD",
       "--",
       "*.ts",
       "*.tsx",
