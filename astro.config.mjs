@@ -40,6 +40,11 @@ export default defineConfig({
         "@": path.resolve(__dirname, "./src"),
       },
     },
+    server: {
+      watch: {
+        ignored: ["**/.claude/**"],
+      },
+    },
     // VERCEL_GIT_COMMIT_SHA is set by Vercel's build platform, not VITE_-prefixed,
     // so Vite won't expose it to client code on its own — bridge it through here.
     define: {
