@@ -74,13 +74,24 @@ const filterOptions = buildFilterOptions(rows, common);
               <dt class="text-gray-600">{common.table_weekday_only}</dt>
               <dd class="text-end">{row.weekdayOnly}</dd>
             </dl>
-            <LeaveDetailsIsland
-              client:only="react"
-              locale={locale}
-              convexUrl={convexUrl}
-              supplierId={row.supplierId}
-              planVersionId={row.pvId}
-            />
+            <div class="flex flex-col gap-2">
+              <LeaveDetailsIsland
+                client:only="react"
+                locale={locale}
+                convexUrl={convexUrl}
+                supplierId={row.supplierId}
+                planVersionId={row.pvId}
+              />
+              {row.supportedHandoffTypes.includes("clickThrough") && (
+                <ClickThroughIsland
+                  client:only="react"
+                  locale={locale}
+                  convexUrl={convexUrl}
+                  supplierId={row.supplierId}
+                  planVersionId={row.pvId}
+                />
+              )}
+            </div>
           </div>
         ))
       }
@@ -131,7 +142,14 @@ const filterOptions = buildFilterOptions(rows, common);
               <td class="py-3 pe-6">{row.window}</td>
               <td class="py-3 pe-6">{row.weekdayOnly}</td>
               <td class="py-3 w-[158px]">
-                <div class="h-8 flex gap-2">
+                <div class="flex flex-col gap-2">
+                  <LeaveDetailsIsland
+                    client:only="react"
+                    locale={locale}
+                    convexUrl={convexUrl}
+                    supplierId={row.supplierId}
+                    planVersionId={row.pvId}
+                  />
                   {row.supportedHandoffTypes.includes("clickThrough") && (
                     <ClickThroughIsland
                       client:only="react"
@@ -141,13 +159,6 @@ const filterOptions = buildFilterOptions(rows, common);
                       planVersionId={row.pvId}
                     />
                   )}
-                  <LeaveDetailsIsland
-                    client:only="react"
-                    locale={locale}
-                    convexUrl={convexUrl}
-                    supplierId={row.supplierId}
-                    planVersionId={row.pvId}
-                  />
                 </div>
               </td>
             </tr>
