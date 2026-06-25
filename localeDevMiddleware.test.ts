@@ -71,6 +71,26 @@ describe("localeDevMiddleware", () => {
     expect(res.end).toHaveBeenCalledOnce();
   });
 
+  it("follows a rewrite from middleware.ts by rewriting req.url and calling next()", async () => {
+    const handler = await setup();
+    const req = {
+      url: "/en/does-not-exist",
+      headers: { host: "localhost:4321" },
+    };
+    const res = fakeRes();
+    const next = vi.fn();
+
+    handler(
+      req as unknown as IncomingMessage,
+      res as unknown as ServerResponse,
+      next,
+    );
+
+    expect(req.url).toBe("/en/404");
+    expect(next).toHaveBeenCalledOnce();
+    expect(res.end).not.toHaveBeenCalled();
+  });
+
   it("joins multi-value request headers before constructing the Request", async () => {
     const handler = await setup();
     const req = {

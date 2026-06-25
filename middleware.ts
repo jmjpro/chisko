@@ -1,3 +1,4 @@
+import { rewrite } from "@vercel/functions";
 import {
   LANG_COOKIE,
   LOCALES,
@@ -5,6 +6,7 @@ import {
   parseAcceptLanguage,
   type Locale,
 } from "./src/lib/locale.js";
+import { TOP_LEVEL_ROUTES } from "./src/lib/routes.js";
 
 export const config = {
   matcher: ["/((?!_astro/|locales/|_server-islands/).*)"],
@@ -27,11 +29,14 @@ export default function middleware(request: Request): Response | undefined {
 
   if (pathname.startsWith("/r/")) return undefined;
 
-  if (
-    PREFIXED_LOCALES.some(
-      (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),
-    )
-  ) {
+  const prefixLocale = PREFIXED_LOCALES.find(
+    (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),
+  );
+  if (prefixLocale) {
+    const rest = pathname.slice(`/${prefixLocale}`.length) || "/";
+    if (!TOP_LEVEL_ROUTES.includes(rest)) {
+      return rewrite(new URL(`/${prefixLocale}/404`, request.url));
+    }
     return undefined;
   }
 
