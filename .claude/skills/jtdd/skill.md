@@ -23,6 +23,16 @@ If no, stop.
 
 If yes, call `save_issue` **once** with `state: "In Progress"` and `labels` set to the issue's current labels (from Step 1) plus `ready-for-agent`. `save_issue` resolves state and label names directly — do not call `list_issue_statuses`/`list_issue_labels` to look up IDs first.
 
+## Step 1.5 — Enter worktree
+
+The issue has a `gitBranchName` field (from Step 1). Run `git worktree list` and look for a worktree on that branch.
+
+- If one exists: call `EnterWorktree` with `path` set to that worktree's path.
+- If none exists: call `EnterWorktree` with `name` derived from the issue ID (e.g. `chi-96-email-relay`) to create a new worktree on the issue branch.
+- If already in the correct worktree: proceed directly.
+
+Do NOT make code changes in `main`. All implementation work must happen in the worktree.
+
 ## Step 2 — TDD
 
 Invoke `/tdd`. The issue title and body are already in context from Step 1 — use them to drive the TDD session.
