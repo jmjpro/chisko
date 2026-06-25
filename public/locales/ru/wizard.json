@@ -95,6 +95,7 @@
   "savings_breakdown_saving": "Годовая экономия: ₪{{amount}}",
   "rank_label": "#{{rank}}",
   "show_more_options_one": "Показать ещё 1 вариант",
-  "show_more_options_other": "Показать ещё {{count}} варианта",
+  "show_more_options_few": "Показать ещё {{count}} варианта",
+  "show_more_options_other": "Показать ещё {{count}} вариантов",
   "hide_options": "Скрыть варианты"
 }

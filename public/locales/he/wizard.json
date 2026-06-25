@@ -95,6 +95,7 @@
   "savings_breakdown_saving": "חיסכון שנתי: ₪{{amount}}",
   "rank_label": "#{{rank}}",
   "show_more_options_one": "הצג עוד אפשרות אחת",
+  "show_more_options_two": "הצג עוד שתי אפשרויות",
   "show_more_options_other": "הצג עוד {{count}} אפשרויות",
   "hide_options": "הסתר אפשרויות"
 }
