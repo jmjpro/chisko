@@ -105,7 +105,11 @@ function baseProps(
         planVersionId: primaryPlanVersionId,
         isEligible: true,
         annualSavingsAgorot: 100000,
-        supplier: { _id: primarySupplierId, name: "Acme Energy" },
+        supplier: {
+          _id: primarySupplierId,
+          name: "Acme Energy",
+          logoFileName: "acme.webp",
+        },
         plan: { name: "Acme Fixed", planType: "fixed" },
         planVersion: {
           discountPercent: 7,
@@ -163,7 +167,7 @@ describe("ResultsStep recalculate flicker", () => {
               planVersionId: rec.primaryPlanVersionId,
               isEligible: true,
               annualSavingsAgorot: 5000,
-              supplier: { name: "Acme Power" },
+              supplier: { name: "Acme Power", logoFileName: "acme.webp" },
               plan: { name: "Acme Fixed", planType: "fixed" },
               planVersion: {
                 discountPercent: 7,
@@ -178,6 +182,39 @@ describe("ResultsStep recalculate flicker", () => {
 
     expect(screen.queryByText("result_loading")).not.toBeInTheDocument();
     expect(screen.getByText(/Acme Power/)).toBeInTheDocument();
+  });
+
+  it("renders the supplier logo inline before the supplier — plan line on the recommendation card", () => {
+    render(
+      <ResultsStep
+        {...baseProps({
+          rec,
+          evaluatedPlans: [
+            {
+              planVersionId: rec.primaryPlanVersionId,
+              isEligible: true,
+              annualSavingsAgorot: 5000,
+              supplier: { name: "Acme Power", logoFileName: "acme.webp" },
+              plan: { name: "Acme Fixed", planType: "fixed" },
+              planVersion: {
+                discountPercent: 7,
+                weekdayWindowOnly: false,
+              },
+            },
+          ],
+          generating: false,
+        })}
+      />,
+    );
+
+    const logo = screen.getByAltText("Acme Power");
+    expect(logo).toHaveAttribute("src", "/suppliers/acme.webp");
+    expect(logo).toHaveAttribute("loading", "lazy");
+    expect(logo).toHaveAttribute("width", "48");
+    expect(logo).toHaveAttribute("height", "48");
+    expect(logo.compareDocumentPosition(screen.getByText(/Acme Power/))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 });
 
@@ -241,6 +278,7 @@ describe("ResultsStep — click-through CTA", () => {
               supplier: {
                 _id: primarySupplierId,
                 name: "Acme Energy",
+                logoFileName: "acme.webp",
                 supportedHandoffTypes: ["clickThrough", "formHandoff"],
               },
               plan: { name: "Acme Fixed", planType: "fixed" },

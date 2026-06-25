@@ -43,6 +43,7 @@ export const listActive = query({
           pvId: pv._id,
           supplierId: supplier._id,
           supplierName: supplier.name,
+          logoFileName: supplier.logoFileName,
           supportedHandoffTypes: supplier.supportedHandoffTypes,
           planName: plan.name,
           planType: plan.planType,

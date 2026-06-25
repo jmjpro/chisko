@@ -43,6 +43,7 @@ type EvaluatedPlan = {
   supplier?: {
     _id: Id<"suppliers">;
     name: string;
+    logoFileName: string;
     supportedHandoffTypes?: ("clickThrough" | "formHandoff" | "phoneBased")[];
   } | null;
   plan?: { name: string; planType: "fixed" | "day" | "night" } | null;
@@ -190,9 +191,21 @@ export default function ResultsStep({
         }
       >
         {label && <p className="text-sm text-muted-foreground mb-1">{label}</p>}
-        <p className="font-semibold text-lg">
-          {plan.supplier?.name} — {plan.plan?.name}
-        </p>
+        <div className="flex items-center gap-2">
+          {plan.supplier && (
+            <img
+              src={`/suppliers/${plan.supplier.logoFileName}`}
+              alt={plan.supplier.name}
+              loading="lazy"
+              width={48}
+              height={48}
+              className="h-12 w-12 object-contain shrink-0"
+            />
+          )}
+          <p className="font-semibold text-lg">
+            {plan.supplier?.name} — {plan.plan?.name}
+          </p>
+        </div>
 
         <div className="flex flex-wrap items-center gap-2 mt-2">
           {planType && (

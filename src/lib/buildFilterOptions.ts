@@ -2,6 +2,7 @@ interface FilterableRow {
   planType: string;
   supplierName: string;
   supplierLabel: string;
+  logoFileName: string;
 }
 
 const PLAN_TYPE_ORDER = ["fixed", "day", "night"];
@@ -18,16 +19,22 @@ export function buildFilterOptions(
     label: common[`plan_type_${planType}`] ?? planType,
   }));
 
-  const supplierLabels = new Map<string, string>();
+  const supplierOptions = new Map<
+    string,
+    { label: string; logoFileName: string }
+  >();
   for (const row of rows) {
-    if (!supplierLabels.has(row.supplierName)) {
-      supplierLabels.set(row.supplierName, row.supplierLabel);
+    if (!supplierOptions.has(row.supplierName)) {
+      supplierOptions.set(row.supplierName, {
+        label: row.supplierLabel,
+        logoFileName: row.logoFileName,
+      });
     }
   }
-  const suppliers = Array.from(supplierLabels, ([value, label]) => ({
-    value,
-    label,
-  }));
+  const suppliers = Array.from(
+    supplierOptions,
+    ([value, { label, logoFileName }]) => ({ value, label, logoFileName }),
+  );
 
   return { planTypes, suppliers };
 }

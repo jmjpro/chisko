@@ -7,8 +7,13 @@ const common = {
   plan_type_night: "Night",
 };
 
-function row(planType: string, supplierName: string, supplierLabel: string) {
-  return { planType, supplierName, supplierLabel };
+function row(
+  planType: string,
+  supplierName: string,
+  supplierLabel: string,
+  logoFileName = "default.webp",
+) {
+  return { planType, supplierName, supplierLabel, logoFileName };
 }
 
 describe("buildFilterOptions", () => {
@@ -36,8 +41,22 @@ describe("buildFilterOptions", () => {
     const result = buildFilterOptions(rows, common);
 
     expect(result.suppliers).toEqual([
-      { value: "s1", label: "Supplier One" },
-      { value: "s2", label: "Supplier Two" },
+      { value: "s1", label: "Supplier One", logoFileName: "default.webp" },
+      { value: "s2", label: "Supplier Two", logoFileName: "default.webp" },
+    ]);
+  });
+
+  it("carries each supplier's logoFileName through into the filter option", () => {
+    const rows = [
+      row("fixed", "s1", "Supplier One", "supplierOne.webp"),
+      row("night", "s2", "Supplier Two", "supplierTwo.webp"),
+    ];
+
+    const result = buildFilterOptions(rows, common);
+
+    expect(result.suppliers).toEqual([
+      { value: "s1", label: "Supplier One", logoFileName: "supplierOne.webp" },
+      { value: "s2", label: "Supplier Two", logoFileName: "supplierTwo.webp" },
     ]);
   });
 });

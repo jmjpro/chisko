@@ -7,11 +7,15 @@ interface FilterOption {
   label: string;
 }
 
+interface SupplierFilterOption extends FilterOption {
+  logoFileName: string;
+}
+
 interface PlanFilterSortIslandProps {
   locale: string;
   filterOptions: {
     planTypes: FilterOption[];
-    suppliers: FilterOption[];
+    suppliers: SupplierFilterOption[];
   };
 }
 
@@ -229,6 +233,14 @@ export default function PlanFilterSortIsland({
               onChange={() =>
                 setSelectedSuppliers((prev) => toggleInSet(prev, option.value))
               }
+            />
+            <img
+              src={`/suppliers/${option.logoFileName}`}
+              alt={option.label}
+              loading="lazy"
+              width={40}
+              height={40}
+              className="h-10 w-10 object-contain"
             />
             {option.label}
           </label>
