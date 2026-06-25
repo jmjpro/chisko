@@ -8,6 +8,7 @@ import plans from "../../public/locales/he/plans.json";
 import { getConvexUrl } from "../lib/getConvexUrl";
 import { buildLangSwitchUrls } from "../lib/locale";
 import { buildPlanRows } from "../lib/buildPlanRows";
+import { sortPlanRowsByDiscountDesc } from "../lib/sortPlanRows";
 
 const locale = "he";
 const convexUrl = getConvexUrl(import.meta.env.VITE_CONVEX_URL);
@@ -16,11 +17,13 @@ const langSwitchUrls = buildLangSwitchUrls("/plans");
 const client = new ConvexHttpClient(convexUrl);
 const rows = await client.query(api.plans.listActive);
 
-const processedRows = buildPlanRows(
-  rows,
-  common as Record<string, string>,
-  suppliers as Record<string, string>,
-  plans as Record<string, string>,
+const processedRows = sortPlanRowsByDiscountDesc(
+  buildPlanRows(
+    rows,
+    common as Record<string, string>,
+    suppliers as Record<string, string>,
+    plans as Record<string, string>,
+  ),
 );
 ---
 
