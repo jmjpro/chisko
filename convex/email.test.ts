@@ -113,7 +113,9 @@ test("sendDeliveryNotification logs an error and no-ops when neither LOCAL_SMTP_
 
   expect(fetchMock).not.toHaveBeenCalled();
   expect(mockSendMail).not.toHaveBeenCalled();
-  expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("LOCAL_SMTP_HOST"));
+  expect(errorSpy).toHaveBeenCalledWith(
+    expect.stringContaining("LOCAL_SMTP_HOST"),
+  );
 });
 
 test("sendDeliveryNotification throws when Resend returns an error", async () => {

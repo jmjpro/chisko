@@ -27,7 +27,10 @@ export const sendDeliveryNotification = internalAction({
     const subject = `New lead for ${details.supplierName}`;
 
     if (localSmtpHost) {
-      const transport = nodemailer.createTransport({ host: localSmtpHost, port: 1025 });
+      const transport = nodemailer.createTransport({
+        host: localSmtpHost,
+        port: 1025,
+      });
       await transport.sendMail({
         from: "Chisko Leads <leads@chisko.app>",
         to: NOTIFICATION_RECIPIENT,
