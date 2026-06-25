@@ -1,0 +1,27 @@
+---
+import NotFoundPage from "../../components/pages/NotFoundPage.astro";
+import { localeStaticPaths, buildLangSwitchUrls, type Locale } from "../../lib/locale";
+import { notFoundByLocale } from "../../lib/notFoundLocale";
+import { commonByLocale } from "../../lib/commonLocale";
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+const { locale } = Astro.params;
+
+const t = notFoundByLocale[locale as Locale];
+const common = commonByLocale[locale as Locale];
+const langSwitchUrls = buildLangSwitchUrls("/");
+---
+
+<NotFoundPage
+  locale={locale}
+  title={`Chisko — ${t.title}`}
+  heading={t.title}
+  message={t.message}
+  backButtonLabel={t.back_button}
+  homeLabel={common.back_to_home}
+  homeHref={`/${locale}/`}
+  langSwitchUrls={langSwitchUrls}
+/>

@@ -1,0 +1,22 @@
+---
+import NotFoundPage from "../components/pages/NotFoundPage.astro";
+import { buildLangSwitchUrls } from "../lib/locale";
+import { notFoundByLocale } from "../lib/notFoundLocale";
+import { commonByLocale } from "../lib/commonLocale";
+
+const locale = "he";
+const t = notFoundByLocale[locale];
+const common = commonByLocale[locale];
+const langSwitchUrls = buildLangSwitchUrls("/");
+---
+
+<NotFoundPage
+  locale={locale}
+  title={`Chisko — ${t.title}`}
+  heading={t.title}
+  message={t.message}
+  backButtonLabel={t.back_button}
+  homeLabel={common.back_to_home}
+  homeHref="/"
+  langSwitchUrls={langSwitchUrls}
+/>

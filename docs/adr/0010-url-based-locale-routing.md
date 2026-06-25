@@ -46,6 +46,10 @@ In Astro 6 dev mode, Astro's own route handling receives an **empty headers obje
 
 As a result, the `parseAcceptLanguage` logic is covered by unit tests (`middleware.test.ts`) and can also be exercised manually (or via e2e) against the local dev server.
 
+### Rewrite signal handling (CHI-87)
+
+`middleware.ts` also calls `rewrite()` from `@vercel/functions` to serve a locale's static 404 page for unmatched paths under a known locale prefix (see `src/lib/routes.ts`'s `TOP_LEVEL_ROUTES`). `rewrite()` returns an empty `200` response carrying an `x-middleware-rewrite` header — Vercel's edge platform reads that header and internally re-serves the target path's real response in production. That interception doesn't exist in `astro dev`. `localeDevMiddleware.ts` therefore special-cases this: when the response from `middleware()` carries `x-middleware-rewrite`, it rewrites `req.url` to the destination's path and calls `next()` (so Vite/Astro's own pipeline serves the real target page) instead of writing the synthetic response straight to the client.
+
 ## Consequences
 
 - The `chisko_lang` cookie (set by the language switcher in `header.tsx`) remains the mechanism for persisting an explicit user language choice across sessions. The middleware reads it on every request and skips the `Accept-Language` fallback when it is present.

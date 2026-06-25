@@ -49,6 +49,16 @@ describe("middleware", () => {
     expect(response).toBeUndefined();
   });
 
+  it("rewrites an unmatched path under a locale prefix to that locale's 404 page", () => {
+    const request = new Request("https://chisko.example/en/does-not-exist");
+
+    const response = middleware(request);
+
+    expect(response?.headers.get("x-middleware-rewrite")).toBe(
+      "https://chisko.example/en/404",
+    );
+  });
+
   it("does not redirect /r/ share paths", () => {
     const request = new Request("https://chisko.example/r/abc123", {
       headers: { "accept-language": "en" },
