@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
+import ChiskiMascot from "@/components/chiskiMascot";
 import {
   Sheet,
   SheetContent,
@@ -190,7 +191,14 @@ export default function ResultsStep({
             : "rounded-lg border border-border p-4 mb-4"
         }
       >
-        {label && <p className="text-sm text-muted-foreground mb-1">{label}</p>}
+        {label && (
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-sm text-muted-foreground">{label}</p>
+            {isPrimary && (
+              <ChiskiMascot className="h-10 w-10 pointer-events-none" />
+            )}
+          </div>
+        )}
         <div className="flex items-center gap-2">
           {plan.supplier && (
             <img
@@ -262,13 +270,6 @@ export default function ResultsStep({
 
         {plan.supplier && sessionId && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {plan.supplier.supportedHandoffTypes?.includes("clickThrough") && (
-              <ClickThroughCta
-                sessionId={sessionId}
-                supplierId={plan.supplier._id}
-                planVersionId={plan.planVersionId}
-              />
-            )}
             <LeaveDetailsDialog
               sessionId={sessionId}
               recommendationId={recommendationId}
@@ -276,6 +277,13 @@ export default function ResultsStep({
               planVersionId={plan.planVersionId}
               trigger={<Button size="sm">{tc("cta_leave_details")}</Button>}
             />
+            {plan.supplier.supportedHandoffTypes?.includes("clickThrough") && (
+              <ClickThroughCta
+                sessionId={sessionId}
+                supplierId={plan.supplier._id}
+                planVersionId={plan.planVersionId}
+              />
+            )}
           </div>
         )}
       </div>

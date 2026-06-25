@@ -265,6 +265,132 @@ describe("ResultsStep — leave-details CTA wiring", () => {
   });
 });
 
+describe("ResultsStep — Chiski mascot", () => {
+  it("shows the mascot on the Primary Recommendation card", () => {
+    render(<ResultsStep {...baseProps()} />);
+
+    expect(screen.getByRole("img", { name: /Chiski/i })).toBeInTheDocument();
+  });
+
+  it("does not show the mascot on Alternative Recommendation cards", async () => {
+    const altPlanVersionId = "pv2" as Id<"planVersions">;
+    render(
+      <ResultsStep
+        {...baseProps({
+          evaluatedPlans: [
+            {
+              planVersionId: primaryPlanVersionId,
+              isEligible: true,
+              annualSavingsAgorot: 100000,
+              supplier: {
+                _id: primarySupplierId,
+                name: "Acme Energy",
+                logoFileName: "acme.webp",
+              },
+              plan: { name: "Acme Fixed", planType: "fixed" },
+              planVersion: { discountPercent: 7, weekdayWindowOnly: false },
+            },
+            {
+              planVersionId: altPlanVersionId,
+              isEligible: true,
+              annualSavingsAgorot: 80000,
+              supplier: {
+                _id: "supplier2" as Id<"suppliers">,
+                name: "Beta Power",
+                logoFileName: "beta.webp",
+              },
+              plan: { name: "Beta Fixed", planType: "fixed" },
+              planVersion: { discountPercent: 5, weekdayWindowOnly: false },
+            },
+          ],
+        })}
+      />,
+    );
+
+    await userEvent.click(screen.getByText(/show_more_options/));
+
+    expect(screen.getAllByRole("img", { name: /Chiski/i })).toHaveLength(1);
+  });
+});
+
+describe("ResultsStep — CTA order", () => {
+  it("renders Leave Details before Switch without an Agent on the primary card", () => {
+    render(
+      <ResultsStep
+        {...baseProps({
+          evaluatedPlans: [
+            {
+              planVersionId: primaryPlanVersionId,
+              isEligible: true,
+              annualSavingsAgorot: 100000,
+              supplier: {
+                _id: primarySupplierId,
+                name: "Acme Energy",
+                logoFileName: "acme.webp",
+                supportedHandoffTypes: ["clickThrough", "formHandoff"],
+              },
+              plan: { name: "Acme Fixed", planType: "fixed" },
+              planVersion: { discountPercent: 7, weekdayWindowOnly: false },
+            },
+          ],
+        })}
+      />,
+    );
+
+    const leaveDetails = screen.getByText("cta_leave_details");
+    const switchWithout = screen.getByText("cta_click_through");
+    expect(leaveDetails.compareDocumentPosition(switchWithout)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it("renders Leave Details before Switch without an Agent on Alternative Recommendation cards", async () => {
+    const altPlanVersionId = "pv2" as Id<"planVersions">;
+    render(
+      <ResultsStep
+        {...baseProps({
+          evaluatedPlans: [
+            {
+              planVersionId: primaryPlanVersionId,
+              isEligible: true,
+              annualSavingsAgorot: 100000,
+              supplier: {
+                _id: primarySupplierId,
+                name: "Acme Energy",
+                logoFileName: "acme.webp",
+                supportedHandoffTypes: ["clickThrough", "formHandoff"],
+              },
+              plan: { name: "Acme Fixed", planType: "fixed" },
+              planVersion: { discountPercent: 7, weekdayWindowOnly: false },
+            },
+            {
+              planVersionId: altPlanVersionId,
+              isEligible: true,
+              annualSavingsAgorot: 80000,
+              supplier: {
+                _id: "supplier2" as Id<"suppliers">,
+                name: "Beta Power",
+                logoFileName: "beta.webp",
+                supportedHandoffTypes: ["clickThrough", "formHandoff"],
+              },
+              plan: { name: "Beta Fixed", planType: "fixed" },
+              planVersion: { discountPercent: 5, weekdayWindowOnly: false },
+            },
+          ],
+        })}
+      />,
+    );
+
+    await userEvent.click(screen.getByText(/show_more_options/));
+
+    const [, altLeaveDetails] = screen.getAllByText("cta_leave_details");
+    const [, altSwitchWithout] = screen.getAllByText("cta_click_through");
+    expect(altLeaveDetails.compareDocumentPosition(altSwitchWithout)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+});
+
 describe("ResultsStep — click-through CTA", () => {
   it("shows the click-through CTA alongside Leave Details when the supplier supports clickThrough", () => {
     render(
