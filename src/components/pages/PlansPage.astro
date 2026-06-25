@@ -45,103 +45,68 @@ const filterOptions = buildFilterOptions(rows, common);
       locale={locale}
       filterOptions={filterOptions}
     />
-    <div id="plan-card-list" class="md:hidden flex flex-col gap-4">
-      {
-        rows.map((row) => (
-          <div
-            data-testid="plan-card"
-            data-row-id={row.pvId}
-            data-plan-type={row.planType}
-            data-supplier={row.supplierName}
-            data-supplier-label={row.supplierLabel}
-            data-discount={row.discountPercent}
-            class="border rounded-lg p-4 flex flex-col gap-3"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <div class="font-semibold">{row.supplierLabel}</div>
-                <div class="text-sm text-gray-600">{row.planLabel}</div>
-              </div>
-              <span class="tnum shrink-0 rounded-full bg-green-100 text-green-800 font-semibold px-2.5 py-1 text-sm">
-                {row.discountPercent}%
-              </span>
-            </div>
-            <dl class="text-sm grid grid-cols-2 gap-y-1">
-              <dt class="text-gray-600">{common.table_type}</dt>
-              <dd class="text-end">{row.typeLabel}</dd>
-              <dt class="text-gray-600">{common.table_window}</dt>
-              <dd class="text-end">{row.window}</dd>
-              <dt class="text-gray-600">{common.table_weekday_only}</dt>
-              <dd class="text-end">{row.weekdayOnly}</dd>
-            </dl>
-            <div class="flex flex-col gap-2">
-              <LeaveDetailsIsland
-                client:only="react"
-                locale={locale}
-                convexUrl={convexUrl}
-                supplierId={row.supplierId}
-                planVersionId={row.pvId}
-              />
-              {row.supportedHandoffTypes.includes("clickThrough") && (
-                <ClickThroughIsland
-                  client:only="react"
-                  locale={locale}
-                  convexUrl={convexUrl}
-                  supplierId={row.supplierId}
-                  planVersionId={row.pvId}
-                />
-              )}
-            </div>
-          </div>
-        ))
-      }
-    </div>
-    <table class="hidden md:table w-full text-sm border-collapse">
-      <thead>
-        <tr class="border-b text-start">
-          <th class="pb-2 pe-6 font-semibold text-start" aria-sort="none">
-            <button type="button" data-sort-field="supplier" class="inline-flex items-center gap-1">
-              {common.table_supplier}
-              <span data-sort-indicator aria-hidden="true" class="text-gray-400">↕</span>
-            </button>
-          </th>
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_plan}</th>
-          <th class="pb-2 pe-6 font-semibold text-start" aria-sort="none">
-            <button type="button" data-sort-field="type" class="inline-flex items-center gap-1">
-              {common.table_type}
-              <span data-sort-indicator aria-hidden="true" class="text-gray-400">↕</span>
-            </button>
-          </th>
-          <th class="pb-2 pe-6 font-semibold text-start" aria-sort="descending">
-            <button type="button" data-sort-field="discount" class="inline-flex items-center gap-1">
-              {common.table_discount}
-              <span data-sort-indicator aria-hidden="true" class="text-gray-700">↓</span>
-            </button>
-          </th>
-          <th class="pb-2 pe-6 font-semibold text-start">{common.table_window}</th>
-          <th class="pb-2 font-semibold text-start">{common.table_weekday_only}</th>
-          <th class="pb-2 w-[158px]"></th>
-        </tr>
-      </thead>
-      <tbody id="plan-table-body">
+    <div role="table" class="plan-table text-sm">
+      <div role="row" class="plan-header-row border-b text-start font-semibold">
+        <div role="columnheader" class="cell-supplier pb-2 pe-6" aria-sort="none">
+          <button type="button" data-sort-field="supplier" class="inline-flex items-center gap-1">
+            {common.table_supplier}
+            <span data-sort-indicator aria-hidden="true" class="text-gray-400">↕</span>
+          </button>
+        </div>
+        <div role="columnheader" class="cell-plan pb-2 pe-6">{common.table_plan}</div>
+        <div role="columnheader" class="cell-type pb-2 pe-6" aria-sort="none">
+          <button type="button" data-sort-field="type" class="inline-flex items-center gap-1">
+            {common.table_type}
+            <span data-sort-indicator aria-hidden="true" class="text-gray-400">↕</span>
+          </button>
+        </div>
+        <div role="columnheader" class="cell-discount pb-2 pe-6" aria-sort="descending">
+          <button type="button" data-sort-field="discount" class="inline-flex items-center gap-1">
+            {common.table_discount}
+            <span data-sort-indicator aria-hidden="true" class="text-gray-700">↓</span>
+          </button>
+        </div>
+        <div role="columnheader" class="cell-window pb-2 pe-6">{common.table_window}</div>
+        <div role="columnheader" class="cell-weekday pb-2">{common.table_weekday_only}</div>
+        <div role="columnheader" class="cell-actions pb-2"></div>
+      </div>
+      <div id="plan-rows" class="flex flex-col gap-4 md:gap-0">
         {
           rows.map((row) => (
-            <tr
+            <div
+              role="row"
               data-testid="plan-row"
               data-row-id={row.pvId}
               data-plan-type={row.planType}
               data-supplier={row.supplierName}
               data-supplier-label={row.supplierLabel}
               data-discount={row.discountPercent}
-              class="border-b last:border-0"
+              class="plan-row border rounded-lg p-4 md:rounded-none md:border-0 md:border-b md:p-0 last:md:border-0"
             >
-              <td class="py-3 pe-6">{row.supplierLabel}</td>
-              <td class="py-3 pe-6">{row.planLabel}</td>
-              <td class="py-3 pe-6">{row.typeLabel}</td>
-              <td class="py-3 pe-6 tnum">{row.discountPercent}%</td>
-              <td class="py-3 pe-6">{row.window}</td>
-              <td class="py-3 pe-6">{row.weekdayOnly}</td>
-              <td class="py-3 w-[158px]">
+              <div role="cell" class="cell-supplier font-semibold md:font-normal md:pe-6 md:py-3">
+                {row.supplierLabel}
+              </div>
+              <div role="cell" class="cell-plan text-sm text-gray-600 md:text-foreground md:pe-6 md:py-3">
+                {row.planLabel}
+              </div>
+              <div role="cell" class="cell-discount">
+                <span class="tnum inline-block shrink-0 rounded-full bg-green-100 text-green-800 font-semibold px-2.5 py-1 text-sm md:rounded-none md:bg-transparent md:text-foreground md:font-normal md:px-0 md:py-3 md:pe-6">
+                  {row.discountPercent}%
+                </span>
+              </div>
+              <div role="cell" class="cell-type flex justify-between items-baseline md:block md:pe-6 md:py-3">
+                <span class="cell-label text-gray-600 md:hidden inline-block min-w-[40%]">{common.table_type}</span>
+                <span class="text-end md:text-start">{row.typeLabel}</span>
+              </div>
+              <div role="cell" class="cell-window flex justify-between items-baseline md:block md:pe-6 md:py-3">
+                <span class="cell-label text-gray-600 md:hidden inline-block min-w-[40%]">{common.table_window}</span>
+                <span class="text-end md:text-start">{row.window}</span>
+              </div>
+              <div role="cell" class="cell-weekday flex justify-between items-baseline md:block md:py-3">
+                <span class="cell-label text-gray-600 md:hidden inline-block min-w-[40%]">{common.table_weekday_only}</span>
+                <span class="text-end md:text-start">{row.weekdayOnly}</span>
+              </div>
+              <div role="cell" class="cell-actions md:py-3">
                 <div class="flex flex-col gap-2">
                   <LeaveDetailsIsland
                     client:only="react"
@@ -160,12 +125,71 @@ const filterOptions = buildFilterOptions(rows, common);
                     />
                   )}
                 </div>
-              </td>
-            </tr>
+              </div>
+            </div>
           ))
         }
-      </tbody>
-    </table>
+      </div>
+    </div>
   </main>
   <Footer />
 </BaseLayout>
+
+<style>
+  .plan-header-row {
+    display: none;
+  }
+
+  .plan-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "supplier discount"
+      "plan discount"
+      "type type"
+      "window window"
+      "weekday weekday"
+      "actions actions";
+    row-gap: 0.5rem;
+    column-gap: 0.75rem;
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .plan-header-row {
+      display: grid;
+    }
+
+    .plan-header-row,
+    .plan-row {
+      grid-template-columns:
+        minmax(0, 1fr) minmax(0, 1fr) 90px 110px 140px 110px 158px;
+      grid-template-areas: "supplier plan type discount window weekday actions";
+      column-gap: 0;
+      row-gap: 0;
+      align-items: center;
+    }
+  }
+
+  .cell-supplier {
+    grid-area: supplier;
+  }
+  .cell-plan {
+    grid-area: plan;
+  }
+  .cell-type {
+    grid-area: type;
+  }
+  .cell-discount {
+    grid-area: discount;
+  }
+  .cell-window {
+    grid-area: window;
+  }
+  .cell-weekday {
+    grid-area: weekday;
+  }
+  .cell-actions {
+    grid-area: actions;
+  }
+</style>

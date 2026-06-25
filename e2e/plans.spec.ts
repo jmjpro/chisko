@@ -6,13 +6,9 @@ test.describe("Plans page — build-time data fetch", () => {
   }) => {
     await page.goto("/en/plans");
 
-    // Table is in the HTML from the start — no waiting for Convex WebSocket
-    const table = page.locator("table");
-    await expect(table).toBeVisible();
-
-    // At least one plan row should be present
-    const rows = page.locator("tbody tr");
-    await expect(rows.first()).toBeVisible();
+    // Rows are in the HTML from the start — no waiting for Convex WebSocket
+    const firstRow = page.getByTestId("plan-row").first();
+    await expect(firstRow).toBeVisible();
   });
 
   test("/plans (Hebrew default) renders plan rows with Hebrew supplier names", async ({
@@ -20,27 +16,25 @@ test.describe("Plans page — build-time data fetch", () => {
   }) => {
     await page.goto("/plans");
 
-    const table = page.locator("table");
-    await expect(table).toBeVisible();
-
     // Hebrew locale: at least one translated supplier name should appear
-    // (not the raw English key like "Bezek Electricity")
-    const rows = page.locator("tbody tr");
-    await expect(rows.first()).toBeVisible();
+    const firstRow = page.getByTestId("plan-row").first();
+    await expect(firstRow).toBeVisible();
   });
 });
 
-test.describe("Plans page — mobile cards (Hebrew default route)", () => {
-  test("below md breakpoint, /plans renders cards instead of the table", async ({
+test.describe("Plans page — responsive layout (Hebrew default route)", () => {
+  test("below md breakpoint, column headers are hidden (card look applies)", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 600, height: 800 });
     await page.goto("/plans");
 
-    await expect(page.locator("table")).toBeHidden();
+    // plan-rows exist at both viewports — the visual switch is CSS-only
+    const firstRow = page.getByTestId("plan-row").first();
+    await expect(firstRow).toBeVisible();
 
-    const cards = page.getByTestId("plan-card");
-    await expect(cards.first()).toBeVisible();
+    // Header row is display:none at mobile — column header text is not visible
+    await expect(page.locator('[role="columnheader"]').first()).toBeHidden();
   });
 
   test("a fixed plan card shows 24/7 and No for the discount window and weekday only rows", async ({
@@ -49,95 +43,100 @@ test.describe("Plans page — mobile cards (Hebrew default route)", () => {
     await page.setViewportSize({ width: 600, height: 800 });
     await page.goto("/plans");
 
-    const card = page
-      .getByTestId("plan-card")
+    const row = page
+      .getByTestId("plan-row")
       .filter({ hasText: "בזק חשמל" })
       .filter({ hasText: "בזק קבועה" });
-    await expect(card).toBeVisible();
+    await expect(row).toBeVisible();
 
-    await expect(card.getByText("חלון הנחה")).toBeVisible();
-    await expect(card.getByText("ימי חול בלבד")).toBeVisible();
-    await expect(card.getByText("24/7")).toBeVisible();
-    await expect(card.getByText("לא", { exact: true })).toBeVisible();
+    await expect(row.getByText("חלון הנחה")).toBeVisible();
+    await expect(row.getByText("ימי חול בלבד")).toBeVisible();
+    await expect(row.getByText("24/7")).toBeVisible();
+    await expect(row.getByText("לא", { exact: true })).toBeVisible();
   });
 });
 
-test.describe("Plans page — mobile cards", () => {
-  test("below md breakpoint, cards render instead of the table", async ({
+test.describe("Plans page — responsive layout", () => {
+  test("below md breakpoint, column headers are hidden and plan rows are visible", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 600, height: 800 });
     await page.goto("/en/plans");
 
-    await expect(page.locator("table")).toBeHidden();
+    const firstRow = page.getByTestId("plan-row").first();
+    await expect(firstRow).toBeVisible();
 
-    const cards = page.getByTestId("plan-card");
-    await expect(cards.first()).toBeVisible();
+    // Header row is display:none at mobile
+    await expect(page.locator('[role="columnheader"]').first()).toBeHidden();
   });
 
-  test("at and above md breakpoint, the table renders and cards stay hidden", async ({
+  test("at and above md breakpoint, column headers are visible and plan rows render in table layout", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1024, height: 800 });
     await page.goto("/en/plans");
 
-    await expect(page.locator("table")).toBeVisible();
-    await expect(page.getByTestId("plan-card").first()).toBeHidden();
+    // Same rows visible at desktop (no separate table/card structures)
+    const firstRow = page.getByTestId("plan-row").first();
+    await expect(firstRow).toBeVisible();
+
+    // Column header row becomes visible at desktop
+    await expect(page.locator('[role="columnheader"]').first()).toBeVisible();
   });
 
-  test("a day/night plan card shows supplier, plan, discount, type, window, and weekday fields", async ({
+  test("a day/night plan row shows supplier, plan, discount, type, window, and weekday fields", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 600, height: 800 });
     await page.goto("/en/plans");
 
-    const card = page
-      .getByTestId("plan-card")
+    const row = page
+      .getByTestId("plan-row")
       .filter({ hasText: "Bezek Electricity" })
       .filter({ hasText: "Bezek Day" });
-    await expect(card).toBeVisible();
+    await expect(row).toBeVisible();
 
-    await expect(card.getByText("15%")).toBeVisible();
-    await expect(card.getByText("Day", { exact: true })).toBeVisible();
-    await expect(card.getByText("07:00–17:00")).toBeVisible();
-    await expect(card.getByText("Yes", { exact: true })).toBeVisible();
+    await expect(row.getByText("15%")).toBeVisible();
+    await expect(row.getByText("Day", { exact: true })).toBeVisible();
+    await expect(row.getByText("07:00–17:00")).toBeVisible();
+    await expect(row.getByText("Yes", { exact: true })).toBeVisible();
   });
 
-  test("a fixed plan card shows 24/7 and No for the discount window and weekday only rows", async ({
+  test("a fixed plan row shows 24/7 and No for the discount window and weekday only rows", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 600, height: 800 });
     await page.goto("/en/plans");
 
-    const card = page
-      .getByTestId("plan-card")
+    const row = page
+      .getByTestId("plan-row")
       .filter({ hasText: "Bezek Electricity" })
       .filter({ hasText: "Bezek Fixed" });
-    await expect(card).toBeVisible();
+    await expect(row).toBeVisible();
 
-    await expect(card.getByText("Fixed", { exact: true })).toBeVisible();
-    await expect(card.getByText("Discount Window")).toBeVisible();
-    await expect(card.getByText("Weekday Only")).toBeVisible();
-    await expect(card.getByText("24/7")).toBeVisible();
-    await expect(card.getByText("No", { exact: true })).toBeVisible();
+    await expect(row.getByText("Fixed", { exact: true })).toBeVisible();
+    await expect(row.getByText("Discount Window")).toBeVisible();
+    await expect(row.getByText("Weekday Only")).toBeVisible();
+    await expect(row.getByText("24/7")).toBeVisible();
+    await expect(row.getByText("No", { exact: true })).toBeVisible();
   });
 
-  test("the Leave Details CTA inside a card opens the leave-details dialog", async ({
+  test("the Leave Details CTA inside a row opens the leave-details dialog, spanning the row content width at mobile", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 600, height: 800 });
     await page.goto("/en/plans");
 
-    const firstCard = page.getByTestId("plan-card").first();
-    const leaveDetails = firstCard.getByRole("button", {
+    const firstRow = page.getByTestId("plan-row").first();
+    const leaveDetails = firstRow.getByRole("button", {
       name: "Leave details",
     });
     await leaveDetails.waitFor({ state: "visible", timeout: 15000 });
 
-    // CTA spans the card's content width, not a narrow inline button
-    const cardBox = await firstCard.boundingBox();
+    // CTA spans the row's content width, not a narrow inline button
+    const rowBox = await firstRow.boundingBox();
     const buttonBox = await leaveDetails.boundingBox();
-    expect(buttonBox!.width).toBeGreaterThan(cardBox!.width * 0.8);
+    expect(buttonBox!.width).toBeGreaterThan(rowBox!.width * 0.8);
 
     await leaveDetails.click();
 
@@ -151,7 +150,7 @@ test.describe("Plans page — Leave details CTA", () => {
   }) => {
     await page.goto("/en/plans");
 
-    const firstRow = page.locator("tbody tr").first();
+    const firstRow = page.getByTestId("plan-row").first();
     const leaveDetails = firstRow.getByRole("button", {
       name: "Leave details",
     });
@@ -178,7 +177,7 @@ test.describe("Plans page — Leave details CTA", () => {
   test("declining the fan-out step closes the dialog", async ({ page }) => {
     await page.goto("/en/plans");
 
-    const firstRow = page.locator("tbody tr").first();
+    const firstRow = page.getByTestId("plan-row").first();
     const leaveDetails = firstRow.getByRole("button", {
       name: "Leave details",
     });
@@ -207,7 +206,7 @@ test.describe("Plans page — click-through CTA", () => {
     await page.goto("/en/plans");
 
     const electraRow = page
-      .locator("tbody tr")
+      .getByTestId("plan-row")
       .filter({ hasText: "Electra Power" })
       .first();
     await expect(
@@ -224,7 +223,7 @@ test.describe("Plans page — click-through CTA", () => {
     await page.goto("/en/plans");
 
     const otherRow = page
-      .locator("tbody tr")
+      .getByTestId("plan-row")
       .filter({ hasNotText: "Electra Power" })
       .first();
     await expect(

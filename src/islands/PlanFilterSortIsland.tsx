@@ -15,34 +15,28 @@ interface PlanFilterSortIslandProps {
   };
 }
 
-function getRowTrees() {
-  return [
-    document.getElementById("plan-table-body"),
-    document.getElementById("plan-card-list"),
-  ].filter((el): el is HTMLElement => el !== null);
+function getRowContainer() {
+  return document.getElementById("plan-rows");
 }
 
 function applyFilter(
   planTypes: Set<string>,
   suppliers: Set<string>,
 ): { matching: number; total: number } {
-  const trees = getRowTrees();
+  const container = getRowContainer();
+  if (!container) return { matching: 0, total: 0 };
+  const rows = container.querySelectorAll<HTMLElement>("[data-row-id]");
   let matching = 0;
-  let total = 0;
-  trees.forEach((tree, treeIndex) => {
-    const rows = tree.querySelectorAll<HTMLElement>("[data-row-id]");
-    if (treeIndex === 0) total = rows.length;
-    for (const row of rows) {
-      const matchesType =
-        planTypes.size === 0 || planTypes.has(row.dataset.planType ?? "");
-      const matchesSupplier =
-        suppliers.size === 0 || suppliers.has(row.dataset.supplier ?? "");
-      const visible = matchesType && matchesSupplier;
-      row.classList.toggle("hidden", !visible);
-      if (treeIndex === 0 && visible) matching += 1;
-    }
-  });
-  return { matching, total };
+  for (const row of rows) {
+    const matchesType =
+      planTypes.size === 0 || planTypes.has(row.dataset.planType ?? "");
+    const matchesSupplier =
+      suppliers.size === 0 || suppliers.has(row.dataset.supplier ?? "");
+    const visible = matchesType && matchesSupplier;
+    row.classList.toggle("hidden", !visible);
+    if (visible) matching += 1;
+  }
+  return { matching, total: rows.length };
 }
 
 function toggleInSet(set: Set<string>, value: string): Set<string> {
@@ -83,16 +77,16 @@ function compareRows(field: SortField, a: HTMLElement, b: HTMLElement): number {
 }
 
 function applySort(field: SortField, direction: SortDirection) {
-  for (const tree of getRowTrees()) {
-    const rows = Array.from(
-      tree.querySelectorAll<HTMLElement>("[data-row-id]"),
-    );
-    rows.sort((a, b) => {
-      const cmp = compareRows(field, a, b);
-      return direction === "desc" ? -cmp : cmp;
-    });
-    for (const row of rows) tree.appendChild(row);
-  }
+  const container = getRowContainer();
+  if (!container) return;
+  const rows = Array.from(
+    container.querySelectorAll<HTMLElement>("[data-row-id]"),
+  );
+  rows.sort((a, b) => {
+    const cmp = compareRows(field, a, b);
+    return direction === "desc" ? -cmp : cmp;
+  });
+  for (const row of rows) container.appendChild(row);
 }
 
 const SORT_ARROWS: Record<SortDirection, string> = { asc: "↑", desc: "↓" };
@@ -118,7 +112,7 @@ function updateSortIndicators(
       indicator.classList.toggle("text-gray-400", !isActive);
     }
     header
-      .closest("th")
+      .closest('[role="columnheader"]')
       ?.setAttribute(
         "aria-sort",
         isActive ? (direction === "asc" ? "ascending" : "descending") : "none",
