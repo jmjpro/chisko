@@ -72,4 +72,24 @@ describe("middleware", () => {
     expect(favicon).toBeUndefined();
     expect(chunk).toBeUndefined();
   });
+
+  it("does not redirect Vite's internal dev-server paths, even when Accept-Language resolves to a non-default locale", () => {
+    const headers = { "accept-language": "en" };
+
+    const viteClient = middleware(
+      new Request("https://chisko.example/@vite/client", { headers }),
+    );
+    const reactRefresh = middleware(
+      new Request("https://chisko.example/@react-refresh", { headers }),
+    );
+    const viteId = middleware(
+      new Request("https://chisko.example/@id/__x00__astro:toolbar:internal", {
+        headers,
+      }),
+    );
+
+    expect(viteClient).toBeUndefined();
+    expect(reactRefresh).toBeUndefined();
+    expect(viteId).toBeUndefined();
+  });
 });

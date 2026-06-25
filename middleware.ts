@@ -23,7 +23,12 @@ function getCookie(request: Request, name: string): string | undefined {
 export default function middleware(request: Request): Response | undefined {
   const { pathname } = new URL(request.url);
 
-  if (pathname.startsWith("/_") || /\.\w+$/.test(pathname)) return undefined;
+  if (
+    pathname.startsWith("/_") ||
+    pathname.startsWith("/@") ||
+    /\.\w+$/.test(pathname)
+  )
+    return undefined;
 
   if (pathname.startsWith("/r/")) return undefined;
 
