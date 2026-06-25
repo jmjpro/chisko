@@ -40,6 +40,17 @@ test.describe("Locale routing — wizard", () => {
   });
 });
 
+test.describe("Locale routing — Accept-Language redirect", () => {
+  test.use({ locale: "en-US" });
+
+  test("a non-Hebrew browser locale redirects / to the matching locale prefix", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/en\/$/);
+  });
+});
+
 test.describe("Locale routing — page titles", () => {
   test("home page title per locale", async ({ page }) => {
     await page.goto("/");
