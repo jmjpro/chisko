@@ -42,7 +42,14 @@ export default defineConfig({
     },
     server: {
       watch: {
-        ignored: ["**/.claude/**"],
+        // Ignore sibling worktrees when running from the main checkout.
+        // Use an absolute path so this doesn't fire when running from inside a worktree.
+        ignored: [path.resolve(__dirname, ".claude")],
+      },
+      fs: {
+        // Worktrees share node_modules with the main repo root, which Vite's
+        // default allow list doesn't cover. Disable strict mode for dev only.
+        strict: false,
       },
     },
     // VERCEL_GIT_COMMIT_SHA is set by Vercel's build platform, not VITE_-prefixed,

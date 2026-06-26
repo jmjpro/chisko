@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -81,6 +82,10 @@ function rowIdsOf(containerId: string) {
   ).map((el) => (el as HTMLElement).dataset.rowId);
 }
 
+async function openMenu(triggerLabel: string) {
+  await userEvent.click(screen.getByRole("button", { name: triggerLabel }));
+}
+
 describe("PlanFilterSortIsland", () => {
   it("switches the shared i18n instance to the locale passed in via props, so it doesn't race other islands for the active language", () => {
     render(
@@ -96,37 +101,53 @@ describe("PlanFilterSortIsland", () => {
     }
   });
 
-  it("renders a checkbox for every plan type and every supplier option", () => {
+  it("renders trigger buttons for plan type and supplier, with all options checked by default", async () => {
     render(
       <PlanFilterSortIsland locale="en" filterOptions={baseFilterOptions()} />,
     );
 
-    expect(screen.getByRole("checkbox", { name: "Fixed" })).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Day" })).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Night" })).toBeInTheDocument();
     expect(
-      screen.getByRole("checkbox", { name: /Bezek Electricity Co\./ }),
+      screen.getByRole("button", { name: "filter_plan_type_label" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("checkbox", { name: /Acme Power/ }),
+      screen.getByRole("button", { name: "filter_supplier_label" }),
     ).toBeInTheDocument();
+
+    await openMenu("filter_plan_type_label");
+    expect(
+      screen.getByRole("menuitemcheckbox", { name: "Fixed" }),
+    ).toBeChecked();
+    expect(screen.getByRole("menuitemcheckbox", { name: "Day" })).toBeChecked();
+    expect(
+      screen.getByRole("menuitemcheckbox", { name: "Night" }),
+    ).toBeChecked();
+
+    await openMenu("filter_supplier_label");
+    expect(
+      screen.getByRole("menuitemcheckbox", { name: /Bezek Electricity Co\./ }),
+    ).toBeChecked();
+    expect(
+      screen.getByRole("menuitemcheckbox", { name: /Acme Power/ }),
+    ).toBeChecked();
   });
 
-  it("renders a logo before each supplier label, sized for the filter checkboxes", () => {
+  it("renders a logo for each supplier inside the supplier dropdown", async () => {
     render(
       <PlanFilterSortIsland locale="en" filterOptions={baseFilterOptions()} />,
     );
 
-    const label = screen
-      .getByRole("checkbox", { name: /Bezek Electricity Co\./ })
-      .closest("label");
-    const logo = label?.querySelector("img");
+    await openMenu("filter_supplier_label");
+
+    const bezekItem = screen.getByRole("menuitemcheckbox", {
+      name: /Bezek Electricity Co\./,
+    });
+    const logo = bezekItem.querySelector("img");
 
     expect(logo).toHaveAttribute("src", "/suppliers/bezek.webp");
-    expect(logo).toHaveAttribute("alt", "Bezek Electricity Co.");
+    expect(logo).toHaveAttribute("alt", "");
     expect(logo).toHaveAttribute("loading", "lazy");
-    expect(logo).toHaveAttribute("width", "40");
-    expect(logo).toHaveAttribute("height", "40");
+    expect(logo).toHaveAttribute("width", "32");
+    expect(logo).toHaveAttribute("height", "32");
   });
 
   it("renders a mobile sort-by select listing discount, supplier, and plan type", () => {
@@ -147,19 +168,23 @@ describe("PlanFilterSortIsland", () => {
     ).toBeInTheDocument();
   });
 
-  it("checking a plan-type checkbox hides non-matching rows, leaving matching rows visible", async () => {
+  it("unchecking a plan type hides rows of that type, leaving other rows visible", async () => {
     mountRowFixtures();
     render(
       <PlanFilterSortIsland locale="en" filterOptions={baseFilterOptions()} />,
     );
 
-    await userEvent.click(screen.getByRole("checkbox", { name: "Fixed" }));
+    await openMenu("filter_plan_type_label");
+    await userEvent.click(
+      screen.getByRole("menuitemcheckbox", { name: "Fixed" }),
+    );
 
-    const fixedRow = document.querySelector('#plan-rows [data-row-id="pv1"]');
-    const dayRow = document.querySelector('#plan-rows [data-row-id="pv2"]');
-
-    expect(fixedRow).not.toHaveClass("hidden");
-    expect(dayRow).toHaveClass("hidden");
+    expect(
+      document.querySelector('#plan-rows [data-row-id="pv1"]'),
+    ).toHaveClass("hidden");
+    expect(
+      document.querySelector('#plan-rows [data-row-id="pv2"]'),
+    ).not.toHaveClass("hidden");
   });
 
   it("unions multiple checked values within the same facet, but intersects across facets", async () => {
@@ -168,26 +193,29 @@ describe("PlanFilterSortIsland", () => {
       <PlanFilterSortIsland locale="en" filterOptions={baseFilterOptions()} />,
     );
 
-    await userEvent.click(screen.getByRole("checkbox", { name: "Fixed" }));
-    await userEvent.click(screen.getByRole("checkbox", { name: "Day" }));
-
-    expect(
-      document.querySelector('#plan-rows [data-row-id="pv1"]'),
-    ).not.toHaveClass("hidden");
-    expect(
-      document.querySelector('#plan-rows [data-row-id="pv2"]'),
-    ).not.toHaveClass("hidden");
-
+    // Uncheck Night only — both pv1 (fixed) and pv2 (day) still show (union within facet)
+    await openMenu("filter_plan_type_label");
     await userEvent.click(
-      screen.getByRole("checkbox", { name: /Bezek Electricity Co\./ }),
+      screen.getByRole("menuitemcheckbox", { name: "Night" }),
     );
-
     expect(
       document.querySelector('#plan-rows [data-row-id="pv1"]'),
     ).not.toHaveClass("hidden");
     expect(
       document.querySelector('#plan-rows [data-row-id="pv2"]'),
+    ).not.toHaveClass("hidden");
+
+    // Now uncheck Bezek — pv1 (Bezek/fixed) hides even though Fixed is still selected
+    await openMenu("filter_supplier_label");
+    await userEvent.click(
+      screen.getByRole("menuitemcheckbox", { name: /Bezek Electricity Co\./ }),
+    );
+    expect(
+      document.querySelector('#plan-rows [data-row-id="pv1"]'),
     ).toHaveClass("hidden");
+    expect(
+      document.querySelector('#plan-rows [data-row-id="pv2"]'),
+    ).not.toHaveClass("hidden");
   });
 
   it("selecting Plan Type from the mobile sort-by select reorders the rows using the canonical Fixed/Day/Night order", async () => {
@@ -263,7 +291,10 @@ describe("PlanFilterSortIsland", () => {
       screen.getByText('filter_result_count|{"count":2,"total":2}'),
     ).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("checkbox", { name: "Fixed" }));
+    await openMenu("filter_plan_type_label");
+    await userEvent.click(
+      screen.getByRole("menuitemcheckbox", { name: "Fixed" }),
+    );
 
     expect(
       screen.getByText('filter_result_count|{"count":1,"total":2}'),
@@ -276,11 +307,22 @@ describe("PlanFilterSortIsland", () => {
       <PlanFilterSortIsland locale="en" filterOptions={baseFilterOptions()} />,
     );
 
-    await userEvent.click(screen.getByRole("checkbox", { name: "Night" }));
+    // Uncheck Fixed and Day — only Night selected, but no night rows in the fixture
+    await openMenu("filter_plan_type_label");
+    await userEvent.click(
+      screen.getByRole("menuitemcheckbox", { name: "Fixed" }),
+    );
+    await userEvent.click(
+      screen.getByRole("menuitemcheckbox", { name: "Day" }),
+    );
+    await userEvent.keyboard("{Escape}");
 
     expect(screen.getByText("filter_empty_state_message")).toBeInTheDocument();
     expect(
       document.querySelector('#plan-rows [data-row-id="pv1"]'),
+    ).toHaveClass("hidden");
+    expect(
+      document.querySelector('#plan-rows [data-row-id="pv2"]'),
     ).toHaveClass("hidden");
 
     await userEvent.click(
@@ -293,6 +335,17 @@ describe("PlanFilterSortIsland", () => {
     expect(
       document.querySelector('#plan-rows [data-row-id="pv1"]'),
     ).not.toHaveClass("hidden");
-    expect(screen.getByRole("checkbox", { name: "Night" })).not.toBeChecked();
+    expect(
+      document.querySelector('#plan-rows [data-row-id="pv2"]'),
+    ).not.toHaveClass("hidden");
+
+    // All plan type options are checked again after clearing
+    await openMenu("filter_plan_type_label");
+    expect(
+      screen.getByRole("menuitemcheckbox", { name: "Fixed" }),
+    ).toBeChecked();
+    expect(
+      screen.getByRole("menuitemcheckbox", { name: "Night" }),
+    ).toBeChecked();
   });
 });

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { MultiSelectMenu } from "../components/ui/multiSelectMenu";
 import i18n from "../i18n";
 
 interface FilterOption {
@@ -41,16 +42,6 @@ function applyFilter(
     if (visible) matching += 1;
   }
   return { matching, total: rows.length };
-}
-
-function toggleInSet(set: Set<string>, value: string): Set<string> {
-  const next = new Set(set);
-  if (next.has(value)) {
-    next.delete(value);
-  } else {
-    next.add(value);
-  }
-  return next;
 }
 
 type SortField = "discount" | "supplier" | "type";
@@ -135,10 +126,10 @@ export default function PlanFilterSortIsland({
   }, [locale]);
 
   const [selectedPlanTypes, setSelectedPlanTypes] = useState<Set<string>>(
-    new Set(),
+    () => new Set(filterOptions.planTypes.map((o) => o.value)),
   );
   const [selectedSuppliers, setSelectedSuppliers] = useState<Set<string>>(
-    new Set(),
+    () => new Set(filterOptions.suppliers.map((o) => o.value)),
   );
   const [sort, setSort] = useState<{
     field: SortField;
@@ -159,8 +150,8 @@ export default function PlanFilterSortIsland({
   const isEmpty = resultCount.matching === 0 && resultCount.total > 0;
 
   const clearFilters = () => {
-    setSelectedPlanTypes(new Set());
-    setSelectedSuppliers(new Set());
+    setSelectedPlanTypes(new Set(filterOptions.planTypes.map((o) => o.value)));
+    setSelectedSuppliers(new Set(filterOptions.suppliers.map((o) => o.value)));
   };
 
   useEffect(() => {
@@ -188,64 +179,43 @@ export default function PlanFilterSortIsland({
     };
   }, []);
 
+  const supplierOptions = filterOptions.suppliers.map((o) => ({
+    value: o.value,
+    label: o.label,
+    icon: (
+      <img
+        src={`/suppliers/${o.logoFileName}`}
+        alt=""
+        loading="lazy"
+        width={32}
+        height={32}
+        className="h-8 w-8 object-contain"
+      />
+    ),
+  }));
+
   return (
     <div className="flex flex-col gap-4 mb-6">
-      <p className="text-sm text-gray-600">
-        {t("filter_result_count", {
-          count: resultCount.matching,
-          total: resultCount.total,
-        })}
-      </p>
-      <fieldset className="flex flex-wrap items-center gap-3">
-        <legend className="font-semibold text-sm mb-1">
-          {t("filter_plan_type_label")}
-        </legend>
-        {filterOptions.planTypes.map((option) => (
-          <label
-            key={option.value}
-            className="flex items-center gap-1.5 text-sm"
-          >
-            <input
-              type="checkbox"
-              value={option.value}
-              checked={selectedPlanTypes.has(option.value)}
-              onChange={() =>
-                setSelectedPlanTypes((prev) => toggleInSet(prev, option.value))
-              }
-            />
-            {option.label}
-          </label>
-        ))}
-      </fieldset>
-      <fieldset className="flex flex-wrap items-center gap-3">
-        <legend className="font-semibold text-sm mb-1">
-          {t("filter_supplier_label")}
-        </legend>
-        {filterOptions.suppliers.map((option) => (
-          <label
-            key={option.value}
-            className="flex items-center gap-1.5 text-sm"
-          >
-            <input
-              type="checkbox"
-              value={option.value}
-              checked={selectedSuppliers.has(option.value)}
-              onChange={() =>
-                setSelectedSuppliers((prev) => toggleInSet(prev, option.value))
-              }
-            />
-            <img
-              src={`/suppliers/${option.logoFileName}`}
-              alt={option.label}
-              loading="lazy"
-              width={40}
-              height={40}
-              className="h-10 w-10 object-contain"
-            />
-            {option.label}
-          </label>
-        ))}
-      </fieldset>
+      <div className="flex items-center gap-2">
+        <MultiSelectMenu
+          label={t("filter_plan_type_label")}
+          options={filterOptions.planTypes}
+          selected={selectedPlanTypes}
+          onSelectedChange={setSelectedPlanTypes}
+        />
+        <MultiSelectMenu
+          label={t("filter_supplier_label")}
+          options={supplierOptions}
+          selected={selectedSuppliers}
+          onSelectedChange={setSelectedSuppliers}
+        />
+        <p className="text-sm text-gray-600 ms-auto">
+          {t("filter_result_count", {
+            count: resultCount.matching,
+            total: resultCount.total,
+          })}
+        </p>
+      </div>
       <label className="md:hidden flex items-center gap-2 text-sm">
         {t("sort_by_label")}
         <select
