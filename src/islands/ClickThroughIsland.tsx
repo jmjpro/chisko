@@ -11,6 +11,7 @@ interface ClickThroughIslandProps {
   convexUrl: string;
   supplierId: Id<"suppliers">;
   planVersionId: Id<"planVersions">;
+  supplierName: string;
 }
 
 export default function ClickThroughIsland({
@@ -18,8 +19,10 @@ export default function ClickThroughIsland({
   convexUrl,
   supplierId,
   planVersionId,
+  supplierName,
 }: ClickThroughIslandProps) {
   const { t } = useTranslation("common");
+  const { t: tSupplier } = useTranslation("suppliers");
   const [client] = useState(() => getSharedConvexClient(convexUrl));
   const [sessionId, setSessionId] = useState<Id<"sessions"> | null>(null);
 
@@ -33,8 +36,8 @@ export default function ClickThroughIsland({
 
   if (!sessionId) {
     return (
-      <Button size="sm" variant="outline" className="w-full" disabled>
-        {t("cta_click_through")}
+      <Button size="sm" variant="outline" disabled>
+        {t("cta_click_through", { supplier: tSupplier(supplierName) })}
       </Button>
     );
   }
@@ -44,6 +47,7 @@ export default function ClickThroughIsland({
       sessionId={sessionId}
       supplierId={supplierId}
       planVersionId={planVersionId}
+      supplierName={supplierName}
     />
   );
 }

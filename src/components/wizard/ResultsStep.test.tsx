@@ -338,7 +338,9 @@ describe("ResultsStep — CTA order", () => {
     );
 
     const leaveDetails = screen.getByText("cta_leave_details");
-    const switchWithout = screen.getByText("cta_click_through");
+    const switchWithout = screen.getByRole("button", {
+      name: /cta_click_through/,
+    });
     expect(leaveDetails.compareDocumentPosition(switchWithout)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
@@ -384,7 +386,9 @@ describe("ResultsStep — CTA order", () => {
     await userEvent.click(screen.getByText(/show_more_options/));
 
     const [, altLeaveDetails] = screen.getAllByText("cta_leave_details");
-    const [, altSwitchWithout] = screen.getAllByText("cta_click_through");
+    const [, altSwitchWithout] = screen.getAllByRole("button", {
+      name: /cta_click_through/,
+    });
     expect(altLeaveDetails.compareDocumentPosition(altSwitchWithout)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
@@ -419,9 +423,9 @@ describe("ResultsStep — click-through CTA", () => {
       />,
     );
 
-    const cta = screen.getByText("cta_click_through");
+    const cta = screen.getByRole("button", { name: /cta_click_through/ });
     expect(cta).toBeInTheDocument();
-    expect(cta.closest("a")).toHaveAttribute(
+    expect(cta).toHaveAttribute(
       "href",
       `/out/${primarySupplierId}/${primaryPlanVersionId}?sessionId=${sessionId}`,
     );
@@ -431,7 +435,9 @@ describe("ResultsStep — click-through CTA", () => {
   it("does not show the click-through CTA when the supplier doesn't support clickThrough", () => {
     render(<ResultsStep {...baseProps()} />);
 
-    expect(screen.queryByText("cta_click_through")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /cta_click_through/ }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("cta_leave_details")).toBeInTheDocument();
   });
 });

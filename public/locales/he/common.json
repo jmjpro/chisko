@@ -27,7 +27,7 @@
   "back_to_home": "חזרה לדף הבית",
   "share_savings_description": "חיסכון שנתי צפוי: ₪{{amount}}",
   "cta_switch_now": "מעבר עכשיו",
-  "cta_click_through": "מעבר ללא נציג",
+  "cta_click_through": "לתוכנית של {{supplier}}",
   "cta_leave_details": "השאירו פרטים",
   "lead_form_title": "השאירו את הפרטים שלכם",
   "lead_form_name_label": "שם מלא",

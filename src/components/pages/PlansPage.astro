@@ -118,7 +118,7 @@ const filterOptions = buildFilterOptions(rows, common);
                 <span class="text-end md:text-start">{row.weekdayOnly}</span>
               </div>
               <div role="cell" class="cell-actions md:py-3">
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2 items-center">
                   <LeaveDetailsIsland
                     client:only="react"
                     locale={locale}
@@ -133,6 +133,7 @@ const filterOptions = buildFilterOptions(rows, common);
                       convexUrl={convexUrl}
                       supplierId={row.supplierId}
                       planVersionId={row.pvId}
+                      supplierName={row.supplierName}
                     />
                   )}
                 </div>

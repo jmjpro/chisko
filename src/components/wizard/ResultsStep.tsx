@@ -283,6 +283,7 @@ export default function ResultsStep({
                 sessionId={sessionId}
                 supplierId={plan.supplier._id}
                 planVersionId={plan.planVersionId}
+                supplierName={plan.supplier.name}
               />
             )}
           </div>
