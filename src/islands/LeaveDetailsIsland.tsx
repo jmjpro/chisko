@@ -39,14 +39,10 @@ export default function LeaveDetailsIsland({
           sessionId={sessionId}
           supplierId={supplierId}
           planVersionId={planVersionId}
-          trigger={
-            <Button size="sm" className="w-full">
-              {t("cta_leave_details")}
-            </Button>
-          }
+          trigger={<Button size="sm">{t("cta_leave_details")}</Button>}
         />
       ) : (
-        <Button size="sm" className="w-full" disabled>
+        <Button size="sm" disabled>
           {t("cta_leave_details")}
         </Button>
       )}

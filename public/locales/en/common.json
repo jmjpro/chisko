@@ -27,7 +27,7 @@
   "back_to_home": "Back to home",
   "share_savings_description": "Expected annual savings: ₪{{amount}}",
   "cta_switch_now": "Switch now",
-  "cta_click_through": "Switch without an agent",
+  "cta_click_through": "View plan at {{supplier}}",
   "cta_leave_details": "Leave details",
   "lead_form_title": "Leave your details",
   "lead_form_name_label": "Full name",

@@ -27,7 +27,7 @@
   "back_to_home": "На главную",
   "share_savings_description": "Ожидаемая годовая экономия: ₪{{amount}}",
   "cta_switch_now": "Перейти сейчас",
-  "cta_click_through": "Перейти без посредника",
+  "cta_click_through": "Смотреть план у {{supplier}}",
   "cta_leave_details": "Оставить контакты",
   "lead_form_title": "Оставьте свои контакты",
   "lead_form_name_label": "Полное имя",

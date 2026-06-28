@@ -27,7 +27,7 @@
   "back_to_home": "العودة إلى الصفحة الرئيسية",
   "share_savings_description": "المدخرات السنوية المتوقعة: ₪{{amount}}",
   "cta_switch_now": "التبديل الآن",
-  "cta_click_through": "التبديل بدون وكيل",
+  "cta_click_through": "لخطة {{supplier}}",
   "cta_leave_details": "اترك بياناتك",
   "lead_form_title": "اترك بياناتك",
   "lead_form_name_label": "الاسم الكامل",
