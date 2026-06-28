@@ -192,7 +192,9 @@ export const upsertMeta = internalMutation({
       await ctx.db.insert("smartMeterRegistryMeta", {
         lastRefreshedAt: args.lastRefreshedAt ?? Date.now(),
         ...(args.sourceETag !== undefined && { sourceETag: args.sourceETag }),
-        ...(args.lastCheckedAt !== undefined && { lastCheckedAt: args.lastCheckedAt }),
+        ...(args.lastCheckedAt !== undefined && {
+          lastCheckedAt: args.lastCheckedAt,
+        }),
       });
     }
   },
