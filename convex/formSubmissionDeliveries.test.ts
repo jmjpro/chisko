@@ -44,7 +44,7 @@ test("claimBatch marks open deliveries as processing and returns them", async ()
   const now = Date.now();
   const claimed = await t.mutation(
     internal.formSubmissionDeliveries.claimBatch,
-    {},
+    { limit: 10 },
   );
 
   expect(claimed).toHaveLength(1);
@@ -58,12 +58,12 @@ test("claimBatch marks open deliveries as processing and returns them", async ()
 test("claimBatch leaves recently-claimed processing deliveries alone", async () => {
   const t = convexTest(schema, modules);
   const referralId = await seedOpenDelivery(t);
-  await t.mutation(internal.formSubmissionDeliveries.claimBatch, {});
+  await t.mutation(internal.formSubmissionDeliveries.claimBatch, { limit: 10 });
 
   vi.advanceTimersByTime(5 * 60 * 1000); // 5 min — under the 10 min staleness threshold
   const claimed = await t.mutation(
     internal.formSubmissionDeliveries.claimBatch,
-    {},
+    { limit: 10 },
   );
 
   expect(claimed).toHaveLength(0);
@@ -74,13 +74,13 @@ test("claimBatch leaves recently-claimed processing deliveries alone", async () 
 test("claimBatch reclaims stale processing deliveries past the staleness threshold", async () => {
   const t = convexTest(schema, modules);
   const referralId = await seedOpenDelivery(t);
-  await t.mutation(internal.formSubmissionDeliveries.claimBatch, {});
+  await t.mutation(internal.formSubmissionDeliveries.claimBatch, { limit: 10 });
 
   vi.advanceTimersByTime(10 * 60 * 1000); // exactly at the 10 min staleness threshold
   const now = Date.now();
   const claimed = await t.mutation(
     internal.formSubmissionDeliveries.claimBatch,
-    {},
+    { limit: 10 },
   );
 
   expect(claimed).toHaveLength(1);
@@ -159,6 +159,73 @@ test("runBatch permanently closes a delivery after exhausting the retry cap, wit
   expect(delivery!.lastError).toBe("Resend error: invalid recipient");
 });
 
+test("claimBatch respects the limit and does not claim beyond it", async () => {
+  const t = convexTest(schema, modules);
+  await seedOpenDelivery(t);
+  await seedOpenDelivery(t);
+  await seedOpenDelivery(t);
+
+  const claimed = await t.mutation(
+    internal.formSubmissionDeliveries.claimBatch,
+    { limit: 2 },
+  );
+
+  expect(claimed).toHaveLength(2);
+});
+
+test("runBatch closes all deliveries in a multi-delivery batch when all emails succeed", async () => {
+  const t = convexTest(schema, modules);
+  const r1 = await seedOpenDelivery(t);
+  const r2 = await seedOpenDelivery(t);
+  vi.stubGlobal("fetch", okFetch());
+
+  await t.action(internal.formSubmissionDeliveries.runBatch, {});
+
+  const d1 = await getDeliveryByReferral(t, r1);
+  const d2 = await getDeliveryByReferral(t, r2);
+  expect(d1).toMatchObject({ state: "closed", attempts: 1 });
+  expect(d2).toMatchObject({ state: "closed", attempts: 1 });
+});
+
+test("runBatch closes the successful delivery and retries the failed one independently", async () => {
+  const t = convexTest(schema, modules);
+  const okReferralId = await seedOpenDelivery(t);
+  const failReferralId = await seedOpenDelivery(t);
+
+  let callCount = 0;
+  vi.stubGlobal("fetch", async (...args: Parameters<typeof fetch>) => {
+    callCount++;
+    if (callCount === 1) return okFetch()(...args);
+    return failingFetch("bad address")(...args);
+  });
+
+  await t.action(internal.formSubmissionDeliveries.runBatch, {});
+
+  const ok = await getDeliveryByReferral(t, okReferralId);
+  const fail = await getDeliveryByReferral(t, failReferralId);
+  expect(ok).toMatchObject({ state: "closed", attempts: 1 });
+  expect(fail).toMatchObject({ state: "open", attempts: 1 });
+});
+
+test("claimBatch fills remaining slots with stale deliveries after open quota is used", async () => {
+  const t = convexTest(schema, modules);
+  // Seed 3 deliveries and claim them all → all in processing state
+  await seedOpenDelivery(t);
+  await seedOpenDelivery(t);
+  const staleReferralId = await seedOpenDelivery(t);
+  await t.mutation(internal.formSubmissionDeliveries.claimBatch, { limit: 10 });
+  vi.advanceTimersByTime(10 * 60 * 1000); // all 3 become stale
+
+  // 0 open + 3 stale, limit 3 → all 3 stale claimed
+  const claimed = await t.mutation(
+    internal.formSubmissionDeliveries.claimBatch,
+    { limit: 3 },
+  );
+
+  expect(claimed).toHaveLength(3);
+  expect(claimed.map((c) => c.referralId)).toContain(staleReferralId);
+});
+
 test("claimBatch never claims closed deliveries", async () => {
   const t = convexTest(schema, modules);
   const referralId = await seedOpenDelivery(t);
@@ -175,7 +242,7 @@ test("claimBatch never claims closed deliveries", async () => {
   vi.advanceTimersByTime(24 * 60 * 60 * 1000); // 1 day later
   const claimed = await t.mutation(
     internal.formSubmissionDeliveries.claimBatch,
-    {},
+    { limit: 10 },
   );
 
   expect(claimed).toHaveLength(0);
