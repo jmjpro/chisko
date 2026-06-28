@@ -71,7 +71,7 @@ export async function getDeliveryByReferral(
 }
 
 export function okFetch() {
-  return vi.fn(async (_url: string, _options: RequestInit) => ({
+  return vi.fn(async (_url: string | URL | Request, _options: RequestInit) => ({
     ok: true,
     json: async () => ({ id: "email_123" }),
     headers: new Headers(),
@@ -79,7 +79,7 @@ export function okFetch() {
 }
 
 export function failingFetch(message: string) {
-  return vi.fn(async (_url: string, _options: RequestInit) => ({
+  return vi.fn(async (_url: string | URL | Request, _options: RequestInit) => ({
     ok: false,
     text: async () => JSON.stringify({ message }),
     headers: new Headers(),

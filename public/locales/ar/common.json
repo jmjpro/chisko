@@ -43,6 +43,8 @@
   "fan_out_confirm": "شارك أيضًا مع هؤلاء الموردين",
   "fan_out_decline": "لا، شكرًا",
   "fan_out_confirmation": "تم إرسال الطلب — سيتواصل معك {{count}} من الموردين",
+  "back_to_plans": "العودة إلى الخطط",
+  "back_to_wizard": "العودة إلى المعالج",
   "filter_plan_type_label": "نوع الخطة",
   "filter_supplier_label": "المورد",
   "sort_by_label": "الترتيب حسب",

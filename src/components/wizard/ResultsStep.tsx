@@ -276,6 +276,7 @@ export default function ResultsStep({
               supplierId={plan.supplier._id}
               planVersionId={plan.planVersionId}
               trigger={<Button size="sm">{tc("cta_leave_details")}</Button>}
+              backLabel={tc("back_to_wizard")}
             />
             {plan.supplier.supportedHandoffTypes?.includes("clickThrough") && (
               <ClickThroughCta

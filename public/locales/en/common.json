@@ -43,6 +43,8 @@
   "fan_out_confirm": "Also share with these suppliers",
   "fan_out_decline": "No thanks",
   "fan_out_confirmation": "Request sent — {{count}} supplier(s) will contact you",
+  "back_to_plans": "Back to Plans",
+  "back_to_wizard": "Back to Wizard",
   "filter_plan_type_label": "Plan type",
   "filter_supplier_label": "Supplier",
   "sort_by_label": "Sort by",
