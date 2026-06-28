@@ -53,7 +53,7 @@ test("sendDeliveryNotification emails the lead's details to the configured recip
   expect(fetchMock).toHaveBeenCalledTimes(1);
   const [url, options] = fetchMock.mock.calls[0];
   expect(url).toBe(RESEND_URL);
-  const body = JSON.parse(options.body as string);
+  const body = JSON.parse(options!.body as string);
   expect(body.to).toBe("jmjpro+chisko_form@gmail.com");
   expect(body.text).toContain("Yossi");
   expect(body.text).toContain("0501234567");
