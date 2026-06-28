@@ -52,8 +52,7 @@ describe("renovate.json — devDependency auto-merge", () => {
 describe("renovate.json — major bump policy", () => {
   const majorRule = config.packageRules?.find(
     (r: Record<string, unknown>) =>
-      r.matchUpdateTypes &&
-      (r.matchUpdateTypes as string[]).includes("major"),
+      r.matchUpdateTypes && (r.matchUpdateTypes as string[]).includes("major"),
   );
 
   it("has a rule for major updates", () => {
