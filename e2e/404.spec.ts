@@ -9,9 +9,9 @@ test.describe("404 page — per locale", () => {
     // src/lib/locale.ts's LANG_COOKIE) — the browser's own Accept-Language
     // would otherwise decide which unprefixed-locale redirect fires here,
     // which is the unrelated, separately-tracked flakiness CHI-85 covers.
-    await page.context().addCookies([
-      { name: "chisko_lang", value: "he", url: baseURL },
-    ]);
+    await page
+      .context()
+      .addCookies([{ name: "chisko_lang", value: "he", url: baseURL }]);
     await page.goto("/asdkjasd");
     await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
     await expect(page.locator("html")).toHaveAttribute("lang", "he");
@@ -61,7 +61,7 @@ test.describe("404 page — regression guard", () => {
     page,
   }) => {
     await page.goto("/en/plans");
-    await expect(page.locator("table")).toBeVisible();
+    await expect(page.locator('[role="table"]')).toBeVisible();
     await expect(page).not.toHaveTitle("Chisko — Page not found");
   });
 });

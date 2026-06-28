@@ -61,6 +61,7 @@ test.describe("Header — language switcher", () => {
   }) => {
     await page.goto("/wizard");
     await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+    await expect(page.locator("main")).toBeVisible();
 
     await page.selectOption("#chisko-lang-select", "en");
 
