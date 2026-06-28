@@ -338,6 +338,8 @@ export default defineSchema({
   // Singleton tracking the last successful Smart Meter Registry refresh
   smartMeterRegistryMeta: defineTable({
     lastRefreshedAt: v.number(),
+    sourceETag: v.optional(v.string()), // ETag from last HEAD/GET response; absent = never stored
+    lastCheckedAt: v.optional(v.number()), // updated on every cron run, including ETag-match skips
   }),
 
   // Singleton counter for PDF extraction confidence.
