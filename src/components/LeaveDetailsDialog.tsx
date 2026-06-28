@@ -228,7 +228,10 @@ export default function LeaveDetailsDialog({
               ))}
             </ul>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setStep({ kind: "confirmation", count: 1 })}>
+              <Button
+                variant="ghost"
+                onClick={() => setStep({ kind: "confirmation", count: 1 })}
+              >
                 {t("fan_out_decline")}
               </Button>
               <Button onClick={() => void handleConfirmFanOut()}>

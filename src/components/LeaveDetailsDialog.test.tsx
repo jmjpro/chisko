@@ -231,8 +231,14 @@ describe("LeaveDetailsDialog", () => {
     ]);
 
     await openDialog();
-    await userEvent.type(screen.getByLabelText("lead_form_name_label"), "Yossi");
-    await userEvent.type(screen.getByLabelText("lead_form_phone_label"), "0501234567");
+    await userEvent.type(
+      screen.getByLabelText("lead_form_name_label"),
+      "Yossi",
+    );
+    await userEvent.type(
+      screen.getByLabelText("lead_form_phone_label"),
+      "0501234567",
+    );
     await userEvent.click(screen.getByText("lead_form_submit"));
     await screen.findByText("fan_out_title");
     await userEvent.click(screen.getByText("fan_out_confirm"));
@@ -241,7 +247,9 @@ describe("LeaveDetailsDialog", () => {
     await userEvent.click(screen.getByText("back_to_plans"));
 
     await waitFor(() =>
-      expect(screen.queryByText('fan_out_confirmation|{"count":2}')).not.toBeInTheDocument(),
+      expect(
+        screen.queryByText('fan_out_confirmation|{"count":2}'),
+      ).not.toBeInTheDocument(),
     );
   });
 
@@ -267,8 +275,14 @@ describe("LeaveDetailsDialog", () => {
       />,
     );
     await userEvent.click(screen.getByText("cta_leave_details"));
-    await userEvent.type(screen.getByLabelText("lead_form_name_label"), "Yossi");
-    await userEvent.type(screen.getByLabelText("lead_form_phone_label"), "0501234567");
+    await userEvent.type(
+      screen.getByLabelText("lead_form_name_label"),
+      "Yossi",
+    );
+    await userEvent.type(
+      screen.getByLabelText("lead_form_phone_label"),
+      "0501234567",
+    );
     await userEvent.click(screen.getByText("lead_form_submit"));
     await screen.findByText("fan_out_title");
     await userEvent.click(screen.getByText("fan_out_confirm"));
