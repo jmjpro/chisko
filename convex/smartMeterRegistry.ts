@@ -179,16 +179,20 @@ export const insertAddressesBatch = internalMutation({
 });
 
 export const upsertMeta = internalMutation({
-  args: { lastRefreshedAt: v.number() },
+  args: {
+    lastRefreshedAt: v.optional(v.number()),
+    sourceETag: v.optional(v.string()),
+    lastCheckedAt: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
     const existing = await ctx.db.query("smartMeterRegistryMeta").first();
     if (existing) {
-      await ctx.db.patch("smartMeterRegistryMeta", existing._id, {
-        lastRefreshedAt: args.lastRefreshedAt,
-      });
+      await ctx.db.patch("smartMeterRegistryMeta", existing._id, args);
     } else {
       await ctx.db.insert("smartMeterRegistryMeta", {
-        lastRefreshedAt: args.lastRefreshedAt,
+        lastRefreshedAt: args.lastRefreshedAt ?? Date.now(),
+        ...(args.sourceETag !== undefined && { sourceETag: args.sourceETag }),
+        ...(args.lastCheckedAt !== undefined && { lastCheckedAt: args.lastCheckedAt }),
       });
     }
   },

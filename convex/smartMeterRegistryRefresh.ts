@@ -1,7 +1,7 @@
 "use node";
 
 import { internalAction } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import type { FunctionReference } from "convex/server";
 import { BATCH_SIZE } from "./smartMeterRegistry";
 import { withCapturedExceptions } from "./lib/sentry";
@@ -11,6 +11,12 @@ import type { ActionCtx } from "./_generated/server";
 const IEC_CSV_URL =
   "https://minisites.howazit.com/5430101017/mobility_addresses.csv";
 
+// Convex free plan enforces a 4 MiB/s rolling write limit. At BATCH_SIZE=2000
+// rows, each mutation is ~100–160 KB, so back-to-back mutations can burst past
+// the limit on a fresh database. 50ms between batches keeps throughput well
+// under 4 MiB/s while reducing the original 150ms (≈32s for 215 address
+// batches) to ≈11s on a first-run seed.
+const BATCH_SLEEP_MS = 50;
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -53,6 +59,21 @@ export const doRefresh = internalAction({
 async function runRefresh(ctx: ActionCtx) {
   const t0 = Date.now();
   const ts = () => `[+${((Date.now() - t0) / 1000).toFixed(1)}s]`;
+
+  // ETag short-circuit: HEAD the source before downloading — see ADR 0031
+  const meta = await ctx.runQuery(api.smartMeterRegistry.getMeta);
+  const headResponse = await fetch(IEC_CSV_URL, { method: "HEAD" });
+  const currentETag = headResponse.headers?.get("etag") ?? null;
+
+  if (currentETag !== null && meta?.sourceETag === currentETag) {
+    console.log(
+      `${ts()} ETag match (${currentETag}) — source unchanged, skipping refresh.`,
+    );
+    await ctx.runMutation(internal.smartMeterRegistry.upsertMeta, {
+      lastCheckedAt: Date.now(),
+    });
+    return;
+  }
 
   console.log(`${ts()} Fetching CSV…`);
   const response = await fetch(IEC_CSV_URL);
@@ -129,7 +150,7 @@ async function runRefresh(ctx: ActionCtx) {
     await ctx.runMutation(internal.smartMeterRegistry.insertCitiesBatch, {
       rows: newCities.slice(i, i + BATCH_SIZE),
     });
-    await sleep(150);
+    await sleep(BATCH_SLEEP_MS);
   }
 
   const existingStreetKeys = await loadKeySet(
@@ -144,7 +165,7 @@ async function runRefresh(ctx: ActionCtx) {
     await ctx.runMutation(internal.smartMeterRegistry.insertStreetsBatch, {
       rows: newStreets.slice(i, i + BATCH_SIZE),
     });
-    await sleep(150);
+    await sleep(BATCH_SLEEP_MS);
   }
 
   // Addresses aren't deduped while parsing the CSV, so the existing-keys Set
@@ -169,7 +190,7 @@ async function runRefresh(ctx: ActionCtx) {
     await ctx.runMutation(internal.smartMeterRegistry.insertAddressesBatch, {
       rows: newAddresses.slice(i, i + BATCH_SIZE),
     });
-    await sleep(150);
+    await sleep(BATCH_SLEEP_MS);
     const batch = Math.floor(i / BATCH_SIZE) + 1;
     if (batch % 25 === 0) {
       const pct = Math.round((batch / totalAddressBatches) * 100);
@@ -181,6 +202,8 @@ async function runRefresh(ctx: ActionCtx) {
 
   await ctx.runMutation(internal.smartMeterRegistry.upsertMeta, {
     lastRefreshedAt: Date.now(),
+    lastCheckedAt: Date.now(),
+    ...(currentETag !== null && { sourceETag: currentETag }),
   });
   console.log(`${ts()} Done.`);
 }
