@@ -19,6 +19,8 @@ export default defineConfig({
             "src/**/*.test.ts",
             "middleware.test.ts",
             "localeDevMiddleware.test.ts",
+            "renovate.test.ts",
+            "ci.test.ts",
           ],
           environment: "node",
         },

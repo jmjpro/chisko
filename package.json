@@ -1,7 +1,6 @@
 {
   "name": "ec2",
-  "private": true,
-  "version": "0.0.0",
+"version": "0.0.0",
   "type": "module",
   "scripts": {
     "agent:dev": "npm run dev 2>&1 | tee /tmp/chisko-dev-server.log",

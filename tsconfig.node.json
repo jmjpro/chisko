@@ -20,5 +20,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts", "vitest.config.ts", "playwright.config.ts", "e2e/**/*.ts", "scripts/**/*.ts", "middleware.ts", "middleware.test.ts", "localeDevMiddleware.ts", "localeDevMiddleware.test.ts", "extension/**/*.ts"]
+  "include": ["vite.config.ts", "vitest.config.ts", "playwright.config.ts", "e2e/**/*.ts", "scripts/**/*.ts", "middleware.ts", "middleware.test.ts", "localeDevMiddleware.ts", "localeDevMiddleware.test.ts", "renovate.test.ts", "ci.test.ts", "extension/**/*.ts"]
 }
