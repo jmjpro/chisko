@@ -43,6 +43,8 @@
   "fan_out_confirm": "Поделиться также с этими поставщиками",
   "fan_out_decline": "Нет, спасибо",
   "fan_out_confirmation": "Заявка отправлена — с вами свяжутся {{count}} поставщик(ов)",
+  "back_to_plans": "Вернуться к тарифам",
+  "back_to_wizard": "Вернуться к мастеру",
   "filter_plan_type_label": "Тип тарифа",
   "filter_supplier_label": "Поставщик",
   "sort_by_label": "Сортировать по",

@@ -43,6 +43,8 @@
   "fan_out_confirm": "שתפו גם עם הספקים האלה",
   "fan_out_decline": "לא, תודה",
   "fan_out_confirmation": "הפנייה נשלחה — {{count}} ספקים יצרו איתכם קשר",
+  "back_to_plans": "חזרה לתוכניות",
+  "back_to_wizard": "חזרה לאשף",
   "filter_plan_type_label": "סוג תוכנית",
   "filter_supplier_label": "ספק",
   "sort_by_label": "מיון לפי",

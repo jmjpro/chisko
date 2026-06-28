@@ -20,6 +20,7 @@ export interface LeaveDetailsDialogProps {
   supplierId: Id<"suppliers">;
   planVersionId: Id<"planVersions">;
   trigger: React.ReactElement;
+  backLabel?: string;
 }
 
 type FanOutItem = {
@@ -43,6 +44,7 @@ export default function LeaveDetailsDialog({
   supplierId,
   planVersionId,
   trigger,
+  backLabel,
 }: LeaveDetailsDialogProps) {
   const { t } = useTranslation("common");
   const convex = useConvex();
@@ -108,7 +110,7 @@ export default function LeaveDetailsDialog({
         excludeSupplierId: supplierId,
       });
       if (scope.length === 0) {
-        handleOpenChange(false);
+        setStep({ kind: "confirmation", count: 1 });
         return;
       }
       setChecked(
@@ -131,13 +133,13 @@ export default function LeaveDetailsDialog({
     if (fanOuts.length > 0) {
       await confirmSupplierFanOut({ leadId: step.leadId, fanOuts });
     }
-    setStep({ kind: "confirmation", count: fanOuts.length });
+    setStep({ kind: "confirmation", count: fanOuts.length + 1 });
   }
 
   return (
     <Dialog open={open} onOpenChange={(next) => handleOpenChange(next)}>
       <DialogTrigger render={trigger} />
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         {step.kind === "form" && (
           <form onSubmit={(e) => void handleSubmitStep1(e)}>
             <DialogHeader>
@@ -226,7 +228,7 @@ export default function LeaveDetailsDialog({
               ))}
             </ul>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => handleOpenChange(false)}>
+              <Button variant="ghost" onClick={() => setStep({ kind: "confirmation", count: 1 })}>
                 {t("fan_out_decline")}
               </Button>
               <Button onClick={() => void handleConfirmFanOut()}>
@@ -237,11 +239,18 @@ export default function LeaveDetailsDialog({
         )}
 
         {step.kind === "confirmation" && (
-          <DialogHeader>
-            <DialogTitle>
-              {t("fan_out_confirmation", { count: step.count })}
-            </DialogTitle>
-          </DialogHeader>
+          <>
+            <DialogHeader>
+              <DialogTitle>
+                {t("fan_out_confirmation", { count: step.count })}
+              </DialogTitle>
+            </DialogHeader>
+            <DialogFooter>
+              <Button onClick={() => handleOpenChange(false)}>
+                {backLabel ?? t("back_to_plans")}
+              </Button>
+            </DialogFooter>
+          </>
         )}
       </DialogContent>
     </Dialog>

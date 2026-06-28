@@ -212,11 +212,73 @@ describe("LeaveDetailsDialog", () => {
     );
 
     expect(
-      await screen.findByText('fan_out_confirmation|{"count":1}'),
+      await screen.findByText('fan_out_confirmation|{"count":2}'),
     ).toBeInTheDocument();
+    expect(screen.getByText("back_to_plans")).toBeInTheDocument();
   });
 
-  it("declining fan-out closes the dialog without creating any further referrals", async () => {
+  it("clicking the back button on the confirmation step closes the dialog", async () => {
+    const leadId = "lead1" as Id<"leads">;
+    mockSubmitLeadForm.mockResolvedValue({ leadId });
+    mockConfirmSupplierFanOut.mockResolvedValue([]);
+    mockConvexQuery.mockResolvedValue([
+      {
+        supplierId: otherSupplierId,
+        planVersionId: otherPlanVersionId,
+        supplierName: "Other Supplier",
+        logoFileName: "other.webp",
+      },
+    ]);
+
+    await openDialog();
+    await userEvent.type(screen.getByLabelText("lead_form_name_label"), "Yossi");
+    await userEvent.type(screen.getByLabelText("lead_form_phone_label"), "0501234567");
+    await userEvent.click(screen.getByText("lead_form_submit"));
+    await screen.findByText("fan_out_title");
+    await userEvent.click(screen.getByText("fan_out_confirm"));
+    await screen.findByText('fan_out_confirmation|{"count":2}');
+
+    await userEvent.click(screen.getByText("back_to_plans"));
+
+    await waitFor(() =>
+      expect(screen.queryByText('fan_out_confirmation|{"count":2}')).not.toBeInTheDocument(),
+    );
+  });
+
+  it("renders the backLabel prop instead of the default on the confirmation step", async () => {
+    mockSubmitLeadForm.mockResolvedValue({ leadId: "lead1" as Id<"leads"> });
+    mockConfirmSupplierFanOut.mockResolvedValue([]);
+    mockConvexQuery.mockResolvedValue([
+      {
+        supplierId: otherSupplierId,
+        planVersionId: otherPlanVersionId,
+        supplierName: "Other Supplier",
+        logoFileName: "other.webp",
+      },
+    ]);
+
+    render(
+      <LeaveDetailsDialog
+        sessionId={sessionId}
+        supplierId={supplierId}
+        planVersionId={planVersionId}
+        backLabel="back_to_wizard"
+        trigger={<button>cta_leave_details</button>}
+      />,
+    );
+    await userEvent.click(screen.getByText("cta_leave_details"));
+    await userEvent.type(screen.getByLabelText("lead_form_name_label"), "Yossi");
+    await userEvent.type(screen.getByLabelText("lead_form_phone_label"), "0501234567");
+    await userEvent.click(screen.getByText("lead_form_submit"));
+    await screen.findByText("fan_out_title");
+    await userEvent.click(screen.getByText("fan_out_confirm"));
+    await screen.findByText('fan_out_confirmation|{"count":2}');
+
+    expect(screen.getByText("back_to_wizard")).toBeInTheDocument();
+    expect(screen.queryByText("back_to_plans")).not.toBeInTheDocument();
+  });
+
+  it("declining fan-out shows confirmation for the primary supplier without creating additional referrals", async () => {
     mockSubmitLeadForm.mockResolvedValue({
       leadId: "lead1" as Id<"leads">,
       referralId: "referral1" as Id<"referrals">,
@@ -245,10 +307,12 @@ describe("LeaveDetailsDialog", () => {
     await userEvent.click(screen.getByText("fan_out_decline"));
 
     expect(mockConfirmSupplierFanOut).not.toHaveBeenCalled();
-    expect(screen.queryByText("fan_out_title")).not.toBeInTheDocument();
+    expect(
+      await screen.findByText('fan_out_confirmation|{"count":1}'),
+    ).toBeInTheDocument();
   });
 
-  it("closes automatically when the fan-out scope is empty", async () => {
+  it("shows confirmation for the primary supplier when the fan-out scope is empty", async () => {
     mockSubmitLeadForm.mockResolvedValue({
       leadId: "lead1" as Id<"leads">,
       referralId: "referral1" as Id<"referrals">,
@@ -266,9 +330,9 @@ describe("LeaveDetailsDialog", () => {
     );
     await userEvent.click(screen.getByText("lead_form_submit"));
 
-    await waitFor(() =>
-      expect(screen.queryByText("lead_form_title")).not.toBeInTheDocument(),
-    );
+    expect(
+      await screen.findByText('fan_out_confirmation|{"count":1}'),
+    ).toBeInTheDocument();
     expect(screen.queryByText("fan_out_title")).not.toBeInTheDocument();
   });
 
@@ -331,13 +395,13 @@ describe("LeaveDetailsDialog", () => {
     await userEvent.click(screen.getByText("lead_form_submit"));
     await screen.findByText("fan_out_title");
     await userEvent.click(screen.getByText("fan_out_confirm"));
-    await screen.findByText('fan_out_confirmation|{"count":1}');
+    await screen.findByText('fan_out_confirmation|{"count":2}');
 
     // Close (e.g. via Escape) and reopen on the same trigger.
     await userEvent.keyboard("{Escape}");
     await waitFor(() =>
       expect(
-        screen.queryByText('fan_out_confirmation|{"count":1}'),
+        screen.queryByText('fan_out_confirmation|{"count":2}'),
       ).not.toBeInTheDocument(),
     );
     await userEvent.click(screen.getByText("cta_leave_details"));
