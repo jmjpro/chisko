@@ -5,24 +5,32 @@ import { isConvexCloudEnabled } from "./lib/convexCloud";
 
 export const STALENESS_THRESHOLD_MS = 10 * 60 * 1000;
 export const MAX_ATTEMPTS = 3;
+export const MAX_BATCH_SIZE = 10;
 
 export const claimBatch = internalMutation({
-  args: {},
-  handler: async (ctx) => {
+  args: { limit: v.number() },
+  handler: async (ctx, { limit }) => {
     const now = Date.now();
 
     const open = await ctx.db
       .query("formSubmissionDeliveries")
       .withIndex("by_state", (q) => q.eq("state", "open"))
-      .collect();
+      .take(limit);
 
-    const stuck = await ctx.db
-      .query("formSubmissionDeliveries")
-      .withIndex("by_state", (q) => q.eq("state", "processing"))
-      .collect();
-    const stale = stuck.filter(
-      (d) => now - d.processingStartedAt! >= STALENESS_THRESHOLD_MS,
-    );
+    const remaining = limit - open.length;
+    const stale =
+      remaining > 0
+        ? (
+            await ctx.db
+              .query("formSubmissionDeliveries")
+              .withIndex("by_state", (q) => q.eq("state", "processing"))
+              .collect()
+          )
+            .filter(
+              (d) => now - d.processingStartedAt! >= STALENESS_THRESHOLD_MS,
+            )
+            .slice(0, remaining)
+        : [];
 
     const claimed = [];
     for (const delivery of [...open, ...stale]) {
@@ -90,22 +98,30 @@ export const runBatch = internalAction({
 
     const claimed = await ctx.runMutation(
       internal.formSubmissionDeliveries.claimBatch,
-      {},
+      { limit: MAX_BATCH_SIZE },
     );
-    for (const { deliveryId, referralId } of claimed) {
-      try {
-        await ctx.runAction(internal.email.sendDeliveryNotification, {
-          referralId,
-        });
-        await ctx.runMutation(internal.formSubmissionDeliveries.markDelivered, {
-          deliveryId,
-        });
-      } catch (err) {
-        await ctx.runMutation(internal.formSubmissionDeliveries.markFailed, {
-          deliveryId,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      }
-    }
+    await Promise.allSettled(
+      claimed.map(({ deliveryId, referralId }) =>
+        (async () => {
+          try {
+            await ctx.runAction(internal.email.sendDeliveryNotification, {
+              referralId,
+            });
+            await ctx.runMutation(
+              internal.formSubmissionDeliveries.markDelivered,
+              { deliveryId },
+            );
+          } catch (err) {
+            await ctx.runMutation(
+              internal.formSubmissionDeliveries.markFailed,
+              {
+                deliveryId,
+                error: err instanceof Error ? err.message : String(err),
+              },
+            );
+          }
+        })(),
+      ),
+    );
   },
 });
