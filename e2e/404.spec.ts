@@ -61,7 +61,7 @@ test.describe("404 page — regression guard", () => {
     page,
   }) => {
     await page.goto("/en/plans");
-    await expect(page.locator("table")).toBeVisible();
+    await expect(page.locator('[role="table"]')).toBeVisible();
     await expect(page).not.toHaveTitle("Chisko — Page not found");
   });
 });
