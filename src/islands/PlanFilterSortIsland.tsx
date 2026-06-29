@@ -238,13 +238,17 @@ export default function PlanFilterSortIsland({
                     value="discount"
                     className="flex cursor-default select-none items-center px-3 py-2 text-sm outline-none data-[highlighted]:bg-muted"
                   >
-                    <Select.ItemText>{t("sort_option_discount")}</Select.ItemText>
+                    <Select.ItemText>
+                      {t("sort_option_discount")}
+                    </Select.ItemText>
                   </Select.Item>
                   <Select.Item
                     value="supplier"
                     className="flex cursor-default select-none items-center px-3 py-2 text-sm outline-none data-[highlighted]:bg-muted"
                   >
-                    <Select.ItemText>{t("sort_option_supplier")}</Select.ItemText>
+                    <Select.ItemText>
+                      {t("sort_option_supplier")}
+                    </Select.ItemText>
                   </Select.Item>
                   <Select.Item
                     value="type"
