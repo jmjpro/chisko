@@ -150,13 +150,16 @@ describe("PlanFilterSortIsland", () => {
     expect(logo).toHaveAttribute("height", "32");
   });
 
-  it("renders a mobile sort-by select listing discount, supplier, and plan type", () => {
+  it("renders a mobile sort-by Select trigger showing the label prefix and the default selected field, with options accessible after opening", async () => {
     render(
       <PlanFilterSortIsland locale="en" filterOptions={baseFilterOptions()} />,
     );
 
-    const select = screen.getByLabelText("sort_by_label");
-    expect(select).toBeInTheDocument();
+    const trigger = screen.getByRole("combobox");
+    expect(trigger).toHaveTextContent("sort_by_label");
+    expect(trigger).toHaveTextContent("sort_option_discount");
+
+    await userEvent.click(trigger);
     expect(
       screen.getByRole("option", { name: "sort_option_discount" }),
     ).toBeInTheDocument();
@@ -218,15 +221,15 @@ describe("PlanFilterSortIsland", () => {
     ).not.toHaveClass("hidden");
   });
 
-  it("selecting Plan Type from the mobile sort-by select reorders the rows using the canonical Fixed/Day/Night order", async () => {
+  it("selecting Plan Type from the mobile sort-by Select reorders the rows using the canonical Fixed/Day/Night order", async () => {
     mountSortFixtures();
     render(
       <PlanFilterSortIsland locale="en" filterOptions={baseFilterOptions()} />,
     );
 
-    await userEvent.selectOptions(
-      screen.getByLabelText("sort_by_label"),
-      "type",
+    await userEvent.click(screen.getByRole("combobox"));
+    await userEvent.click(
+      screen.getByRole("option", { name: "sort_option_type" }),
     );
 
     expect(rowIdsOf("plan-rows")).toEqual(["fixed", "day", "night"]);

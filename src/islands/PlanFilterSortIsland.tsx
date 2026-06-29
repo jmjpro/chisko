@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Select } from "@base-ui/react/select";
+import { ChevronDown } from "lucide-react";
 import { MultiSelectMenu } from "../components/ui/multiSelectMenu";
 import i18n from "../i18n";
 
@@ -195,7 +197,7 @@ export default function PlanFilterSortIsland({
   }));
 
   return (
-    <div className="flex flex-col gap-4 mb-6">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <MultiSelectMenu
           label={t("filter_plan_type_label")}
@@ -216,20 +218,50 @@ export default function PlanFilterSortIsland({
           })}
         </p>
       </div>
-      <label className="md:hidden flex items-center gap-2 text-sm">
-        {t("sort_by_label")}
-        <select
+      <div className="md:hidden">
+        <Select.Root
           value={sort.field}
-          onChange={(event) => {
-            const field = event.target.value as SortField;
-            setSort({ field, direction: DEFAULT_DIRECTION[field] });
-          }}
+          onValueChange={(field: SortField) =>
+            setSort({ field, direction: DEFAULT_DIRECTION[field] })
+          }
         >
-          <option value="discount">{t("sort_option_discount")}</option>
-          <option value="supplier">{t("sort_option_supplier")}</option>
-          <option value="type">{t("sort_option_type")}</option>
-        </select>
-      </label>
+          <Select.Trigger className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-input rounded-md bg-background hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30">
+            <span className="font-semibold">{t("sort_by_label")}</span>
+            <span>{t(`sort_option_${sort.field}`)}</span>
+            <ChevronDown className="size-3.5 text-muted-foreground" />
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Positioner sideOffset={4} align="start">
+              <Select.Popup className="z-50 min-w-[160px] rounded-md border border-border bg-background py-1 shadow-md outline-none">
+                <Select.List>
+                  <Select.Item
+                    value="discount"
+                    className="flex cursor-default select-none items-center px-3 py-2 text-sm outline-none data-[highlighted]:bg-muted"
+                  >
+                    <Select.ItemText>
+                      {t("sort_option_discount")}
+                    </Select.ItemText>
+                  </Select.Item>
+                  <Select.Item
+                    value="supplier"
+                    className="flex cursor-default select-none items-center px-3 py-2 text-sm outline-none data-[highlighted]:bg-muted"
+                  >
+                    <Select.ItemText>
+                      {t("sort_option_supplier")}
+                    </Select.ItemText>
+                  </Select.Item>
+                  <Select.Item
+                    value="type"
+                    className="flex cursor-default select-none items-center px-3 py-2 text-sm outline-none data-[highlighted]:bg-muted"
+                  >
+                    <Select.ItemText>{t("sort_option_type")}</Select.ItemText>
+                  </Select.Item>
+                </Select.List>
+              </Select.Popup>
+            </Select.Positioner>
+          </Select.Portal>
+        </Select.Root>
+      </div>
       {isEmpty && (
         <div className="flex flex-col items-start gap-2 text-sm text-gray-600">
           <p>{t("filter_empty_state_message")}</p>

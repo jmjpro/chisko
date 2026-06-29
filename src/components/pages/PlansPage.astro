@@ -41,11 +41,13 @@ const filterOptions = buildFilterOptions(rows, common);
 >
   <main class="flex-1 px-6 py-8 overflow-x-auto">
     <h1 class="text-2xl font-bold mb-6">{common.plans_page_title}</h1>
-    <PlanFilterSortIsland
-      client:only="react"
-      locale={locale}
-      filterOptions={filterOptions}
-    />
+    <div class="min-h-[84px] md:min-h-[34px] mb-6">
+      <PlanFilterSortIsland
+        client:only="react"
+        locale={locale}
+        filterOptions={filterOptions}
+      />
+    </div>
     <div role="table" class="plan-table text-sm">
       <div role="row" class="plan-header-row border-b text-start font-semibold">
         <div role="columnheader" class="cell-supplier pb-2 pe-6" aria-sort="none">
