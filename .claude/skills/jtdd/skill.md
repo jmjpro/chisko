@@ -44,3 +44,13 @@ Run the full red-green-refactor loop per the tdd skill instructions. When all te
 Ask: `TDD complete. Advance label ready-for-agent → ready-for-human? [y/n]`
 
 If yes, call `save_issue` **once** with `labels` set to the issue's current labels (from Step 1) with `ready-for-agent` removed and `ready-for-human` added.
+
+## Step 4 — Optional dev server
+
+Ask: `Run npm run dev:client-only? [y/n]`
+
+If yes, start `npm run dev:client-only` in the worktree directory (background or foreground per context). Then print:
+
+> Local dev server: http://localhost:4321
+
+(Astro's default port is 4321; if the output shows a different port, use that instead.)
